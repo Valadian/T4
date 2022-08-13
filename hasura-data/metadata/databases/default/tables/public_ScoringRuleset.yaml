@@ -1,0 +1,15 @@
+table:
+  name: ScoringRuleset
+  schema: public
+object_relationships:
+  - name: Game
+    using:
+      foreign_key_constraint_on: game
+array_relationships:
+  - name: Tournaments
+    using:
+      foreign_key_constraint_on:
+        column: scoring_ruleset_id
+        table:
+          name: Tournament
+          schema: public
