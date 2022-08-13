@@ -1,0 +1,10 @@
+table:
+  name: PlayerListEntity
+  schema: public
+object_relationships:
+  - name: Entity
+    using:
+      foreign_key_constraint_on: entity_id
+  - name: PlayerList
+    using:
+      foreign_key_constraint_on: player_list_id

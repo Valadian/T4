@@ -11,3 +11,8 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.tournament-link {
+  font-weight: bold;
+  text-decoration: none;
+}

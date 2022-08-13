@@ -5,14 +5,19 @@ class TournamentSummary extends React.Component {
         return (
             <div className="row">
                 <div className="row">
-                    <a href={"/event/"+this.props.data.name}>{this.props.data.name}</a>
+                    <a className="tournament-link" href={"/event/"+this.props.data.name}>{this.props.data.name}</a>
                 </div>
-                <div className="row">
-                    <div className="col-6-md">
-                        <span>{this.props.data.start}</span>
+                <div className="row text-muted small">
+                    <div className="col-md-6 d-flex gap-3">
+                        <span><i className="bi bi-calendar3"></i> {this.props.data.start}</span>
+                        <span><i className="bi bi-people-fill"></i> {this.props.data.Ladder_aggregate.aggregate.count}</span>
+                        {this.props.data.Game &&
+                        <span><i className="bi bi-trophy-fill"></i> {this.props.data.Game.value} </span>
+                        }
                     </div>
-                    <div className="col-6-md">
-                        <span>{this.props.data.location}</span>
+                    <div className="col-md-6 d-flex gap-3">
+                        <span><i className="bi bi-globe"></i> {this.props.data.location}</span>
+                        <span><i class="bi bi-person-fill"></i> {this.props.data.Creator.name}</span>
                     </div>
                 </div>
             </div>

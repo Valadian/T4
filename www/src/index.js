@@ -1,5 +1,6 @@
-import 'bootstrap-dark-5/dist/css/bootstrap-dark.min.css';
 import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-dark-5/dist/css/bootstrap-dark.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';

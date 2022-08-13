@@ -42,7 +42,7 @@ async function fetchGraphQL(operationsDoc, operationName, variables) {
 
 const operationsDoc = `
   query AllTournaments {
-    Tournament {
+    Tournament(order_by: {start: desc}) {
       id
       name
       location
@@ -79,7 +79,7 @@ async function startFetchMyQuery(obj) {
   }
 
   // do something great with this precious data
-//   console.log(data);
+  console.log(data);
   obj.setState({tournaments:data.Tournament})
 }
 

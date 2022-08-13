@@ -1,0 +1,18 @@
+table:
+  name: Entity
+  schema: public
+array_relationships:
+  - name: PlayerListEntities
+    using:
+      foreign_key_constraint_on:
+        column: entity_id
+        table:
+          name: PlayerListEntity
+          schema: public
+  - name: Upgrades
+    using:
+      foreign_key_constraint_on:
+        column: entity_id
+        table:
+          name: EntityUpgrade
+          schema: public
