@@ -14,14 +14,23 @@ To spin up your local dev instance of T4:
 
    - `docker-compose up -d`
 
-5. Either create a Postgres DB or message Ardaedhel for access to his Heroku dev DB.
+5. Install Hasura CLI
 
-   - If you're creating a new DB from scratch, use the SQL in ./T4/www/migrations/default/1660374352905_init/up.sql to create the requisite tables.
+   - `npm install --global hasura-cli`
 
-6. Connect Hasura to the DB that you're using:
+   Full instructions are here: https://hasura.io/docs/latest/hasura-cli/install-hasura-cli/
 
-   - Navigate to Hasura at http://localhost:8080/
-   - Data tab > "Manage" in the left pane, and follow prompts to finish setup.
+6. Apply Initial Migation
+
+   - `cd www/hasura-data`
+   - `hasura deploy --endpoint http://localhost:8080`
+
+7. Apply Seed
+
+   - `cd www/hasura-data`
+   - `hasura seed apply --file 1661564742301_GameSeed.sql`
+   - `hasura seed apply --file 1661564794900_UserSeed.sql`
+   - `hasura seed apply --file 1661564773764_TournamentSeed.sql`
 
 7. Start the dev server from ./T4/www/:
    - `npm start`
