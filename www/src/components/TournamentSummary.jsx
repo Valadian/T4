@@ -17,7 +17,7 @@ class TournamentSummary extends React.Component {
                     </div>
                     <div className="col-md-6 d-flex gap-3">
                         <span><i className="bi bi-globe"></i> {this.props.data.location}</span>
-                        <span><i class="bi bi-person-fill"></i> {this.props.data.Creator.name}</span>
+                        <span><i className="bi bi-person-fill"></i> {this.props.data.Creator.name}</span>
                     </div>
                 </div>
             </div>

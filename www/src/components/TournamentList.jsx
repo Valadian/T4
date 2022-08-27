@@ -31,7 +31,6 @@ class TournamentList extends React.Component {
     componentDidMount() {
         this.setState({query:[]});
         Query("AllTournaments", operationsDoc).then((data)=> this.setState({query:data.Tournament}));
-        // startFetchMyQuery(this); 
       }
     render() {
         if(this.state){

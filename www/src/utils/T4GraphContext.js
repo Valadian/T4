@@ -1,11 +1,11 @@
-function Query(operationName, operationDoc) {
+function Query(operationName, operationDoc,variables) {
     return fetch(
         "http://localhost:8080/v1/graphql",
         {
             method: "POST",
             body: JSON.stringify({
                 query: operationDoc,
-                variables: {},
+                variables: variables??{},
                 operationName: operationName
             })
         }
