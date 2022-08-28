@@ -16,3 +16,10 @@ code {
   font-weight: bold;
   text-decoration: none;
 }
+input:disabled {
+  color: #333;
+  border-color: #333;
+}
+input.form-control {
+  background-color: #181818;
+}

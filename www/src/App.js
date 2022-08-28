@@ -1,5 +1,4 @@
 import './App.css';
-import ReactDOM from "react-dom";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout";
 import Home from "./pages/Home";
@@ -18,6 +17,7 @@ function App() {
           <Route path="events" element={<Events />} />
           <Route path="players" element={<Players />} />
           <Route path="players/:id" element={<PlayerEditor />} />
+          <Route path="players/add" element={<PlayerEditor />} />
           <Route path="search" element={<Search />} />
           <Route path="*" element={<NoPage />} />
         </Route>

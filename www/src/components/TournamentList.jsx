@@ -1,6 +1,6 @@
 import React from "react";
 import TournamentSummary from "./TournamentSummary";
-import Query from "../utils/T4GraphContext"
+import Query from "../data/T4GraphContext"
 
 const operationsDoc = `
   query AllTournaments {
@@ -25,18 +25,18 @@ const operationsDoc = `
 `;
 
 class TournamentList extends React.Component {
-    constructor(props) {
-        super(props);
-    }
+    // constructor(props) {
+    //     super(props);
+    // }
     componentDidMount() {
-        this.setState({query:[]});
-        Query("AllTournaments", operationsDoc).then((data)=> this.setState({query:data.Tournament}));
+        Query("AllTournaments", operationsDoc)
+        .then((data)=> this.setState({values:data.Tournament}));
       }
     render() {
-        if(this.state){
+        if(this.state && this.state.values){
             return (
                 <>
-                {this.state.query.map((tourn) => <TournamentSummary key={tourn.id} data={tourn} />)}
+                {this.state.values.map((tourn) => <TournamentSummary key={tourn.id} data={tourn} />)}
                 </>
             )
         } else {
