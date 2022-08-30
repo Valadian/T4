@@ -125,3 +125,51 @@
   .col-xxl-11 { flex: 0 0 91% !important; max-width: 91% !important; }
   .col-xxl-12 { flex: 0 0 100% !important; max-width: 100% !important; }
 }
+
+button:disabled {
+  cursor: not-allowed;
+  pointer-events: all !important;
+}
+span.react-datepicker__navigation-icon::before {
+  top: 12px;
+}
+button.react-datepicker__close-icon::after{
+  background-color: #e74c3c;
+  font-weight: bolder;
+}
+.react-select__contrl:active {
+  background-color: #222 !important;
+}
+.react-select__control {
+  background-color: #181818 !important;
+  border: 1px solid #515151 !important;
+  color: #b1b1b1;
+  box-shadow:none !important;
+}
+.react-select__control:hover{
+  background-color: transparent !important;
+  border: 1px solid #ffffffA0 !important;
+}
+.react-select__menu {
+  background-color: #181818 !important;
+  color: #b1b1b1;
+
+}
+.react-select__single-value {
+  color: #b1b1b1 !important;
+}
+.react-select__option:hover,
+.react-select__option:focus,
+.react-select__option:active{
+  background-color: #222 !important;
+}
+/* .react-select__value-container,
+.react-select__input-container,
+.css-1s2u09g-control,
+.css-1pahdxg-control:hover{
+  background-color: transparent !important;
+} */
+/* .css-1pahdxg-control:hover{
+  background-color: transparent !important;
+  border: 1px solid #515151 !important;
+} */

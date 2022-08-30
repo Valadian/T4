@@ -1,6 +1,6 @@
 import React from "react";
 import TournamentSummary from "./TournamentSummary";
-import Query from "../data/T4GraphContext"
+import Query from "../../data/T4GraphContext"
 
 const operationsDoc = `
   query AllTournaments {
@@ -18,6 +18,7 @@ const operationsDoc = `
         value
       }
       Creator {
+        id
         name
       }
     }

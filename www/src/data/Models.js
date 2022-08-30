@@ -18,6 +18,6 @@ export class Tournament {
         count:0
         }
     }
-    Game = Game()
-    Creator = User()
+    Game = new Game()
+    Creator = new User()
 }

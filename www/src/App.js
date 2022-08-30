@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Events from "./pages/Events";
 import Players from "./pages/Players";
 import PlayerEditor from "./pages/players/PlayerEditor";
+import TournamentEditor from "./pages/tournaments/TournamentEditor";
 import Search from "./pages/Search";
 import NoPage from "./pages/NoPage";
 
@@ -15,6 +16,8 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="events" element={<Events />} />
+          <Route path="events/:name" element={<TournamentEditor />} />
+          <Route path="events/:name" element={<TournamentEditor />} />
           <Route path="players" element={<Players />} />
           <Route path="players/:id" element={<PlayerEditor />} />
           <Route path="players/add" element={<PlayerEditor />} />

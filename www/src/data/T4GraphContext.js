@@ -12,6 +12,10 @@ function Query(operationName, operationDoc,variables) {
     )
     .then((response) => response.json())
     .then((json) => {
+        if(json.errors && json.errors.length>0){
+            console.error(json.errors);
+            throw new Error("Graphql query has error, see console")
+        }
         console.log(json.data);
         return Promise.resolve(json.data)
     })

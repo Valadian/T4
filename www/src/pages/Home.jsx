@@ -1,5 +1,5 @@
 import React from 'react';
-import TournamentList from '../components/TournamentList';
+import TournamentList from '../components/tournaments/TournamentList';
 
 function Home() {
     return (
