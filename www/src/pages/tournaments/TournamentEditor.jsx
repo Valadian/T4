@@ -82,6 +82,34 @@ mutation UpdateTournament($name: String = "", $location: String = "", $start: da
   }
 }  
 `
+const insertDoc = `
+mutation InsertTournament($name: String = "", $location: String = "", $start: date = null, $game: Game_enum  = "", $scoring_ruleset_id: uuid = null, $creator_id: uuid = null) {
+  insert_Tournament(objects: {name: $name, location: $location, start: $start, game: $game, scoring_ruleset_id: $scoring_ruleset_id, creator_id: $creator_id}) {
+    returning {
+      id
+      name
+      location
+      start
+      Ladder_aggregate {
+        aggregate {
+          count
+        }
+      }
+      Game {
+        key
+        value
+      }
+      Creator {
+        name
+      }
+      ScoringRuleset {
+        id
+        name
+      }
+    }
+  }
+}  
+`
 class TournamentEditor extends React.Component {
     constructor(props) {
         super(props);
@@ -128,30 +156,49 @@ class TournamentEditor extends React.Component {
         })
     }
     loadScoringRulesets(game){
-      Query("ScoringByGame", allScoringDoc, {gameKey:game})
-        .then((data)=> {
-          if(data && data.ScoringRuleset && data.ScoringRuleset.length>0){
-            this.setState({scoringOptions:data.ScoringRuleset.map(g => {return {value:g.id, label:g.name}})})
-          }
-        })
+      if(game){
+        Query("ScoringByGame", allScoringDoc, {gameKey:game})
+          .then((data)=> {
+            if(data && data.ScoringRuleset && data.ScoringRuleset.length>0){
+              this.setState({scoringOptions:data.ScoringRuleset.map(g => {return {value:g.id, label:g.name}})})
+            }
+          })
+      }
     }
     save(){
-      
-      Query("UpdateTournament", updateDoc, {
-        name: this.state.value.name, 
-        location: this.state.value.location, 
-        start: new Date(this.state.value.start).toISOString(), 
-        game: this.state.value.Game?.key, 
-        scoring_ruleset_id: this.state.value.ScoringRuleset?.id, 
-        creator_id: this.state.value.Creator?.id, 
-        id: this.state.value.id})
-      .then((data) => {
-          const node = this.alertRef.current;
-          // node.classList.add('show');
-          new Collapse(node)
-          // setTimeout(() => node.classList.remove('show'), 2000);
-          setTimeout(() => new Collapse(node), 2000);
-      });
+      if(this.state.value.id){
+        Query("UpdateTournament", updateDoc, {
+          name: this.state.value.name, 
+          location: this.state.value.location, 
+          start: new Date(this.state.value.start).toISOString(), 
+          game: this.state.value.Game?.key, 
+          scoring_ruleset_id: this.state.value.ScoringRuleset?.id, 
+          creator_id: this.state.value.Creator?.id, 
+          id: this.state.value.id})
+        .then((data) => {
+            const node = this.alertRef.current;
+            // node.classList.add('show');
+            new Collapse(node)
+            // setTimeout(() => node.classList.remove('show'), 2000);
+            setTimeout(() => new Collapse(node), 2000);
+        });
+      } else {
+        Query("InsertTournament", insertDoc, {
+          name: this.state.value.name, 
+          location: this.state.value.location, 
+          start: new Date(this.state.value.start).toISOString(), 
+          game: this.state.value.Game?.key, 
+          scoring_ruleset_id: this.state.value.ScoringRuleset?.id, 
+          creator_id: this.state.value.Creator?.id}) //TODO: Get logged in user
+        .then((data) => {
+            const node = this.alertRef.current;
+            // node.classList.add('show');
+            new Collapse(node)
+            // setTimeout(() => node.classList.remove('show'), 2000);
+            setTimeout(() => new Collapse(node), 2000);
+        });
+        
+      }
     }
     breadcrumbs() {
         return (
@@ -176,7 +223,7 @@ class TournamentEditor extends React.Component {
               </div> */}
               <div className="mb-3">
                   <label htmlFor="nameInput" className="form-label">Name</label>
-                  <input type="text" id="nameInput" className="form-control" placeholder="Name" value={this.state.value.name || ''} onChange={(e) => this.setState({name: e.target.value})} />
+                  <input type="text" id="nameInput" className="form-control" placeholder="Name" value={this.state.value.name || ''} onChange={(e) => this.setValue({name: e.target.value})} />
               </div>
               <div className="mb-3">
                   <label htmlFor="dateInput" className="form-label">Date</label>
