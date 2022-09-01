@@ -5,7 +5,13 @@ export class User {
 }
 
 export class Game {
+    key = ""
     value = ""
+}
+
+export class ScoringRuleset {
+    if = null
+    name = ""
 }
 
 export class Tournament {
@@ -20,4 +26,5 @@ export class Tournament {
     }
     Game = new Game()
     Creator = new User()
+    ScoringRuleset = new ScoringRuleset()
 }

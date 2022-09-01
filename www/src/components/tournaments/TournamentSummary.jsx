@@ -1,12 +1,13 @@
 import React from "react";
 import PlayerLink from "../players/PlayerLink";
+import { Link } from 'react-router-dom';
 
 class TournamentSummary extends React.Component {
     render () {
         return (
             <div className="row">
                 <div className="row">
-                    <a className="tournament-link" href={"/events/"+this.props.data.name}>{this.props.data.name}</a>
+                    <Link to={"/events/"+this.props.data.name} className="tournament-link">{this.props.data.name}</Link>
                 </div>
                 <div className="row text-muted small">
                     <div className="col-12 col-lg-6 d-flex row">
