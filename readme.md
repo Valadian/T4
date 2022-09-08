@@ -20,19 +20,15 @@ To spin up your local dev instance of T4:
 
    Full instructions are here: https://hasura.io/docs/latest/hasura-cli/install-hasura-cli/
 
-6. Apply Initial Migation
+6. Apply Seed data to database
 
-   - `cd www/hasura-data`
-   - `hasura deploy --endpoint http://localhost:8080`
-
-7. Apply Seed
-
-   - `cd www/hasura-data`
-   - `hasura seed apply --file 1661564742301_GameSeed.sql`
-   - `hasura seed apply --file 1661564794900_UserSeed.sql`
-   - `hasura seed apply --file 1661564773764_TournamentSeed.sql`
+   - `./plant_seeds.sh` or `./plant_seeds.ps1`, as applicable
 
 7. Start the dev server from ./T4/www/:
    - `npm start`
 
-At this point the page should render in whatever browser you have open, at http://localhost:3000/. There will be no seed data in your DB if you created one from scratch, so you'll need to go into Hasura (http://localhost:8080/) to manually input some. I found the interface pretty intuitive, so exerciseforthereader.png. Once you've created a Tournament entry (which requires a few rows in other tables too), the details will show up on the page.
+At this point the page should render in whatever browser you have open, at http://localhost:3000/. 
+
+To access the Hasura GraphQL engine console, from a terminal at ./T4/www/hasura-data:
+   - `hasura console`
+   This will spin up a console and open it in a tab in your browser.  From here you can interact with the GraphQL engine and the data.
