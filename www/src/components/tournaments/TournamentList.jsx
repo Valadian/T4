@@ -1,14 +1,10 @@
 import React from "react";
 import TournamentSummary from "./TournamentSummary";
 import Query from "../../data/T4GraphContext";
-import LocationDropdown from "./LocationDropdown";
-
-// Filter by Game, Country, City, date
-// v---- doesn't work yet -----v
 
 const tournamentOperationsDoc = `
-  query AllTournaments($locationWhereExpr: Tournament_bool_exp ) {
-    Tournament(where: $locationWhereExpr) {
+  query AllTournaments($whereExpr: Tournament_bool_exp ) {
+    Tournament(where: $whereExpr) {
       id
       name
       location
@@ -27,28 +23,62 @@ const tournamentOperationsDoc = `
       }
     }
   }
-`
+`;
 
 class TournamentList extends React.Component {
-  // constructor(props) {
-  //     super(props);
-  // }
-  componentDidMount() {
-    Query("AllTournaments", tournamentOperationsDoc).then((data) =>
-      this.setState({ values: data.Tournament })
-    );
+  constructor(props) {
+    super(props);
   }
+
+  componentDidMount() {
+    this.performQuery();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.filter !== prevProps.filter) {
+      this.performQuery();
+    }
+  }
+
+  performQuery() {
+    let where_expression;
+    if (this.props.filter) {
+      if (this.props.filter["location"] == null) {
+        where_expression = {
+          location: {},
+          start: {
+            _gt: this.props.filter["earliest"],
+            _lt: this.props.filter["latest"],
+          },
+        };
+      } else {
+        where_expression = {
+          location: { _eq: this.props.filter["location"] },
+          start: {
+            _gt: this.props.filter["earliest"],
+            _lt: this.props.filter["latest"],
+          },
+        };
+      }
+
+      Query("AllTournaments", tournamentOperationsDoc, {
+        whereExpr: where_expression,
+      }).then((data) => this.setState({ values: data.Tournament }));
+    } else {
+      Query("AllTournaments", tournamentOperationsDoc, {
+        whereExpr: null,
+      }).then((data) => this.setState({ values: data.Tournament }));
+    }
+  }
+
   render() {
     if (this.state && this.state.values) {
       return (
-        <>
-          <div>
-            <LocationDropdown />
-          </div>
+        <div>
           {this.state.values.map((tourn) => (
             <TournamentSummary key={tourn.id} data={tourn} />
           ))}
-        </>
+        </div>
       );
     } else {
       return <div>Loading...</div>;
