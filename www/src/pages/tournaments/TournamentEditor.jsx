@@ -10,8 +10,8 @@ function withParams(Component) {
     return props => <Component {...props} params={useParams()} />;
 }
 const operationsDoc = `
-  query TournamentByName($name: String) {
-    Tournament(order_by: {start: desc}, where: {name: {_eq: $name}}) {
+  query TournamentById($id: uuid) {
+    Tournament(order_by: {start: desc}, where: {id: {_eq: $id}}) {
       id
       name
       location
@@ -44,9 +44,9 @@ class TournamentEditor extends React.Component {
         super(props);
     }
     componentDidMount() {
-        const name = this.props.params.name;
+        const id = this.props.params.id;
         this.setState({gameOptions:[]})
-        Query("TournamentByName", operationsDoc, {name:name})
+        Query("TournamentById", operationsDoc, {id:id})
         .then((data)=> {
             var value = null
             if(data && data.Tournament && data.Tournament.length>0){

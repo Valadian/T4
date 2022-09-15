@@ -8,7 +8,7 @@ class TournamentSummary extends React.Component {
         <div className="row">
           <a
             className="tournament-link"
-            href={"/events/" + this.props.data.name}
+            href={"/events/" + this.props.data.id}
           >
             {this.props.data.name}
           </a>

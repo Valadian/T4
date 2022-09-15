@@ -16,8 +16,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="events" element={<Events />} />
-          <Route path="events/:name" element={<TournamentEditor />} />
-          <Route path="events/:name" element={<TournamentEditor />} />
+          <Route path="events/:id" element={<TournamentEditor />} />
           <Route path="players" element={<Players />} />
           <Route path="players/:id" element={<PlayerEditor />} />
           <Route path="players/add" element={<PlayerEditor />} />
