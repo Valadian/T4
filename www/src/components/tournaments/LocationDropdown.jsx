@@ -33,7 +33,7 @@ class LocationDropdown extends React.Component {
         >
           <Dropdown.Item eventKey={null}>Any Location</Dropdown.Item>
           {this.state.values.map((tourn) => (
-            <Dropdown.Item eventKey={tourn.location}>
+            <Dropdown.Item key={tourn.location} eventKey={tourn.location}>
               {tourn.location}
             </Dropdown.Item>
           ))}
