@@ -12,6 +12,7 @@ export class Tournament {
     id = null
     name = ""
     location = ""
+    description = ""
     start = Date.now()
     Ladder_aggregate = {
         aggregate: {
