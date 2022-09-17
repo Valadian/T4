@@ -2,9 +2,7 @@ import React from "react";
 import { Link, useParams } from "react-router-dom";
 import Query from "../../data/T4GraphContext";
 import { Tournament } from "../../data/Models";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import Select from "react-select";
 import TournamentHeader from "../../components/tournaments/TournamentHeader";
 import TournamentControlPanel from "../../components/tournaments/TournamentControlPanel";
 
@@ -87,7 +85,7 @@ class TournamentHome extends React.Component {
           <>
             {this.breadcrumbs()}
             {/*eventually I'd like to make an interactive variant of this and present it to the TO as a quick way of editing an event.*/}
-            <TournamentHeader tournament={this.state.value} />{" "}
+            <TournamentHeader tournament={this.state.value} />
             <TournamentControlPanel tournament={this.state.value} />
           </>
         );
@@ -100,7 +98,22 @@ class TournamentHome extends React.Component {
         );
       }
     } else {
-      return <div>Bananas</div>;
+      if (this.state && this.state.value) {
+        return (
+          <>
+            {this.breadcrumbs()}
+            {/*eventually I'd like to make an interactive variant of this and present it to the TO as a quick way of editing an event.*/}
+            <TournamentHeader tournament={this.state.value} />{" "}
+          </>
+        );
+      } else {
+        return (
+          <>
+            {this.breadcrumbs()}
+            <div>Loading...</div>
+          </>
+        );
+      }
     }
   }
 }
