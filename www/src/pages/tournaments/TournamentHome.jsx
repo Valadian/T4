@@ -102,7 +102,6 @@ class TournamentHome extends React.Component {
         return (
           <>
             {this.breadcrumbs()}
-            {/*eventually I'd like to make an interactive variant of this and present it to the TO as a quick way of editing an event.*/}
             <TournamentHeader tournament={this.state.value} />{" "}
           </>
         );

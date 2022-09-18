@@ -7,7 +7,10 @@ import TournamentPlayerEditor from "./TournamentPlayerEditor";
 class TournamentControlPanel extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { showTournamentPlayerEditor: false };
+    this.state = {
+      showTournamentPlayerEditor: false,
+      showTournamentEditor: false,
+    };
   }
 
   handleAddPlayerClick() {
@@ -15,6 +18,14 @@ class TournamentControlPanel extends React.Component {
   }
 
   handleAddPlayerClose() {
+    this.setState({ showTournamentPlayerEditor: false });
+  }
+
+  handleEditEventClick() {
+    this.setState({ showTournamentPlayerEditor: true });
+  }
+
+  handleEditEventClose() {
     this.setState({ showTournamentPlayerEditor: false });
   }
 
@@ -35,6 +46,7 @@ class TournamentControlPanel extends React.Component {
               <TournamentPlayerEditor
                 show={this.state.showTournamentPlayerEditor}
                 onHide={() => this.handleAddPlayerClose()}
+                tournament_id={this.props.tournament.id}
               />
             </div>
           </Col>
