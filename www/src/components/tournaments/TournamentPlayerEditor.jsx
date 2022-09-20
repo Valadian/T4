@@ -44,9 +44,6 @@ class TournamentPlayerEditor extends React.Component {
       new_player_name: "",
       new_player_club: "",
     };
-    console.log(
-      `Invoked TournamentPlayerEditor with props ${JSON.stringify(this.props)}`
-    );
   }
 
   getUserByEmail(player_email) {
@@ -57,7 +54,7 @@ class TournamentPlayerEditor extends React.Component {
   updateTournamentPlayerById(player_id) {
     Query("updateTournamentPlayerById", updateTournamentPlayerByIdDoc, {
       user_id: player_id,
-      tournament_id: this.props.tournament_id,
+      tournament_id: this.props.tournament.id,
     }).then((data) =>
       this.setState({ added_tournament_player: data.TournamentPlayer })
     );
@@ -69,7 +66,7 @@ class TournamentPlayerEditor extends React.Component {
     }
 
     const new_player_name = this.state.new_player_name;
-    const id = this.props.tournament_id;
+    const id = this.props.tournament.id;
     const player_club = this.state.new_player_club
       ? this.state.new_player_club
       : "";

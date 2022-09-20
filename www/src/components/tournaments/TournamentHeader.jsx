@@ -1,9 +1,28 @@
-import React from "react";
+import { React, useState } from "react";
 import format from "date-fns/format";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 function TournamentHeader(props) {
+  const [showTournamentDateEditor, setShowTournamentDateEditor] =
+    useState(false);
+  const [
+    showTournamentRegistrationEditor,
+    setShowTournamentRegistrationEditor,
+  ] = useState(false);
+  const [
+    showTournamentListProtectionEditor,
+    setShowTournamentListProtectionEditor,
+  ] = useState(false);
+  const [showTournamentLocationEditor, setShowTournamentLocationEditor] =
+    useState(false);
+  const [
+    showTournamentLadderProtectionEditor,
+    setShowTournamentLadderProtectionEditor,
+  ] = useState(false);
+  const [showTournamentAdminEditor, setShowTournamentAdminEditor] =
+    useState(false);
+
   var list_visibility = props.tournament.lists_visible ? "visible" : "hidden";
   var list_availability = props.tournament.lists_locked
     ? `Lists ${list_visibility} & locked`
@@ -17,14 +36,12 @@ function TournamentHeader(props) {
 
   return (
     <div>
-      <h2 className="text-light">
-        {props.tournament.name || "Fetching Event..."}
-      </h2>
+      <h2 className="">{props.tournament.name || "Fetching Event..."}</h2>
       <h4 className="text-secondary" style={{ fontVariant: ["small-caps"] }}>
         {props.tournament.Game.value || "Fetching Game..."}
       </h4>
       <p className="text-white">{props.tournament.description}</p>
-      <Row className="pt-3">
+      <Row className="pt-3 small">
         {/* Timezone issue: day of the month off by one depending on tz; 
           need to figure out overall tz approach*/}
         <Col xs={12} md>
@@ -32,6 +49,11 @@ function TournamentHeader(props) {
             <Col>
               <i className="bi bi-calendar3 text-primary"></i>{" "}
               {format(props.tournament.start, "eeee, dd MMM, yyyy")}
+              {/* <TournamentPlayerEditor
+                show={this.state.showTournamentPlayerEditor}
+                onHide={() => this.handleAddPlayerClose()}
+                tournament_id={props.tournament.id}
+              /> */}
             </Col>
           </Row>
           <Row>
@@ -69,7 +91,7 @@ function TournamentHeader(props) {
           </Row>
         </Col>
       </Row>
-      <Row className="pt-3 pb-3">
+      <Row className="pt-3 pb-s small text-light">
         <Col>
           <i className="bi bi-person-fill text-primary"></i>{" "}
           {props.tournament.Creator.name}
