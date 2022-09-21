@@ -5,7 +5,7 @@ import { Tournament } from "../../data/Models";
 import "react-datepicker/dist/react-datepicker.css";
 import TournamentAdminHeader from "../../components/tournaments/TournamentAdminHeader";
 import TournamentHeader from "../../components/tournaments/TournamentHeader";
-import TournamentControlPanel from "../../components/tournaments/TournamentControlPanel";
+import Ladder from "../../components/tournaments/TournamentLadder";
 
 function withParams(Component) {
   return (props) => <Component {...props} params={useParams()} />;
@@ -49,7 +49,6 @@ class TournamentHome extends React.Component {
 
   queryTournament() {
     const id = this.props.params.id;
-    // this.setState({gameOptions:[]})
     Query("TournamentById", tournamentByIdDoc, { id: id }).then((response) => {
       var tournament = null;
       if (response && response.Tournament && response.Tournament.length > 0) {
@@ -58,13 +57,14 @@ class TournamentHome extends React.Component {
         tournament = new Tournament();
       }
       tournament.start = Date.parse(tournament.start);
+      console.log(`Updating the tournament...`);
+      console.log(tournament);
       this.setState({ tournament: tournament });
     });
   }
 
-  setStateDate = (newDate) => {
-    let updatedTournament = { ...this.state.tournament, start: newDate };
-    this.setState({ tournament: updatedTournament });
+  updateTournament = () => {
+    this.queryTournament();
   };
 
   breadcrumbs() {
@@ -96,12 +96,14 @@ class TournamentHome extends React.Component {
         return (
           <>
             {this.breadcrumbs()}
-            {/*eventually I'd like to make an interactive variant of this and present it to the TO as a quick way of editing an event.*/}
             <TournamentAdminHeader
               tournament={this.state.tournament}
-              set_date={this.setStateDate}
+              update_tournament={this.updateTournament}
             />
-            <TournamentControlPanel tournament={this.state.tournament} />
+            <Ladder
+              tournament={this.state.tournament}
+              update_tournament={this.updateTournament}
+            />
           </>
         );
       } else {

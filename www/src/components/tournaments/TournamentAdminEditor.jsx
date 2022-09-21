@@ -72,7 +72,7 @@ class TournamentAdminEditor extends React.Component {
         >
           <Modal.Header closeButton>
             <Modal.Title id="contained-modal-title-vcenter">
-              Add Players
+              Change Event Administrators
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>

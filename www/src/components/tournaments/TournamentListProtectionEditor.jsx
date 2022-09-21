@@ -3,57 +3,64 @@ import Query from "../../data/T4GraphContext";
 import { Form, Button, Col, FloatingLabel, Row } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 
-const updateTournamentDateDoc = `
-mutation updateTournamentPlayerByName($tournament_id: uuid = "", $player_name: String = "", $player_club: String = "") {
-  insert_TournamentPlayer(objects: {tournament_id: $tournament_id, player_name: $player_name, club: $player_club}) {
-    returning {
-      player_name
-      Tournament {
-        name
+const updateListLockDoc = `
+  mutation updateListLock($tournament_id: uuid = "", $lists_locked: Boolean) {
+    update_Tournament(where: {id: {_eq: $tournament_id}}, _set: {lists_locked: $lists_locked}) {
+      returning {
+        id
+        lists_locked
       }
-      id
     }
   }
-}`;
+`;
+
+const updateListVisibilityDoc = `
+  mutation updateListVisibility($tournament_id: uuid = "", $lists_visible: Boolean) {
+    update_Tournament(where: {id: {_eq: $tournament_id}}, _set: {lists_visible: $lists_visible}) {
+      returning {
+        id
+        lists_visible
+      }
+    }
+  }
+`;
 
 class TournamentListProtectionEditor extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      new_tournament_date: "",
+      listsAreLocked: "",
+      listsAreVisible: "",
     };
   }
 
-  updateTournamentDate(start_date) {
-    Query("updateTournamentDate", updateTournamentDateDoc, {
-      start_date: start_date,
-      tournament_id: this.props.tournament.id,
-    }).then((data) => this.setState({ new_tournament_date: data.start }));
-  }
+  updateTournamentListsLocked = () => {
+    if (!this.props || !this.props.tournament.id) {
+      return;
+    }
+    let listsAreLocked = !this.props.tournament.lists_locked;
 
-  updateTournamentPlayerByName = () => {
-    if (!this.state || !this.state.new_tournament_date) {
+    Query("updateListLock", updateListLockDoc, {
+      lists_locked: listsAreLocked,
+      tournament_id: this.props.tournament.id,
+    })
+      .then((data) => this.setState({ listsAreLocked: data.lists_locked }))
+      .then(() => this.props.update_tournament());
+  };
+
+  updateTournamentListsVisible = () => {
+    if (!this.props || !this.props.tournament.id) {
       return;
     }
 
-    const new_tournament_date = this.state.new_tournament_date;
-    const id = this.props.tournament.id;
+    let listsAreVisible = !this.props.tournament.lists_visible;
 
-    console.log(`New start date: ${new_tournament_date}`);
-    console.log(`Tournament id: ${id}`);
-
-    Query("updateTournamentDate", updateTournamentDateDoc, {
-      start_date: new_tournament_date,
-      tournament_id: id,
-    }).then((data) =>
-      // TODO: insert a "success" toast
-      this.setState({ new_tournament_date: data.start })
-    );
-  };
-
-  handleDateUpdate = (event) => {
-    console.log(event.target.value);
-    this.setState({ new_tournament_date: event.target.value });
+    Query("updateListVisibility", updateListVisibilityDoc, {
+      lists_visible: listsAreVisible,
+      tournament_id: this.props.tournament.id,
+    })
+      .then((data) => this.setState({ listsAreLocked: data.lists_visible }))
+      .then(() => this.props.update_tournament());
   };
 
   handleClose = () => {
@@ -64,46 +71,41 @@ class TournamentListProtectionEditor extends React.Component {
     if (this.props) {
       return (
         <Modal
-          {...this.props}
-          size="lg"
+          onHide={this.props.onHide}
+          size="sm"
           aria-labelledby="contained-modal-title-vcenter"
           centered
           show={this.props.show}
         >
           <Modal.Header closeButton>
             <Modal.Title id="contained-modal-title-vcenter">
-              Add Players
+              Edit List Protections
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form>
               <Row>
-                <Form.Group
-                  as={Col}
-                  controlId="formPlayerName"
-                  xs={{ span: 7 }}
-                >
-                  <FloatingLabel
-                    controlId="playerName"
-                    label="Player Name"
-                    className="mb-3"
-                    style={{}}
-                  >
-                    <Form.Control
-                      type="text"
-                      placeholder="f"
-                      required
-                      onChange={this.handlePlayerNameUpdate}
-                      value={this.state.new_player_name}
-                      autoFocus
-                    />
-                  </FloatingLabel>
+                <Form.Group controlId="formListsAreLocked">
+                  <Form.Check
+                    id="lists_locked"
+                    type="switch"
+                    label="Lock Lists?"
+                    onChange={this.updateTournamentListsLocked}
+                    checked={this.props.tournament.lists_locked}
+                  />
+                </Form.Group>
+                <Form.Group controlId="formListsAreVisible">
+                  <Form.Switch
+                    id="lists_visible"
+                    label="Lists Visible?"
+                    onChange={this.updateTournamentListsVisible}
+                    checked={this.props.tournament.lists_visible}
+                  />
                 </Form.Group>
               </Row>
             </Form>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={this.updateTournamentPlayerByName}>Add</Button>
             <Button onClick={this.props.onHide}>Close</Button>
           </Modal.Footer>
         </Modal>

@@ -12,8 +12,15 @@ const userByEmailDoc = `
   }`;
 
 const updateTournamentPlayerByIdDoc = `
-  mutation updateTournamentPlayerById($user_id: uuid = "", $tournament_id: uuid = "", $player_name: String = "") {
-    insert_TournamentPlayer(objects: {tournament_id: $tournament_id, user_id: $user_id, player_name: $player_name}) {
+  mutation updateTournamentPlayerById(
+    $user_id: uuid = "", $tournament_id: uuid = "", $player_name: String = ""
+  ) {
+    insert_TournamentPlayer(
+      objects: {
+        tournament_id: $tournament_id, 
+        user_id: $user_id, 
+        player_name: $player_name}
+    ) {
       returning {
         player_name
         Tournament {
@@ -25,17 +32,27 @@ const updateTournamentPlayerByIdDoc = `
   }`;
 
 const updateTournamentPlayerByNameDoc = `
-mutation updateTournamentPlayerByName($tournament_id: uuid = "", $player_name: String = "", $player_club: String = "") {
-  insert_TournamentPlayer(objects: {tournament_id: $tournament_id, player_name: $player_name, club: $player_club}) {
-    returning {
-      player_name
-      Tournament {
-        name
+  mutation updateTournamentPlayerByName(
+    $tournament_id: uuid = "", 
+    $player_name: String = "", 
+    $player_club: String = ""
+  ) {
+    insert_TournamentPlayer(
+      objects: {
+        tournament_id: $tournament_id, 
+        player_name: $player_name, 
+        club: $player_club
       }
-      id
+    ) {
+      returning {
+        player_name
+        Tournament {
+          name
+        }
+        id
+      }
     }
-  }
-}`;
+  }`;
 
 class TournamentPlayerEditor extends React.Component {
   constructor(props) {
@@ -65,33 +82,28 @@ class TournamentPlayerEditor extends React.Component {
       return;
     }
 
-    const new_player_name = this.state.new_player_name;
-    const id = this.props.tournament.id;
     const player_club = this.state.new_player_club
       ? this.state.new_player_club
       : "";
 
-    console.log(`New player name: ${new_player_name}`);
-    console.log(`Tournament id: ${id}`);
-
     Query("updateTournamentPlayerByName", updateTournamentPlayerByNameDoc, {
-      player_name: new_player_name,
-      tournament_id: id,
+      player_name: this.state.new_player_name,
+      tournament_id: this.props.tournament.id,
       player_club: player_club,
-    }).then((data) =>
-      this.setState({ added_tournament_player: data.TournamentPlayer })
-    );
+    })
+      .then((data) => {
+        this.setState({ added_tournament_player: data.TournamentPlayer });
+      })
+      .then(() => this.props.update_tournament());
     // TODO: insert a "success" toast
     this.setState({ new_player_club: "", new_player_name: "" });
   };
 
   handlePlayerNameUpdate = (event) => {
-    console.log(event.target.value);
     this.setState({ new_player_name: event.target.value });
   };
 
   handlePlayerClubUpdate = (event) => {
-    console.log(event.target.value);
     this.setState({ new_player_club: event.target.value });
   };
 
@@ -100,10 +112,10 @@ class TournamentPlayerEditor extends React.Component {
   };
 
   render() {
-    if (this.props) {
+    if (this.props && this.props.tournament && this.state) {
       return (
         <Modal
-          {...this.props}
+          onHide={this.props.onHide}
           size="lg"
           aria-labelledby="contained-modal-title-vcenter"
           centered
@@ -169,6 +181,8 @@ class TournamentPlayerEditor extends React.Component {
       return (
         <>
           <div>Loading...</div>
+          <div>${JSON.stringify(this.props)}</div>
+          <div>${JSON.stringify(this.state)}</div>
         </>
       );
     }

@@ -24,12 +24,16 @@ class TournamentDateEditor extends React.Component {
     };
   }
 
-  updateTournamentDate() {
-    if (!this || !this.state || !this.state.new_tournament_date) {
+  updateTournamentDate(new_tournament_date) {
+    if (
+      !this ||
+      !this.props ||
+      !this.props.tournament ||
+      !this.props.tournament.id
+    ) {
       return;
     }
 
-    const new_tournament_date = this.state.new_tournament_date;
     const id = this.props.tournament.id;
 
     Query("UpdateTournamentDate", updateTournamentDateDoc, {
@@ -39,7 +43,7 @@ class TournamentDateEditor extends React.Component {
       // TODO: insert a "success" toast
       this.setState({ new_tournament_date: data.start })
     );
-    this.props.set_date(new_tournament_date);
+    this.props.update_tournament();
   }
 
   handleClose = () => {
@@ -63,20 +67,17 @@ class TournamentDateEditor extends React.Component {
           </Modal.Header>
           <Modal.Body>
             <Row>
-              <Col>
+              <Col className="d-flex">
                 <DatePicker
                   selected={this.state.new_tournament_date}
-                  onChange={(value) => {
-                    this.setState({ new_tournament_date: value });
-                  }}
-                  // className="form-control"
+                  onChange={(newDate) => this.updateTournamentDate(newDate)}
+                  className=""
                   inline
                 />
               </Col>
             </Row>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={() => this.updateTournamentDate()}>Save</Button>
             <Button onClick={this.props.onHide}>Close</Button>
           </Modal.Footer>
         </Modal>
