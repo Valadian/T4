@@ -16,7 +16,7 @@ function Query(operationName, operationDoc,variables) {
             console.error(json.errors);
             throw new Error("Graphql query has error, see console")
         }
-        console.log(json.data);
+        // console.log(json.data);
         return Promise.resolve(json.data)
     })
     .catch((error) => {

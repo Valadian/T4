@@ -36,3 +36,17 @@ To spin up your local dev instance of T4:
    - `npm start`
 
 At this point the page should render in whatever browser you have open, at http://localhost:3000/. There will be no seed data in your DB if you created one from scratch, so you'll need to go into Hasura (http://localhost:8080/) to manually input some. I found the interface pretty intuitive, so exerciseforthereader.png. Once you've created a Tournament entry (which requires a few rows in other tables too), the details will show up on the page.
+
+# Auth0 configuration
+
+Follow setup instructions here: https://hasura.io/docs/latest/guides/integrations/auth0-jwt/#create-an-auth0-application
+
+Setup ngrok for local development
+
+run: 
+   - `ngrok http 3000`
+   
+Set application logo: https://i.imgur.com/wpr0uCy.png
+Application URIs > Application Login URI: INSERT_NGROK_URL_HERE
+Application URIs > Allowed callback URLs: http://jwt.io
+Advanced Settings > OAuth > OIDC Conformant: disabled

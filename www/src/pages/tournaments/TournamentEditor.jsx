@@ -157,7 +157,7 @@ export default function TournamentEditor(props) {
             setTournamentPartial({Game:{key:tournament.Game.key}})
           }
         })
-      },[params])
+      },[params,tournament])
     const save = function(){
       if(tournament.id){
         Query("UpdateTournament", updateDoc, {
