@@ -1,14 +1,9 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useParams } from "react-router-dom";
 import Query from "../../data/T4GraphContext"
 import { User } from "../../data/Models"
 import {Collapse} from 'bootstrap'
-
-
-function withParams(Component) {
-    return props => <Component {...props} params={useParams()} />;
-  }
 
 const operationsDoc = `
 query PlayerById($id: uuid) {
@@ -31,20 +26,19 @@ mutation UpdateUser($name: String = "", $email: String = "", $id: uuid = "id") {
 }  
 `
 
-class PlayerEditor extends React.Component {
-    constructor(props) {
-        super(props);
-        this.alertRef = React.createRef();
-        this.original = null
-        this.hasEdits = false
+export default function PlayerEditor(props){
+    const params = useParams()
+    const alertRef = React.createRef()
+    const [player, setPlayer] = useState()
+    const [originalPlayer, setOriginalPlayer] = useState()
+    const [hasEdits, setHasEdits] = useState(false)
+
+    const setPlayerPartial = function(valueKeys){
+        setPlayer(prevPlayer => ({...prevPlayer, ...valueKeys}))
     }
-    hasChanges() {
-        return !(this.state === this.original)
-    }
-    componentDidMount() {
-        const id = this.props.params.id;
-        // this.setState({});
-        Query("PlayerById", operationsDoc, {id:id})
+
+    useEffect(() => {
+        Query("PlayerById", operationsDoc, {id:params.id})
         .then((data)=> {
             var value = null
             if(data){
@@ -52,78 +46,78 @@ class PlayerEditor extends React.Component {
             } else {
                 value = new User()
             }
-            this.setState(value)
-            this.original = value
+            setPlayer(value)
+            setOriginalPlayer(value)
         });
-    }
-    componentWillUpdate(nextProps, nextState) {
-        if (this.original) {
-            this.hasEdits = (nextState.id!==this.original.id) || 
-            (nextState.name!==this.original.name) || 
-            (nextState.email!==this.original.email)
+        
+    },[params])
+
+    useEffect(() => {
+        if (originalPlayer) {
+            setHasEdits(
+                (player.id!==originalPlayer.id) || 
+                (player.name!==originalPlayer.name) || 
+                (player.email!==originalPlayer.email))
         }
-    }
-    savePlayer() {
-        Query("UpdateUser", updateDoc, {id:this.state.id, name:this.state.name, email:this.state.email})
+    }, [player, originalPlayer])
+
+    const savePlayer = function() {
+        Query("UpdateUser", updateDoc, {id:player.id, name:player.name, email:player.email})
         .then((data) => {
-            const node = this.alertRef.current;
+            const node = alertRef.current;
             // node.classList.add('show');
             new Collapse(node)
             // setTimeout(() => node.classList.remove('show'), 2000);
             setTimeout(() => new Collapse(node), 2000);
         });
     }
-    breadcrumbs() {
+    const breadcrumbs = function() {
         return (
             <nav className="" aria-label="breadcrumb">
                 <ol className="breadcrumb">
                     <li className="breadcrumb-item"><Link to="/">Home</Link></li>
                     <li className="breadcrumb-item"><Link to="/players">Players</Link></li>
-                    <li className="breadcrumb-item active" aria-current="page">{(this.state && this.state.name) || 'Adding Player...'}</li>
+                    <li className="breadcrumb-item active" aria-current="page">{(player && player.name) || 'Adding Player...'}</li>
                 </ol>
             </nav>
         )
     }
-    render() {
-        
-        if(this.state){
-            return (
-                <>
-                    {this.breadcrumbs()}
-                    <div>
-                        {/* <div className="mb-3">
-                            <label htmlFor="idInput" className="form-label">Id</label>
-                            <input type="text" id="idInput" className="form-control" placeholder="Id" disabled value={this.state.id || ''} />
-                        </div> */}
-                        <div className="mb-3">
-                            <label htmlFor="nameInput" className="form-label">Name</label>
-                            <input type="text" id="nameInput" className="form-control" placeholder="Name" value={this.state.name || ''} onChange={(e) => this.setState({name: e.target.value})} />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="emailInput" className="form-label">Email</label>
-                            <input type="text" id="emailInput" className="form-control" placeholder="Email" value={this.state.email || ''} onChange={(e) => this.setState({email: e.target.value})} />
-                        </div>
+    
+    if(player){
+        return (
+            <>
+                {breadcrumbs()}
+                <div>
+                    {/* <div className="mb-3">
+                        <label htmlFor="idInput" className="form-label">Id</label>
+                        <input type="text" id="idInput" className="form-control" placeholder="Id" disabled value={player.id || ''} />
+                    </div> */}
+                    <div className="mb-3">
+                        <label htmlFor="nameInput" className="form-label">Name</label>
+                        <input type="text" id="nameInput" className="form-control" placeholder="Name" value={player.name || ''} onChange={(e) => setPlayerPartial({name: e.target.value})} />
                     </div>
-                    <div className="d-flex gap-3">
-                        <button className="btn btn-outline-success" onClick={this.savePlayer.bind(this)}  disabled={!this.hasEdits}>Save</button>
-                        {this.hasEdits && <button className="btn btn-outline-danger" onClick={() => window.history.back()}>Cancel</button>}
-                        {!this.hasEdits && <button className="btn btn-outline-primary" onClick={() => window.history.back()}>Done</button>}
-                        
+                    <div className="mb-3">
+                        <label htmlFor="emailInput" className="form-label">Email</label>
+                        <input type="text" id="emailInput" className="form-control" placeholder="Email" value={player.email || ''} onChange={(e) => setPlayerPartial({email: e.target.value})} />
                     </div>
-                    <div ref={this.alertRef} className="alert alert-success collapse mt-3" role="alert">
-                        User has been updated!
-                    </div>
-                </>
-            )
-        } else {
-            return (
-                <>
-                    {this.breadcrumbs()}
-                    <div>Loading...</div>
-                </>
-            )
-        }
-
+                </div>
+                <div className="d-flex gap-3">
+                    <button className="btn btn-outline-success" onClick={savePlayer}  disabled={!hasEdits}>Save</button>
+                    {hasEdits && <button className="btn btn-outline-danger" onClick={() => window.history.back()}>Cancel</button>}
+                    {!hasEdits && <button className="btn btn-outline-primary" onClick={() => window.history.back()}>Done</button>}
+                    
+                </div>
+                <div ref={alertRef} className="alert alert-success collapse mt-3" role="alert">
+                    User has been updated!
+                </div>
+            </>
+        )
+    } else {
+        return (
+            <>
+                {breadcrumbs()}
+                <div>Loading...</div>
+            </>
+        )
     }
 }
-export default withParams(PlayerEditor);

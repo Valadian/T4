@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import TournamentSummary from "./TournamentSummary";
 import Query from "../../data/T4GraphContext"
 
@@ -25,27 +25,19 @@ const operationsDoc = `
   }
 `;
 
-class TournamentList extends React.Component {
+export default function TournamentList() {
+  const [tournaments, setTournaments] = useState([])
     // constructor(props) {
     //     super(props);
     // }
-    componentDidMount() {
-        Query("AllTournaments", operationsDoc)
-        .then((data)=> this.setState({values:data.Tournament}));
-      }
-    render() {
-        if(this.state && this.state.values){
-            return (
-                <>
-                {this.state.values.map((tourn) => <TournamentSummary key={tourn.id} data={tourn} />)}
-                </>
-            )
-        } else {
-            return (
-                <div>Loading...</div>
-            )
-        }
-    }
-}
-
-export default TournamentList
+    useEffect(() => {
+      Query("AllTournaments", operationsDoc)
+      .then((data)=> setTournaments(data.Tournament));
+    }, [])
+    
+    return (
+        <>
+        {tournaments.map((tourn) => <TournamentSummary key={tourn.id} data={tourn} />)}
+        </>
+    )
+ }

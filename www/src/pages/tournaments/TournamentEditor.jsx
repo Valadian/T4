@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useParams } from "react-router-dom";
 import Query from "../../data/T4GraphContext"
 import { Tournament } from "../../data/Models"
@@ -7,9 +7,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import Select from 'react-select'
 import {Collapse} from 'bootstrap'
 
-function withParams(Component) {
-    return props => <Component {...props} params={useParams()} />;
-}
 const operationsDoc = `
   query TournamentByName($name: String) {
     Tournament(order_by: {start: desc}, where: {name: {_eq: $name}}) {
@@ -110,25 +107,35 @@ mutation InsertTournament($name: String = "", $location: String = "", $start: da
   }
 }  
 `
-class TournamentEditor extends React.Component {
-    constructor(props) {
-        super(props);
-        this.alertRef = React.createRef();
+export default function TournamentEditor(props) {
+    const params = useParams()
+    const alertRef = React.createRef();
+    const [tournament, setTournament] = useState()
+    const [gameOptions, setGameOptions] = useState([])
+    const [scoringOptions, setScoringOptions] = useState([])
+
+    const setTournamentPartial = function(valueKeys){
+      setTournament(prevTourn => ({...prevTourn, ...valueKeys}))
     }
-    setValue(valueKeys){
-      this.setState(prevState => ({...prevState, value: {...prevState.value, ...valueKeys}}))
+    const loadScoringRulesets = function(game){
+      if(game){
+        Query("ScoringByGame", allScoringDoc, {gameKey:game})
+          .then((data)=> {
+            if(data && data.ScoringRuleset && data.ScoringRuleset.length>0){
+              setScoringOptions(data.ScoringRuleset.map(g => {return {value:g.id, label:g.name}}))
+            }
+          })
+      }
     }
-    setGame(vlp) { //{value, label}
-      this.setValue({Game:{key:vlp.value,value:vlp.label}})
-      this.loadScoringRulesets(vlp.value)
+    const setGameHandler = function(vlp) { //{value, label}
+      setTournamentPartial({Game:{key:vlp.value,value:vlp.label}})
+      loadScoringRulesets(vlp.value)
     }
-    setScoringRuleset(vlp) {
-      this.setValue({ScoringRuleset:{id:vlp.value,name:vlp.label}})
+    const setScoringRulesetHandler = function(vlp) {
+      setTournamentPartial({ScoringRuleset:{id:vlp.value,name:vlp.label}})
     }
-    componentDidMount() {
-        const name = this.props.params.name;
-        this.setState({gameOptions:[], scoringOptions:[]})
-        Query("TournamentByName", operationsDoc, {name:name})
+    useEffect(() => {
+        Query("TournamentByName", operationsDoc, {name:params.name})
         .then((data)=> {
             var value = null
             if(data && data.Tournament && data.Tournament.length>0){
@@ -137,46 +144,32 @@ class TournamentEditor extends React.Component {
               value = new Tournament()
             }
             value.start = Date.parse(value.start)
-            // this.setState(prevState => ({...prevState, value:value}))
-            this.setState({value:value})
+            setTournament(value)
             return Promise.resolve(value)
         })
         .then((data) => {
-          this.loadScoringRulesets(data.Game.key)
+          loadScoringRulesets(data.Game.key)
         });
         Query("AllGames", allGamesDoc, {})
         .then((data)=> {
           if(data && data.Game && data.Game.length>0){
-            this.setState({gameOptions:data.Game.map(g => {return {value:g.key, label:g.value}})})
-            if(this.state.value && this.state.value.Game){
-              // this.setState(prevState => ({...prevState, value: {...prevState.value, Game:{key:this.state.value.Game.key}}}))
-              this.setValue({Game:{key:this.state.value.Game.key}})
-            }
+            setGameOptions(data.Game.map(g => {return {value:g.key, label:g.value}}))
+            setTournamentPartial({Game:{key:tournament.Game.key}})
           }
         })
-    }
-    loadScoringRulesets(game){
-      if(game){
-        Query("ScoringByGame", allScoringDoc, {gameKey:game})
-          .then((data)=> {
-            if(data && data.ScoringRuleset && data.ScoringRuleset.length>0){
-              this.setState({scoringOptions:data.ScoringRuleset.map(g => {return {value:g.id, label:g.name}})})
-            }
-          })
-      }
-    }
-    save(){
-      if(this.state.value.id){
+      },[params])
+    const save = function(){
+      if(tournament.id){
         Query("UpdateTournament", updateDoc, {
-          name: this.state.value.name, 
-          location: this.state.value.location, 
-          start: new Date(this.state.value.start).toISOString(), 
-          game: this.state.value.Game?.key, 
-          scoring_ruleset_id: this.state.value.ScoringRuleset?.id, 
-          creator_id: this.state.value.Creator?.id, 
-          id: this.state.value.id})
+          name: tournament.name, 
+          location: tournament.location, 
+          start: new Date(tournament.start).toISOString(), 
+          game: tournament.Game?.key, 
+          scoring_ruleset_id: tournament.ScoringRuleset?.id, 
+          creator_id: tournament.Creator?.id, 
+          id: tournament.id})
         .then((data) => {
-            const node = this.alertRef.current;
+            const node = alertRef.current;
             // node.classList.add('show');
             new Collapse(node)
             // setTimeout(() => node.classList.remove('show'), 2000);
@@ -184,14 +177,14 @@ class TournamentEditor extends React.Component {
         });
       } else {
         Query("InsertTournament", insertDoc, {
-          name: this.state.value.name, 
-          location: this.state.value.location, 
-          start: new Date(this.state.value.start).toISOString(), 
-          game: this.state.value.Game?.key, 
-          scoring_ruleset_id: this.state.value.ScoringRuleset?.id, 
-          creator_id: this.state.value.Creator?.id}) //TODO: Get logged in user
+          name: tournament.name, 
+          location: tournament.location, 
+          start: new Date(tournament.start).toISOString(), 
+          game: tournament.Game?.key, 
+          scoring_ruleset_id: tournament.ScoringRuleset?.id, 
+          creator_id: tournament.Creator?.id}) //TODO: Get logged in user
         .then((data) => {
-            const node = this.alertRef.current;
+            const node = alertRef.current;
             // node.classList.add('show');
             new Collapse(node)
             // setTimeout(() => node.classList.remove('show'), 2000);
@@ -200,64 +193,60 @@ class TournamentEditor extends React.Component {
         
       }
     }
-    breadcrumbs() {
+    const breadcrumbs = function () {
         return (
             <nav className="" aria-label="breadcrumb">
                 <ol className="breadcrumb">
                     <li className="breadcrumb-item"><Link to="/">Home</Link></li>
                     <li className="breadcrumb-item"><Link to="/events">Events</Link></li>
-                    <li className="breadcrumb-item active" aria-current="page">{(this.state && this.state.value && this.state.value.name) || 'Adding Event...'}</li>
+                    <li className="breadcrumb-item active" aria-current="page">{(tournament && tournament.name) || 'Adding Event...'}</li>
                 </ol>
             </nav>
         )
     }
-    render() {
-      if(this.state && this.state.value){
-        return (
-          <>
-            {this.breadcrumbs()}
-            <div>
-              {/* <div className="mb-3">
-                  <label htmlFor="idInput" className="form-label">Id</label>
-                  <input type="text" id="idInput" className="form-control" placeholder="Id" disabled value={this.state.id || ''} />
-              </div> */}
-              <div className="mb-3">
-                  <label htmlFor="nameInput" className="form-label">Name</label>
-                  <input type="text" id="nameInput" className="form-control" placeholder="Name" value={this.state.value.name || ''} onChange={(e) => this.setValue({name: e.target.value})} />
-              </div>
-              <div className="mb-3">
-                  <label htmlFor="dateInput" className="form-label">Date</label>
-                  <DatePicker selected={this.state.value.start} onChange={(value) => this.setValue({start: value})} isClearable className="form-control" showPopperArrow={false} />
-              </div>
-              
-              <div className="mb-3">
-                  <label htmlFor="gameInput" className="form-label">Game</label>
-                  <Select value={this.state.gameOptions.filter(o => o.value === this.state.value.Game?.key)} onChange={(vl) => this.setGame(vl)} classNamePrefix="react-select" className="react-select" options={this.state.gameOptions}/>
-              </div>
-              
-              <div className="mb-3">
-                  <label htmlFor="scoringInput" className="form-label">Scoring Ruleset</label>
-                  <Select value={this.state.scoringOptions.filter(o => o.value === this.state.value.ScoringRuleset?.id)} onChange={(vl) => this.setScoringRuleset(vl)} classNamePrefix="react-select" className="react-select" options={this.state.scoringOptions}/>
-              </div>
+    if(tournament){
+      return (
+        <>
+          {breadcrumbs()}
+          <div>
+            {/* <div className="mb-3">
+                <label htmlFor="idInput" className="form-label">Id</label>
+                <input type="text" id="idInput" className="form-control" placeholder="Id" disabled value={tournament.id || ''} />
+            </div> */}
+            <div className="mb-3">
+                <label htmlFor="nameInput" className="form-label">Name</label>
+                <input type="text" id="nameInput" className="form-control" placeholder="Name" value={tournament.name || ''} onChange={(e) => setTournamentPartial({name: e.target.value})} />
             </div>
-            <div className="d-flex gap-3">
-                <button className="btn btn-outline-success" onClick={() => this.save()}>Save</button>
-                <button className="btn btn-outline-danger" onClick={() => window.history.back()}>Cancel</button>
+            <div className="mb-3">
+                <label htmlFor="dateInput" className="form-label">Date</label>
+                <DatePicker selected={tournament.start} onChange={(value) => setTournamentPartial({start: value})} isClearable className="form-control" showPopperArrow={false} />
             </div>
-            <div ref={this.alertRef} className="alert alert-success collapse mt-3" role="alert">
-                Tournament has been updated!
+            
+            <div className="mb-3">
+                <label htmlFor="gameInput" className="form-label">Game</label>
+                <Select value={gameOptions.filter(o => o.value === tournament.Game?.key)} onChange={(vl) => setGameHandler(vl)} classNamePrefix="react-select" className="react-select" options={gameOptions}/>
             </div>
-          </>
-        );
-      } else {
-        return (
-          <>
-            {this.breadcrumbs()}
-            <div>Loading...</div>
-          </>
-        )
-      }
+            
+            <div className="mb-3">
+                <label htmlFor="scoringInput" className="form-label">Scoring Ruleset</label>
+                <Select value={scoringOptions.filter(o => o.value === tournament.ScoringRuleset?.id)} onChange={(vl) => setScoringRulesetHandler(vl)} classNamePrefix="react-select" className="react-select" options={scoringOptions}/>
+            </div>
+          </div>
+          <div className="d-flex gap-3">
+              <button className="btn btn-outline-success" onClick={() => save()}>Save</button>
+              <button className="btn btn-outline-danger" onClick={() => window.history.back()}>Cancel</button>
+          </div>
+          <div ref={alertRef} className="alert alert-success collapse mt-3" role="alert">
+              Tournament has been updated!
+          </div>
+        </>
+      );
+    } else {
+      return (
+        <>
+          {breadcrumbs()}
+          <div>Loading...</div>
+        </>
+      )
     }
 }
-
-export default withParams(TournamentEditor);
