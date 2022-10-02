@@ -173,3 +173,6 @@ button.react-datepicker__close-icon::after{
   background-color: transparent !important;
   border: 1px solid #515151 !important;
 } */
+.profile-pic:hover{
+  outline: 3px solid #CCC;
+}

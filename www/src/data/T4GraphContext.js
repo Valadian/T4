@@ -1,8 +1,15 @@
-function Query(operationName, operationDoc,variables) {
+async function Query(operationName, operationDoc,variables,accessToken) {
+    var headers = {
+        'Content-Type': 'application/json'
+    }
+    if (accessToken){
+        headers['Authorization'] = `Bearer ${accessToken}`
+    }
     return fetch(
         "http://localhost:8080/v1/graphql",
         {
             method: "POST",
+            headers: headers,
             body: JSON.stringify({
                 query: operationDoc,
                 variables: variables??{},

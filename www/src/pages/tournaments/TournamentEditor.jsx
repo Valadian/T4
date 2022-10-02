@@ -6,6 +6,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Select from 'react-select'
 import {Collapse} from 'bootstrap'
+import { useAuth0 } from "@auth0/auth0-react";
 
 const operationsDoc = `
   query TournamentByName($name: String) {
@@ -52,8 +53,8 @@ query ScoringByGame($gameKey: Game_enum) {
 `;
 
 const updateDoc = `
-mutation UpdateTournament($name: String = "", $location: String = "", $start: date = null, $game: Game_enum  = "", $scoring_ruleset_id: uuid = null, $creator_id: uuid = null, $id: uuid = "id") {
-  update_Tournament(_set: {name: $name, location: $location, start: $start, game: $game, scoring_ruleset_id: $scoring_ruleset_id, creator_id: $creator_id}, where: {id: {_eq: $id}}) {
+mutation UpdateTournament($name: String = "", $location: String = "", $start: date = null, $game: Game_enum  = "", $scoring_ruleset_id: uuid = null, $id: uuid = "id") {
+  update_Tournament(_set: {name: $name, location: $location, start: $start, game: $game, scoring_ruleset_id: $scoring_ruleset_id}, where: {id: {_eq: $id}}) {
     returning {
       id
       name
@@ -80,8 +81,8 @@ mutation UpdateTournament($name: String = "", $location: String = "", $start: da
 }  
 `
 const insertDoc = `
-mutation InsertTournament($name: String = "", $location: String = "", $start: date = null, $game: Game_enum  = "", $scoring_ruleset_id: uuid = null, $creator_id: uuid = null) {
-  insert_Tournament(objects: {name: $name, location: $location, start: $start, game: $game, scoring_ruleset_id: $scoring_ruleset_id, creator_id: $creator_id}) {
+mutation InsertTournament($name: String = "", $location: String = "", $start: date = null, $game: Game_enum  = "", $scoring_ruleset_id: uuid = null) {
+  insert_Tournament(objects: {name: $name, location: $location, start: $start, game: $game, scoring_ruleset_id: $scoring_ruleset_id}) {
     returning {
       id
       name
@@ -109,33 +110,54 @@ mutation InsertTournament($name: String = "", $location: String = "", $start: da
 `
 export default function TournamentEditor(props) {
     const params = useParams()
-    const alertRef = React.createRef();
-    const [tournament, setTournament] = useState()
+    const successRef = React.createRef();
+    const failureRef = React.createRef();
+    const [tournament, setTournament] = useState(new Tournament())
     const [gameOptions, setGameOptions] = useState([])
     const [scoringOptions, setScoringOptions] = useState([])
+    const { getAccessTokenSilently } = useAuth0()
 
     const setTournamentPartial = function(valueKeys){
       setTournament(prevTourn => ({...prevTourn, ...valueKeys}))
     }
-    const loadScoringRulesets = function(game){
-      if(game){
-        Query("ScoringByGame", allScoringDoc, {gameKey:game})
-          .then((data)=> {
-            if(data && data.ScoringRuleset && data.ScoringRuleset.length>0){
-              setScoringOptions(data.ScoringRuleset.map(g => {return {value:g.id, label:g.name}}))
-            }
-          })
+    useEffect(() => {
+      const fetchData = async () => {
+        const accessToken = await getAccessTokenSilently()
+        if(tournament.Game && tournament.Game.key){
+          Query("ScoringByGame", allScoringDoc, {gameKey:tournament.Game.key}, accessToken)
+            .then((data)=> {
+              if(data && data.ScoringRuleset){
+                setScoringOptions(data.ScoringRuleset.map(g => {return {value:g.id, label:g.name}}))
+                // if(!(tournament.Game.key in data.ScoringRuleset.map(g => g.id))){
+                //   setTournamentPartial({Game:{id:null}});
+                // }
+              }
+            })
+        }
       }
-    }
+      fetchData();
+    }, [tournament.Game, getAccessTokenSilently])
+    // const loadScoringRulesets = function(game){
+    //   if(game){
+    //     Query("ScoringByGame", allScoringDoc, {gameKey:game})
+    //       .then((data)=> {
+    //         if(data && data.ScoringRuleset && data.ScoringRuleset.length>0){
+    //           setScoringOptions(data.ScoringRuleset.map(g => {return {value:g.id, label:g.name}}))
+    //         }
+    //       })
+    //   }
+    // }
     const setGameHandler = function(vlp) { //{value, label}
       setTournamentPartial({Game:{key:vlp.value,value:vlp.label}})
-      loadScoringRulesets(vlp.value)
+      // loadScoringRulesets(vlp.value)
     }
     const setScoringRulesetHandler = function(vlp) {
       setTournamentPartial({ScoringRuleset:{id:vlp.value,name:vlp.label}})
     }
     useEffect(() => {
-        Query("TournamentByName", operationsDoc, {name:params.name})
+      const fetchData = async () => {
+        const accessToken = await getAccessTokenSilently()
+        Query("TournamentByName", operationsDoc, {name:params.name},accessToken)
         .then((data)=> {
             var value = null
             if(data && data.Tournament && data.Tournament.length>0){
@@ -147,18 +169,25 @@ export default function TournamentEditor(props) {
             setTournament(value)
             return Promise.resolve(value)
         })
-        .then((data) => {
-          loadScoringRulesets(data.Game.key)
-        });
-        Query("AllGames", allGamesDoc, {})
+        // .then((data) => {
+        //   loadScoringRulesets(data.Game.key)
+        //   return Promise.resolve()
+        // })
+
+        Query("AllGames", allGamesDoc, {},accessToken)
         .then((data)=> {
           if(data && data.Game && data.Game.length>0){
             setGameOptions(data.Game.map(g => {return {value:g.key, label:g.value}}))
-            setTournamentPartial({Game:{key:tournament.Game.key}})
+            // if(tournament){
+            //   setTournamentPartial({Game:{key:tournament.Game.key}})
+            // }
           }
         })
-      },[params,tournament])
-    const save = function(){
+      }
+      fetchData();
+    },[params.name, getAccessTokenSilently])
+    const save = async function(){
+      const accessToken = await getAccessTokenSilently()
       if(tournament.id){
         Query("UpdateTournament", updateDoc, {
           name: tournament.name, 
@@ -166,10 +195,12 @@ export default function TournamentEditor(props) {
           start: new Date(tournament.start).toISOString(), 
           game: tournament.Game?.key, 
           scoring_ruleset_id: tournament.ScoringRuleset?.id, 
-          creator_id: tournament.Creator?.id, 
-          id: tournament.id})
+          id: tournament.id}, accessToken)
         .then((data) => {
-            const node = alertRef.current;
+            var node = successRef.current;
+            if(data.update_Tournament.returning.length === 0){
+              node = failureRef.current;
+            }
             // node.classList.add('show');
             new Collapse(node)
             // setTimeout(() => node.classList.remove('show'), 2000);
@@ -181,10 +212,12 @@ export default function TournamentEditor(props) {
           location: tournament.location, 
           start: new Date(tournament.start).toISOString(), 
           game: tournament.Game?.key, 
-          scoring_ruleset_id: tournament.ScoringRuleset?.id, 
-          creator_id: tournament.Creator?.id}) //TODO: Get logged in user
+          scoring_ruleset_id: tournament.ScoringRuleset?.id}, accessToken) //TODO: Get logged in user
         .then((data) => {
-            const node = alertRef.current;
+            var node = successRef.current;
+            if(data.update_Tournament.returning.length === 0){
+              node = failureRef.current;
+            }
             // node.classList.add('show');
             new Collapse(node)
             // setTimeout(() => node.classList.remove('show'), 2000);
@@ -236,8 +269,11 @@ export default function TournamentEditor(props) {
               <button className="btn btn-outline-success" onClick={() => save()}>Save</button>
               <button className="btn btn-outline-danger" onClick={() => window.history.back()}>Cancel</button>
           </div>
-          <div ref={alertRef} className="alert alert-success collapse mt-3" role="alert">
+          <div ref={successRef} className="alert alert-success collapse mt-3" role="alert">
               Tournament has been updated!
+          </div>
+          <div ref={failureRef} className="alert alert-danger collapse mt-3" role="alert">
+              Tournament cannot be updated!
           </div>
         </>
       );

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TournamentSummary from "./TournamentSummary";
 import Query from "../../data/T4GraphContext"
+import { useAuth0 } from "@auth0/auth0-react";
 
 const operationsDoc = `
   query AllTournaments {
@@ -30,10 +31,15 @@ export default function TournamentList() {
     // constructor(props) {
     //     super(props);
     // }
+    const { getAccessTokenSilently } = useAuth0();
     useEffect(() => {
-      Query("AllTournaments", operationsDoc)
-      .then((data)=> setTournaments(data.Tournament));
-    }, [])
+      const fetchData = async () => {
+        const accessToken = await getAccessTokenSilently()
+        Query("AllTournaments", operationsDoc,null,accessToken)
+            .then((data)=> setTournaments(data.Tournament));
+      }
+      fetchData();
+    }, [getAccessTokenSilently])
     
     return (
         <>
