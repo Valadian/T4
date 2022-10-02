@@ -978,3 +978,4 @@ postgresql-data/pg_stat/global.stat
 postgresql-data/pg_subtrans/0000
 postgresql-data/pg_wal/000000010000000000000001
 postgresql-data/pg_xact/0000
+.env
