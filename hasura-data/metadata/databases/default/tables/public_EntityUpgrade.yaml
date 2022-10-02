@@ -5,3 +5,35 @@ object_relationships:
   - name: Owner
     using:
       foreign_key_constraint_on: entity_id
+insert_permissions:
+  - role: user
+    permission:
+      check: {}
+      columns:
+        - id
+        - name
+        - cost
+        - faction
+        - type
+        - entity_id
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - cost
+        - faction
+        - name
+        - type
+        - entity_id
+        - id
+      filter: {}
+  - role: user
+    permission:
+      columns:
+        - cost
+        - faction
+        - name
+        - type
+        - entity_id
+        - id
+      filter: {}

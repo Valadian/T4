@@ -26,3 +26,92 @@ array_relationships:
         table:
           name: Match
           schema: public
+insert_permissions:
+  - role: user
+    permission:
+      check: {}
+      set:
+        creator_id: x-hasura-User-Id
+      columns:
+        - end
+        - game
+        - ladder_visible
+        - lists_locked
+        - lists_visible
+        - location
+        - name
+        - public
+        - scoring_ruleset_id
+        - signups_open
+        - start
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - deleted
+        - ladder_visible
+        - lists_locked
+        - lists_visible
+        - public
+        - signups_open
+        - end
+        - start
+        - creator_id
+        - game
+        - location
+        - name
+        - id
+        - scoring_ruleset_id
+      filter:
+        _and:
+          - public:
+              _eq: true
+          - deleted:
+              _eq: false
+      allow_aggregations: true
+  - role: user
+    permission:
+      columns:
+        - deleted
+        - ladder_visible
+        - lists_locked
+        - lists_visible
+        - public
+        - signups_open
+        - end
+        - start
+        - creator_id
+        - game
+        - location
+        - name
+        - id
+        - scoring_ruleset_id
+      filter:
+        _and:
+          - deleted:
+              _eq: false
+          - _or:
+              - public:
+                  _eq: true
+              - creator_id:
+                  _eq: X-Hasura-User-Id
+      allow_aggregations: true
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - end
+        - game
+        - ladder_visible
+        - lists_locked
+        - lists_visible
+        - location
+        - name
+        - public
+        - scoring_ruleset_id
+        - signups_open
+        - start
+      filter:
+        creator_id:
+          _eq: X-Hasura-User-Id
+      check: null

@@ -11,3 +11,58 @@ object_relationships:
   - name: User
     using:
       foreign_key_constraint_on: user_id
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        Tournament:
+          creator_id:
+            _eq: X-Hasura-User-Id
+      columns:
+        - loss
+        - mov
+        - rank
+        - tournament_points
+        - win
+        - sos
+        - club
+        - group
+        - user_id
+        - id
+        - player_list_id
+        - tournament_id
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - loss
+        - mov
+        - rank
+        - tournament_points
+        - win
+        - sos
+        - club
+        - group
+        - user_id
+        - id
+        - player_list_id
+        - tournament_id
+      filter: {}
+      allow_aggregations: true
+  - role: user
+    permission:
+      columns:
+        - loss
+        - mov
+        - rank
+        - tournament_points
+        - win
+        - sos
+        - club
+        - group
+        - user_id
+        - id
+        - player_list_id
+        - tournament_id
+      filter: {}
+      allow_aggregations: true

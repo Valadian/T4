@@ -1,6 +1,4 @@
 SET check_function_bodies = false;
-CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
-COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
 CREATE TABLE public."Entity" (
     id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     name text NOT NULL,
@@ -26,12 +24,13 @@ CREATE TABLE public."Match" (
 );
 CREATE TABLE public."MatchPlayer" (
     id uuid DEFAULT public.gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
+    user_id text NOT NULL,
     win boolean NOT NULL,
     points integer NOT NULL,
     tournament_points integer NOT NULL,
     match_id uuid NOT NULL,
-    participant_list_id uuid
+    participant_list_id uuid,
+    confirmed boolean DEFAULT false NOT NULL
 );
 CREATE TABLE public."PlayerList" (
     id uuid DEFAULT public.gen_random_uuid() NOT NULL,
@@ -55,17 +54,19 @@ CREATE TABLE public."Tournament" (
     location text NOT NULL,
     start date NOT NULL,
     "end" date,
-    creator_id uuid NOT NULL,
+    creator_id text NOT NULL,
     scoring_ruleset_id uuid,
     lists_visible boolean DEFAULT true NOT NULL,
     lists_locked boolean DEFAULT false NOT NULL,
     ladder_visible boolean DEFAULT true NOT NULL,
     signups_open boolean DEFAULT true NOT NULL,
-    game text
+    game text,
+    public boolean DEFAULT false NOT NULL,
+    deleted boolean DEFAULT false NOT NULL
 );
 CREATE TABLE public."TournamentPlayer" (
     id uuid DEFAULT public.gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
+    user_id text NOT NULL,
     player_list_id uuid NOT NULL,
     tournament_id uuid NOT NULL,
     rank integer,
@@ -78,10 +79,12 @@ CREATE TABLE public."TournamentPlayer" (
     "group" text
 );
 CREATE TABLE public."User" (
-    id uuid DEFAULT public.gen_random_uuid() NOT NULL,
+    id text NOT NULL,
     name text NOT NULL,
     email text NOT NULL,
-    password text NOT NULL
+    username text,
+    picture text,
+    nickname text
 );
 ALTER TABLE ONLY public."EntityUpgrade"
     ADD CONSTRAINT "EntityUpgrade_pkey" PRIMARY KEY (id);

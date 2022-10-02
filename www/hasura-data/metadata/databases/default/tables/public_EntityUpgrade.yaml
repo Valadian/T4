@@ -1,7 +1,0 @@
-table:
-  name: EntityUpgrade
-  schema: public
-object_relationships:
-  - name: Owner
-    using:
-      foreign_key_constraint_on: entity_id

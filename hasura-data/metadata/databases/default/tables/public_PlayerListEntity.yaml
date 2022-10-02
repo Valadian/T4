@@ -8,3 +8,28 @@ object_relationships:
   - name: PlayerList
     using:
       foreign_key_constraint_on: player_list_id
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        _or:
+          - PlayerList:
+              TournamentPlayers:
+                Tournament:
+                  creator_id:
+                    _eq: X-Hasura-User-Id
+          - PlayerList:
+              MatchPlayers:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+          - PlayerList:
+              TournamentPlayers:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+      columns:
+        - count
+        - entity_id
+        - id
+        - player_list_id

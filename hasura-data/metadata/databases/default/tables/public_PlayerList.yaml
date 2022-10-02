@@ -23,3 +23,88 @@ array_relationships:
         table:
           name: TournamentPlayer
           schema: public
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        _or:
+          - TournamentPlayers:
+              Tournament:
+                creator_id:
+                  _eq: X-Hasura-User-Id
+          - TournamentPlayers:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+          - MatchPlayers:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+      columns:
+        - faction
+        - import_url
+        - id
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - faction
+        - import_url
+        - id
+      filter:
+        MatchPlayers:
+          Match:
+            Tournament:
+              lists_visible:
+                _eq: true
+  - role: user
+    permission:
+      columns:
+        - id
+        - faction
+        - import_url
+      filter:
+        _or:
+          - MatchPlayers:
+              Match:
+                Tournament:
+                  lists_visible:
+                    _eq: true
+          - MatchPlayers:
+              user_id:
+                _eq: X-Hasura-User-Id
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - faction
+        - import_url
+        - id
+      filter:
+        _or:
+          - TournamentPlayers:
+              Tournament:
+                creator_id:
+                  _eq: X-Hasura-User-Id
+          - TournamentPlayers:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+          - MatchPlayers:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+      check:
+        _or:
+          - TournamentPlayers:
+              Tournament:
+                creator_id:
+                  _eq: X-Hasura-User-Id
+          - TournamentPlayers:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+          - MatchPlayers:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id

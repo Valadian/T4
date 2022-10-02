@@ -13,3 +13,16 @@ array_relationships:
         table:
           name: MatchPlayer
           schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - tournament_id
+      filter: {}
+  - role: user
+    permission:
+      columns:
+        - id
+        - tournament_id
+      filter: {}
