@@ -18,6 +18,7 @@ CREATE TABLE public."Game" (
     value text NOT NULL,
     key text NOT NULL
 );
+INSERT INTO public."Game" VALUES ("Star Wars: Armada","STAR_WARS_ARMADA")
 CREATE TABLE public."Match" (
     id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     tournament_id uuid
