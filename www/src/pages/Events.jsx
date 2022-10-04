@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import TournamentList from '../components/tournaments/TournamentList';
+import FilteredTournamentList from '../components/tournaments/FilteredTournamentList';
 
 function Events() {
     return (
@@ -21,7 +21,7 @@ function Events() {
                 <Link className="btn btn-sm btn-outline-success" to="/events/add"><i className="bi bi-plus"></i></Link>
             </div>
         </div>
-        <TournamentList />
+        <FilteredTournamentList />
         </>
     );
 }
