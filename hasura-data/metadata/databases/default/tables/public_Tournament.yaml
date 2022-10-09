@@ -33,6 +33,7 @@ insert_permissions:
       set:
         creator_id: x-hasura-User-Id
       columns:
+        - description
         - end
         - game
         - ladder_visible
@@ -48,20 +49,21 @@ select_permissions:
   - role: anonymous
     permission:
       columns:
+        - creator_id
         - deleted
+        - description
+        - end
+        - game
+        - id
         - ladder_visible
         - lists_locked
         - lists_visible
-        - public
-        - signups_open
-        - end
-        - start
-        - creator_id
-        - game
         - location
         - name
-        - id
+        - public
         - scoring_ruleset_id
+        - signups_open
+        - start
       filter:
         _and:
           - public:
@@ -72,20 +74,21 @@ select_permissions:
   - role: user
     permission:
       columns:
+        - creator_id
         - deleted
+        - description
+        - end
+        - game
+        - id
         - ladder_visible
         - lists_locked
         - lists_visible
-        - public
-        - signups_open
-        - end
-        - start
-        - creator_id
-        - game
         - location
         - name
-        - id
+        - public
         - scoring_ruleset_id
+        - signups_open
+        - start
       filter:
         _and:
           - deleted:
@@ -100,6 +103,7 @@ update_permissions:
   - role: user
     permission:
       columns:
+        - description
         - end
         - game
         - ladder_visible

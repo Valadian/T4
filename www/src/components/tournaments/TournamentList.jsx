@@ -27,7 +27,7 @@ const operationsDoc = `
 `;
 
 export default function TournamentList(props) {
-  const [tournaments, setTournaments] = useState([])
+  const [tournaments, setTournaments] = useState([]);
   const { getAccessTokenSilently } = useAuth0();
   useEffect(() => {
     let where_expression = null;

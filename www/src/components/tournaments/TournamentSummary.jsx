@@ -6,7 +6,7 @@ export default function TournamentSummary(props) {
     return (
         <div className="row">
             <div className="row">
-                <Link to={"/events/"+props.data.name} className="tournament-link">{props.data.name}</Link>
+                <Link to={"/events/"+props.data.id} className="tournament-link">{props.data.name}</Link>
             </div>
             <div className="row text-muted small">
                 <div className="col-12 col-lg-6 d-flex row">
