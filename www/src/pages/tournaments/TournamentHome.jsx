@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import Query from "../../data/T4GraphContext";
 import { Tournament } from "../../data/Models";
@@ -7,6 +7,7 @@ import TournamentAdminHeader from "../../components/tournaments/TournamentAdminH
 import TournamentHeader from "../../components/tournaments/TournamentHeader";
 import Ladder from "../../components/tournaments/TournamentLadder";
 import { useAuth0 } from "@auth0/auth0-react";
+import Toaster from "../../components/Toaster"
 
 
 const tournamentByIdDoc = `
@@ -35,11 +36,34 @@ const tournamentByIdDoc = `
     }
   }
 `;
-
+const tournamentPlayersDoc = `
+query AllTournamentPlayers($tournament_id: uuid = "") {
+  TournamentPlayer(where: {Tournament: {id: {_eq: $tournament_id}}}) {
+    player_list_id
+    rank
+    player_name
+    mov
+    loss
+    win
+    tournament_points
+    sos
+    club
+    group
+    id
+    tournament_id
+    user_id
+    User {
+      name
+    }
+  }
+}
+`;
 export default function TournamentHome(props) {
     const { id } = useParams();
     const { getAccessTokenSilently } = useAuth0();
     const [tournament, setTournament] = useState();
+    const [ladder, setLadder] = useState([]);
+    const toaster = useRef(null);
 
 
     const queryTournament = async () => {
@@ -56,8 +80,26 @@ export default function TournamentHome(props) {
             console.log(`Updating the tournament...`);
             console.log(tournament);
             setTournament(tournament);
+        })
+        .catch((error) => {
+            toaster.current.ShowError(error);
         });
     }
+    useEffect(() => {
+        const fetchData = async () => {
+            const accessToken = await getAccessTokenSilently()
+            Query("AllTournamentPlayers", tournamentPlayersDoc, {
+                tournament_id: tournament.id,
+            },accessToken)
+            .then((response) => {
+                if (response){ //Why is response undefined?
+                    setLadder(response.TournamentPlayer)
+                }
+            })
+        }
+        fetchData();
+    },[tournament])
+    
     useEffect(() => {
         queryTournament();
     },[])
@@ -89,26 +131,27 @@ export default function TournamentHome(props) {
 
     if (is_owner) {
         if (tournament) {
-        return (
-            <>
-            {breadcrumbs()}
-            <TournamentAdminHeader
-                tournament={tournament}
-                update_tournament={updateTournament}
-            />
-            <Ladder
-                tournament={tournament}
-                update_tournament={updateTournament}
-            />
-            </>
-        );
+            return (
+                <>
+                {breadcrumbs()}
+                <Toaster ref={toaster} />
+                <TournamentAdminHeader
+                    tournament={tournament}
+                    update_tournament={updateTournament}
+                />
+                <Ladder
+                    Ladder={ladder}
+                    update_tournament={updateTournament}
+                />
+                </>
+            );
         } else {
-        return (
-            <>
-            {breadcrumbs()}
-            <div>Loading...</div>
-            </>
-        );
+            return (
+                <>
+                {breadcrumbs()}
+                <div>Loading...</div>
+                </>
+            );
         }
     } else {
         if (tournament) {

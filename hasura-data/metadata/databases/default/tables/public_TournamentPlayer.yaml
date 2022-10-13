@@ -19,50 +19,73 @@ insert_permissions:
           creator_id:
             _eq: X-Hasura-User-Id
       columns:
-        - loss
-        - mov
-        - rank
-        - tournament_points
-        - win
-        - sos
         - club
         - group
-        - user_id
         - id
+        - loss
+        - mov
         - player_list_id
+        - player_name
+        - rank
+        - sos
         - tournament_id
+        - tournament_points
+        - user_id
+        - win
 select_permissions:
   - role: anonymous
     permission:
       columns:
-        - loss
-        - mov
-        - rank
-        - tournament_points
-        - win
-        - sos
         - club
         - group
-        - user_id
         - id
+        - loss
+        - mov
         - player_list_id
+        - player_name
+        - rank
+        - sos
         - tournament_id
+        - tournament_points
+        - user_id
+        - win
       filter: {}
       allow_aggregations: true
   - role: user
     permission:
       columns:
-        - loss
-        - mov
-        - rank
-        - tournament_points
-        - win
-        - sos
         - club
         - group
-        - user_id
         - id
+        - loss
+        - mov
         - player_list_id
+        - player_name
+        - rank
+        - sos
         - tournament_id
+        - tournament_points
+        - user_id
+        - win
       filter: {}
       allow_aggregations: true
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - club
+        - group
+        - loss
+        - mov
+        - player_list_id
+        - player_name
+        - rank
+        - sos
+        - tournament_points
+        - user_id
+        - win
+      filter:
+        Tournament:
+          creator_id:
+            _eq: X-Hasura-User-Id
+      check: null

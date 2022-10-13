@@ -78,7 +78,7 @@ export default function TournamentPlayerEditor(props){
     }
 
     const updateTournamentPlayerByName = async () => {
-        if (newPlayerName) {
+        if (newPlayerName == "") {
             return;
         }
 
@@ -92,12 +92,15 @@ export default function TournamentPlayerEditor(props){
             player_club: newPlayerClub,
         },accessToken)
         .then((data) => {
-            setAddedTournamentPlayer(data.TournamentPlayer);
+            setAddedTournamentPlayer(data.insert_TournamentPlayer.returning[0]);
         })
-        .then(() => props.update_tournament());
+        .then(() => {
+          setNewPlayerClub("");
+          setNewPlayerName("");
+          props.update_tournament();
+          props.onHide();
+        });
         // TODO: insert a "success" toast
-        setNewPlayerClub("");
-        setNewPlayerName("");
     };
 
     const handlePlayerNameUpdate = (event) => {

@@ -61,7 +61,11 @@ export default function TournamentList(props) {
       Query("AllTournaments", operationsDoc,{
         whereExpr: where_expression
       },accessToken)
-        .then((data)=> setTournaments(data.Tournament));
+        .then((data)=> {
+          if (data){
+            setTournaments(data.Tournament)
+          }
+        });
     }
     fetchData();
         

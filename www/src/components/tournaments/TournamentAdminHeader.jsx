@@ -70,7 +70,7 @@ function TournamentAdminHeader(props) {
                 >
                   <i className="bi bi-calendar3 text-primary"></i>{" "}
                   <span className="text-white">
-                    {format(props.tournament.start, "eeee, dd MMM, yyyy")}
+                    {props.tournament.start ? format(props.tournament.start, "eeee, dd MMM, yyyy") : "N/A"}
                   </span>
                 </Button>
               </div>

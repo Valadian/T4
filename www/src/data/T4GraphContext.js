@@ -20,11 +20,16 @@ async function Query(operationName, operationDoc,variables,accessToken) {
     .then((response) => response.json())
     .then((json) => {
         if(json.errors && json.errors.length>0){
-            console.error(json.errors);
-            throw new Error("Graphql query has error, see console")
+            // console.error(json.errors);
+            // throw new Error("Graphql query has error, see console")
+            return Promise.reject(json.errors)
         }
+        if (json.data) {
         // console.log(json.data);
-        return Promise.resolve(json.data)
+            return Promise.resolve(json.data)
+        } else {
+            return Promise.reject("No Data Returned")
+        }
     })
     .catch((error) => {
         console.error('Error:', error);
