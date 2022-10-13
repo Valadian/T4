@@ -60,7 +60,7 @@ export default function TournamentHome(props) {
     }
     useEffect(() => {
         queryTournament();
-    })
+    },[])
 
     const updateTournament = () => {
         queryTournament();

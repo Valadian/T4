@@ -15,6 +15,12 @@ const operationsDoc = `
           count
         }
       }
+      Ladder {
+        User {
+          id
+          name
+        }
+      }
       Game {
         value
       }

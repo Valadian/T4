@@ -176,3 +176,6 @@ button.react-datepicker__close-icon::after{
 .profile-pic:hover{
   outline: 3px solid #CCC;
 }
+a.selfUserLink {
+  color: aquamarine;
+}
