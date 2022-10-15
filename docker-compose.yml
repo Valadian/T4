@@ -1,4 +1,4 @@
-version: '3.6'
+version: '3.7'
 services:
   postgres:
     image: postgres:12
@@ -7,18 +7,20 @@ services:
     - db_data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+
   graphql-engine:
-    image: hasura/graphql-engine:v2.9.0
+    image: hasura/graphql-engine:latest.cli-migrations-v3
     ports:
     - "8080:8080"
     depends_on:
     - "postgres"
     restart: always
     volumes:
-    - ./www/hasura-data:/var/lib/hasura/
-    - ./www/hasura-data/migrations:/hasura-migrations
-    - ./www/hasura-data/metadata:/hasura-metadata
+    - ./hasura-data:/var/lib/hasura/
+    - ./hasura-data/migrations:/hasura-migrations
+    - ./hasura-data/metadata:/hasura-metadata
     environment:
+      ENDPOINT: http://0.0.0.0:8080
       ## postgres database to store Hasura metadata
       HASURA_GRAPHQL_METADATA_DATABASE_URL: 'postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres'
       ## this env var can be used to add the above postgres database to Hasura as a data source. this can be removed/updated based on your needs
