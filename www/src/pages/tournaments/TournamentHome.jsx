@@ -9,6 +9,7 @@ import Ladder from "../../components/tournaments/TournamentLadder";
 import { useAuth0 } from "@auth0/auth0-react";
 import Toaster from "../../components/Toaster"
 import {Tabs, Tab} from 'react-bootstrap'
+import TournamentRoundsTab from "../../components/tournaments/TournamentRoundsTab";
 
 
 const tournamentByIdDoc = `
@@ -39,7 +40,7 @@ const tournamentByIdDoc = `
   }
 `;
 const tournamentPlayersDoc = `
-query AllTournamentPlayers($tournament_id: uuid = "") {
+query AllTournamentPlayers($tournament_id: uuid!) {
   TournamentPlayer(where: {Tournament: {id: {_eq: $tournament_id}}}) {
     player_list_id
     rank
@@ -60,11 +61,32 @@ query AllTournamentPlayers($tournament_id: uuid = "") {
   }
 }
 `;
+const roundsDoc = `
+query AllTournamentRounds($tournament_id: uuid!) {
+    TournamentRound(where: {tournament_id: {_eq: $tournament_id}}) {
+        Matches {
+        id
+        Players {
+            win
+            tournament_points
+            points
+            confirmed
+            User {
+            id
+            name
+            }
+        }
+        }
+        round_num
+        description
+    }
+}`;
 export default function TournamentHome(props) {
     const { id } = useParams();
     const { user, getAccessTokenSilently } = useAuth0();
     const [tournament, setTournament] = useState();
     const [ladder, setLadder] = useState([]);
+    const [rounds, setRounds] = useState([]);
     const toaster = useRef(null);
 
 
@@ -79,8 +101,8 @@ export default function TournamentHome(props) {
                 tournament = new Tournament();
             }
             tournament.start = Date.parse(tournament.start);
-            console.log(`Updating the tournament...`);
-            console.log(tournament);
+            // console.log(`Updating the tournament...`);
+            // console.log(tournament);
             setTournament(tournament);
         })
         .catch((error) => {
@@ -103,7 +125,22 @@ export default function TournamentHome(props) {
             fetchData();
         }
     },[tournament])
-    
+    useEffect(() => {
+        if(tournament) {
+            const fetchData = async () => {
+                const accessToken = await getAccessTokenSilently()
+                Query("AllTournamentRounds", roundsDoc, {
+                    tournament_id: tournament.id,
+                },accessToken)
+                .then((response) => {
+                    if (response){ //Why is response undefined?
+                        setRounds(response.TournamentRound)
+                    }
+                })
+            }
+            fetchData();
+        }
+    }, [tournament])
     useEffect(() => {
         queryTournament();
     },[])
@@ -132,8 +169,9 @@ export default function TournamentHome(props) {
     }
 
 
-    if (tournament) {
+    if (tournament?.id) {
         var is_owner = user?.sub === tournament.Creator.id;
+        //var round_count = matches.map(m => m.)
         return (
             <>
             {breadcrumbs()}
@@ -150,19 +188,20 @@ export default function TournamentHome(props) {
                 className="mb-3"
                 fill
             >
-                <Tab eventKey="ladder" title={<span><i class="bi bi-list-ol"></i> Ladder</span>}>
+                <Tab eventKey="ladder" title={<span><i className="bi bi-list-ol"></i> Ladder</span>}>
                     <Ladder
                         Ladder={ladder}
                         update_tournament={updateTournament}
                     />
                 </Tab>
-                <Tab eventKey="rounds" title={<span><i class="bi bi-play-circle-fill"></i> Rounds</span>}>
+                <Tab eventKey="rounds" title={<span><i className="bi bi-play-circle-fill"></i> Rounds</span>}>
+                    <TournamentRoundsTab rounds={rounds} update_tournament={updateTournament}/>
                 </Tab>
-                <Tab eventKey="log" title={<span><i class="bi bi-journals"></i> Event Logs</span>}>
+                <Tab eventKey="log" title={<span><i className="bi bi-journals"></i> Event Logs</span>}>
                 </Tab>
-                <Tab eventKey="submit" title={<span><i class="bi bi-trophy-fill"></i> Result Submission</span>}>
+                <Tab eventKey="submit" title={<span><i className="bi bi-trophy-fill"></i> Result Submission</span>}>
                 </Tab>
-                <Tab eventKey="signup" title={<span><i class="bi bi-person-plus-fill"></i> Sign Up</span>}>
+                <Tab eventKey="signup" title={<span><i className="bi bi-person-plus-fill"></i> Sign Up</span>}>
                 </Tab>
             </Tabs>
             </>

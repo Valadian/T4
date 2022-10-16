@@ -1,0 +1,72 @@
+table:
+  name: TournamentRound
+  schema: public
+object_relationships:
+  - name: Tournament
+    using:
+      foreign_key_constraint_on: tournament_id
+array_relationships:
+  - name: Matches
+    using:
+      foreign_key_constraint_on:
+        column: round_id
+        table:
+          name: Match
+          schema: public
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        Tournament:
+          creator_id:
+            _eq: X-Hasura-User-Id
+      columns:
+        - description
+        - round_num
+        - tournament_id
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - description
+        - id
+        - round_num
+        - tournament_id
+      filter:
+        _and:
+          - Tournament:
+              deleted:
+                _eq: false
+          - Tournament:
+              public:
+                _eq: true
+  - role: user
+    permission:
+      columns:
+        - description
+        - id
+        - round_num
+        - tournament_id
+      filter:
+        _and:
+          - Tournament:
+              deleted:
+                _eq: false
+          - _or:
+              - Tournament:
+                  creator_id:
+                    _eq: X-Hasura-User-Id
+              - Tournament:
+                  public:
+                    _eq: true
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - description
+        - round_num
+      filter:
+        Tournament:
+          creator_id:
+            _eq: X-Hasura-User-Id
+      check: null

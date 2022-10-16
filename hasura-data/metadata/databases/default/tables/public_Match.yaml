@@ -2,9 +2,9 @@ table:
   name: Match
   schema: public
 object_relationships:
-  - name: Tournament
+  - name: Round
     using:
-      foreign_key_constraint_on: tournament_id
+      foreign_key_constraint_on: round_id
 array_relationships:
   - name: Players
     using:
@@ -18,11 +18,11 @@ select_permissions:
     permission:
       columns:
         - id
-        - tournament_id
+        - round_id
       filter: {}
   - role: user
     permission:
       columns:
         - id
-        - tournament_id
+        - round_id
       filter: {}

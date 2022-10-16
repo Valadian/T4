@@ -6,7 +6,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 export default function Ladder(props) {
     if (props.Ladder) {
-      console.log("Got past the state check...");
+      //console.log("Got past the state check...");
       return (
         <div>
           <Row className="pb-1 header mb-3">

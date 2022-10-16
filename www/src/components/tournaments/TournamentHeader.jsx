@@ -48,7 +48,7 @@ export default function TournamentHeader(props) {
           <Row>
             <Col>
               <i className="bi bi-calendar3 text-primary"></i>{" "}
-              {format(props.tournament.start, "eeee, dd MMM, yyyy")}
+              {props.tournament.start?format(props.tournament.start, "eeee, dd MMM, yyyy"):""}
               {/* <TournamentPlayerEditor
                 show={this.state.showTournamentPlayerEditor}
                 onHide={() => this.handleAddPlayerClose()}
