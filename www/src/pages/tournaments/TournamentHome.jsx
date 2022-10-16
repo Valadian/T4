@@ -32,6 +32,7 @@ const tournamentByIdDoc = `
       }
       Creator {
         name
+        id
       }
     }
   }
@@ -60,7 +61,7 @@ query AllTournamentPlayers($tournament_id: uuid = "") {
 `;
 export default function TournamentHome(props) {
     const { id } = useParams();
-    const { getAccessTokenSilently } = useAuth0();
+    const { user, getAccessTokenSilently } = useAuth0();
     const [tournament, setTournament] = useState();
     const [ladder, setLadder] = useState([]);
     const toaster = useRef(null);
@@ -86,18 +87,20 @@ export default function TournamentHome(props) {
         });
     }
     useEffect(() => {
-        const fetchData = async () => {
-            const accessToken = await getAccessTokenSilently()
-            Query("AllTournamentPlayers", tournamentPlayersDoc, {
-                tournament_id: tournament.id,
-            },accessToken)
-            .then((response) => {
-                if (response){ //Why is response undefined?
-                    setLadder(response.TournamentPlayer)
-                }
-            })
+        if(tournament){
+            const fetchData = async () => {
+                const accessToken = await getAccessTokenSilently()
+                Query("AllTournamentPlayers", tournamentPlayersDoc, {
+                    tournament_id: tournament.id,
+                },accessToken)
+                .then((response) => {
+                    if (response){ //Why is response undefined?
+                        setLadder(response.TournamentPlayer)
+                    }
+                })
+            }
+            fetchData();
         }
-        fetchData();
     },[tournament])
     
     useEffect(() => {
@@ -127,10 +130,10 @@ export default function TournamentHome(props) {
         );
     }
 
-    var is_owner = true; // stand-in for eventual authentication, of course
 
-    if (is_owner) {
-        if (tournament) {
+    if (tournament) {
+        var is_owner = user?.sub === tournament.Creator.id;
+        if (is_owner) {
             return (
                 <>
                 {breadcrumbs()}
@@ -149,25 +152,20 @@ export default function TournamentHome(props) {
             return (
                 <>
                 {breadcrumbs()}
-                <div>Loading...</div>
+                <TournamentHeader tournament={tournament} />
+                <Ladder
+                    Ladder={ladder}
+                    update_tournament={updateTournament}
+                />
                 </>
             );
         }
     } else {
-        if (tournament) {
-        return (
-            <>
-            {breadcrumbs()}
-            <TournamentHeader tournament={tournament} />
-            </>
-        );
-        } else {
         return (
             <>
             {breadcrumbs()}
             <div>Loading...</div>
             </>
         );
-        }
     }
 }
