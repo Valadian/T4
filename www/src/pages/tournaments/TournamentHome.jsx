@@ -8,6 +8,7 @@ import TournamentHeader from "../../components/tournaments/TournamentHeader";
 import Ladder from "../../components/tournaments/TournamentLadder";
 import { useAuth0 } from "@auth0/auth0-react";
 import Toaster from "../../components/Toaster"
+import {Tabs, Tab} from 'react-bootstrap'
 
 
 const tournamentByIdDoc = `
@@ -133,33 +134,39 @@ export default function TournamentHome(props) {
 
     if (tournament) {
         var is_owner = user?.sub === tournament.Creator.id;
-        if (is_owner) {
-            return (
-                <>
-                {breadcrumbs()}
-                <Toaster ref={toaster} />
-                <TournamentAdminHeader
-                    tournament={tournament}
-                    update_tournament={updateTournament}
-                />
-                <Ladder
-                    Ladder={ladder}
-                    update_tournament={updateTournament}
-                />
-                </>
-            );
-        } else {
-            return (
-                <>
-                {breadcrumbs()}
-                <TournamentHeader tournament={tournament} />
-                <Ladder
-                    Ladder={ladder}
-                    update_tournament={updateTournament}
-                />
-                </>
-            );
-        }
+        return (
+            <>
+            {breadcrumbs()}
+            <Toaster ref={toaster} />
+            {is_owner?
+            <TournamentAdminHeader
+                tournament={tournament}
+                update_tournament={updateTournament}
+            />:
+            <TournamentHeader tournament={tournament} />}
+            <Tabs
+                defaultActiveKey="ladder"
+                id="uncontrolled-tab-example"
+                className="mb-3"
+                fill
+            >
+                <Tab eventKey="ladder" title={<span><i class="bi bi-list-ol"></i> Ladder</span>}>
+                    <Ladder
+                        Ladder={ladder}
+                        update_tournament={updateTournament}
+                    />
+                </Tab>
+                <Tab eventKey="rounds" title={<span><i class="bi bi-play-circle-fill"></i> Rounds</span>}>
+                </Tab>
+                <Tab eventKey="log" title={<span><i class="bi bi-journals"></i> Event Logs</span>}>
+                </Tab>
+                <Tab eventKey="submit" title={<span><i class="bi bi-trophy-fill"></i> Result Submission</span>}>
+                </Tab>
+                <Tab eventKey="signup" title={<span><i class="bi bi-person-plus-fill"></i> Sign Up</span>}>
+                </Tab>
+            </Tabs>
+            </>
+        );
     } else {
         return (
             <>
