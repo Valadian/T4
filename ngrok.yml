@@ -1,0 +1,9 @@
+version: "2"
+authtoken: INSERT_YOUR_AUTH_TOKEN_HERE
+tunnels:
+  first:
+    addr: 3000
+    proto: http    
+  second:
+    addr: 8080
+    proto: http
