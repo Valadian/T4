@@ -13,16 +13,25 @@ array_relationships:
         table:
           name: MatchPlayer
           schema: public
+insert_permissions:
+  - role: user
+    permission:
+      check: {}
+      columns:
+        - round_id
+        - table_num
 select_permissions:
   - role: anonymous
     permission:
       columns:
         - id
         - round_id
+        - table_num
       filter: {}
   - role: user
     permission:
       columns:
         - id
         - round_id
+        - table_num
       filter: {}

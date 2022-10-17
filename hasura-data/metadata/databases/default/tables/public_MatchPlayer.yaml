@@ -16,13 +16,10 @@ insert_permissions:
     permission:
       check: {}
       columns:
-        - id
-        - user_id
-        - win
-        - points
-        - tournament_points
         - match_id
         - participant_list_id
+        - player_name
+        - user_id
 select_permissions:
   - role: anonymous
     permission:
@@ -31,6 +28,7 @@ select_permissions:
         - id
         - match_id
         - participant_list_id
+        - player_name
         - points
         - tournament_points
         - user_id
@@ -43,6 +41,7 @@ select_permissions:
         - id
         - match_id
         - participant_list_id
+        - player_name
         - points
         - tournament_points
         - user_id
