@@ -10,10 +10,7 @@ $dev_utils_folder = $MyInvocation.MyCommand.Path | Split-Path -Parent
 
 Set-Location $dev_utils_folder\..\hasura-data\seeds\
 
-foreach ($table in $seeded_tables)
-{
-    $search_path = '*'+$table+'Seed.sql'
-    Get-ChildItem -Recurse $search_path |ForEach-Object {Write-Host $_; hasura seed apply --database-name default -f $_.Name}
+foreach ($table in $seeded_tables) {
+    $search_path = '*' + $table + 'Seed.sql'
+    Get-ChildItem -Recurse $search_path | ForEach-Object { Write-Host $_; hasura seed apply --database-name default -f $_.Name --admin-secret $env:HASURA_GRAPHQL_ADMIN_SECRET }
 }
-
-Set-Location ../../..
