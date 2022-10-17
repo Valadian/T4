@@ -19,12 +19,12 @@ array_relationships:
         table:
           name: TournamentPlayer
           schema: public
-  - name: Matches
+  - name: Rounds
     using:
       foreign_key_constraint_on:
         column: tournament_id
         table:
-          name: Match
+          name: TournamentRound
           schema: public
 insert_permissions:
   - role: user

@@ -179,3 +179,7 @@ button.react-datepicker__close-icon::after{
 a.selfUserLink {
   color: aquamarine;
 }
+.header {
+  border-bottom: #375a7f solid 3px;
+  font-weight: bold;
+}

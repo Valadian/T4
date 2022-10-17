@@ -27,24 +27,26 @@ select_permissions:
   - role: anonymous
     permission:
       columns:
-        - win
-        - points
-        - tournament_points
-        - user_id
+        - confirmed
         - id
         - match_id
         - participant_list_id
+        - points
+        - tournament_points
+        - user_id
+        - win
       filter: {}
   - role: user
     permission:
       columns:
+        - confirmed
         - id
-        - user_id
-        - win
-        - points
-        - tournament_points
         - match_id
         - participant_list_id
+        - points
+        - tournament_points
+        - user_id
+        - win
       filter: {}
 update_permissions:
   - role: user

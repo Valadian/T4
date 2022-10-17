@@ -45,19 +45,25 @@
 At this point the page should render in whatever browser you have open, at http://localhost:3000/. 
 
 To access the Hasura GraphQL engine console, from a terminal at ./T4/www/hasura-data:
-   - `hasura console`
+   - `hasura console --admin-secret 'ADMIN_SECRET_HERE'`
    This will open a Hasura console in a browser tab.  From here you can interact graphically with the GraphQL engine and the data.
+
+# ngrok Setup
+
+Setup ngrok for local development
+
+Copy `ngrok.yml` to `%USERPROFILE%\AppData\Local\ngrok\ngrok.yml`
+
+Update `%USERPROFILE%\AppData\Local\ngrok\ngrok.yml` with your authtoken from `https://ngrok.com/`
+
+run: 
+   - `ngrok start --all`
 
 # Auth0 configuration
 
 THE BELOW SECTION IS IN WORK AND INCOMPLETE
 
 Follow setup instructions here: https://hasura.io/docs/latest/guides/integrations/auth0-jwt/#create-an-auth0-application
-
-Setup ngrok for local development
-
-run: 
-   - `ngrok http 3000`
    
 Set application logo: https://i.imgur.com/wpr0uCy.png
 Application URIs > Application Login URI: INSERT_NGROK_URL_HERE

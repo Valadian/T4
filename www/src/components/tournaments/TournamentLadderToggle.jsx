@@ -40,7 +40,7 @@ export default function TournamentLadderToggle(props) {
         props.show = false;
     };
 
-    console.log(`Got here with... ${JSON.stringify(props)}`);
+    //console.log(`Got here with... ${JSON.stringify(props)}`);
     if (props) {
       return (
         <Button

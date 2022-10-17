@@ -8,4 +8,5 @@
 - "!include public_ScoringRuleset.yaml"
 - "!include public_Tournament.yaml"
 - "!include public_TournamentPlayer.yaml"
+- "!include public_TournamentRound.yaml"
 - "!include public_User.yaml"
