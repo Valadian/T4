@@ -65,18 +65,19 @@ const roundsDoc = `
 query AllTournamentRounds($tournament_id: uuid!) {
     TournamentRound(where: {tournament_id: {_eq: $tournament_id}}) {
         Matches {
-        id
-        Players {
-            win
-            tournament_points
-            points
-            confirmed
-            User {
             id
-            name
+            Players {
+                win
+                tournament_points
+                points
+                confirmed
+                User {
+                id
+                name
+                }
             }
         }
-        }
+        id
         round_num
         description
     }
@@ -195,7 +196,7 @@ export default function TournamentHome(props) {
                     />
                 </Tab>
                 <Tab eventKey="rounds" title={<span><i className="bi bi-play-circle-fill"></i> Rounds</span>}>
-                    <TournamentRoundsTab rounds={rounds} update_tournament={updateTournament}/>
+                    <TournamentRoundsTab rounds={rounds} isOwner={is_owner} tournament_id={tournament.id} update_tournament={updateTournament}/>
                 </Tab>
                 <Tab eventKey="log" title={<span><i className="bi bi-journals"></i> Event Logs</span>}>
                 </Tab>

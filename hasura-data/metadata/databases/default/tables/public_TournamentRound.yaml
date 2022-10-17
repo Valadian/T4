@@ -59,6 +59,7 @@ select_permissions:
               - Tournament:
                   public:
                     _eq: true
+      allow_aggregations: true
 update_permissions:
   - role: user
     permission:
@@ -70,3 +71,12 @@ update_permissions:
           creator_id:
             _eq: X-Hasura-User-Id
       check: null
+delete_permissions:
+  - role: user
+    permission:
+      backend_only: false
+      filter:
+        _and:
+          - Tournament:
+              creator_id:
+                _eq: X-Hasura-User-Id
