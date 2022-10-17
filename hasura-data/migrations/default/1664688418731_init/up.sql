@@ -18,6 +18,7 @@ CREATE TABLE public."Game" (
     value text NOT NULL,
     key text NOT NULL
 );
+INSERT INTO public."Game" VALUES ("Star Wars: Armada","STAR_WARS_ARMADA")
 CREATE TABLE public."Match" (
     id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     tournament_id uuid
@@ -138,4 +139,3 @@ ALTER TABLE ONLY public."Tournament"
     ADD CONSTRAINT "Tournament_game_fkey" FOREIGN KEY (game) REFERENCES public."Game"(key) ON UPDATE RESTRICT ON DELETE RESTRICT;
 ALTER TABLE ONLY public."Tournament"
     ADD CONSTRAINT "Tournament_scoring_ruleset_id_fkey" FOREIGN KEY (scoring_ruleset_id) REFERENCES public."ScoringRuleset"(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
-INSERT INTO public."Game" (value, key) VALUES ('Star Wars: Armada', 'STAR_WARS_ARMADA') ON CONFLICT DO NOTHING;
