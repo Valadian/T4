@@ -66,14 +66,16 @@ query AllTournamentRounds($tournament_id: uuid!) {
     TournamentRound(where: {tournament_id: {_eq: $tournament_id}}) {
         Matches {
             id
+            table_num
             Players {
                 win
                 tournament_points
                 points
                 confirmed
+                player_name
                 User {
-                id
-                name
+                    id
+                    name
                 }
             }
         }
@@ -196,7 +198,7 @@ export default function TournamentHome(props) {
                     />
                 </Tab>
                 <Tab eventKey="rounds" title={<span><i className="bi bi-play-circle-fill"></i> Rounds</span>}>
-                    <TournamentRoundsTab rounds={rounds} isOwner={is_owner} tournament_id={tournament.id} update_tournament={updateTournament}/>
+                    <TournamentRoundsTab rounds={rounds} ladder={ladder} isOwner={is_owner} tournament_id={tournament.id} update_tournament={updateTournament}/>
                 </Tab>
                 <Tab eventKey="log" title={<span><i className="bi bi-journals"></i> Event Logs</span>}>
                 </Tab>
