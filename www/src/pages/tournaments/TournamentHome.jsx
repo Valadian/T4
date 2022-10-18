@@ -3,13 +3,14 @@ import { Link, useParams } from "react-router-dom";
 import Query from "../../data/T4GraphContext";
 import { Tournament } from "../../data/Models";
 import "react-datepicker/dist/react-datepicker.css";
-import TournamentAdminHeader from "../../components/tournaments/TournamentAdminHeader";
-import TournamentHeader from "../../components/tournaments/TournamentHeader";
 import Ladder from "../../components/tournaments/TournamentLadder";
 import { useAuth0 } from "@auth0/auth0-react";
 import Toaster from "../../components/Toaster"
 import {Tabs, Tab} from 'react-bootstrap'
+import TournamentAdminHeader from "../../components/tournaments/TournamentAdminHeader";
+import TournamentHeader from "../../components/tournaments/TournamentHeader";
 import TournamentRoundsTab from "../../components/tournaments/TournamentRoundsTab";
+import TournamentResultSubmission from "../../components/tournaments/TournamentResultSubmission"
 
 
 const tournamentByIdDoc = `
@@ -207,6 +208,7 @@ function TournamentHome(props) {
                     <Tab eventKey="log" title={<span><i className="bi bi-journals"></i> Event Logs</span>}>
                     </Tab>
                     <Tab eventKey="submit" title={<span><i className="bi bi-trophy-fill"></i> Result Submission</span>}>
+                        <TournamentResultSubmission />
                     </Tab>
                     <Tab eventKey="signup" title={<span><i className="bi bi-person-plus-fill"></i> Sign Up</span>}>
                     </Tab>
