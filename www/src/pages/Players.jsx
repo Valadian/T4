@@ -15,12 +15,15 @@ query AllPlayers {
 }`;
 export default function Players(){
     const [players, setPlayers] = useState([])
-    const { getAccessTokenSilently } = useAuth0()
+    const { user, getAccessTokenSilently } = useAuth0()
     
     useEffect(() => {
         
       const fetchData = async () => {
-        const accessToken = await getAccessTokenSilently()
+        var accessToken = undefined
+        if (user) {
+            accessToken = await getAccessTokenSilently()
+        }
         Query("AllPlayers", operationsDoc, null, accessToken)
         .then((data) => setPlayers(data.User))
       }

@@ -4,21 +4,20 @@ import { Link, useParams } from "react-router-dom";
 import Query from "../../data/T4GraphContext"
 import { User } from "../../data/Models"
 import {Collapse} from 'bootstrap'
+import { useAuth0 } from "@auth0/auth0-react";
 
 const operationsDoc = `
-query PlayerById($id: uuid) {
+query PlayerById($id: String) {
 User(where: {id: {_eq: $id}}) {
     id
     name
-    email
 }
 }`;
 
 const updateDoc = `
-mutation UpdateUser($name: String = "", $email: String = "", $id: uuid = "id") {
+mutation UpdateUser($name: String = "", $email: String = "", $id: String = "id") {
     update_User(_set: {email: $email, name: $name}, where: {id: {_eq: $id}}) {
         returning {
-            email
             id
             name
         }
@@ -32,23 +31,31 @@ export default function PlayerEditor(props){
     const [player, setPlayer] = useState()
     const [originalPlayer, setOriginalPlayer] = useState()
     const [hasEdits, setHasEdits] = useState(false)
+    const { user, getAccessTokenSilently } = useAuth0();
 
     const setPlayerPartial = function(valueKeys){
         setPlayer(prevPlayer => ({...prevPlayer, ...valueKeys}))
     }
 
     useEffect(() => {
-        Query("PlayerById", operationsDoc, {id:params.id})
-        .then((data)=> {
-            var value = null
-            if(data){
-                value = data.User[0]
-            } else {
-                value = new User()
+        const fetchData = async () => {
+            var accessToken = undefined
+            if (user) {
+                accessToken = await getAccessTokenSilently()
             }
-            setPlayer(value)
-            setOriginalPlayer(value)
-        });
+            Query("PlayerById", operationsDoc, {id:params.id},accessToken)
+            .then((data)=> {
+                var value = null
+                if(data){
+                    value = data.User[0]
+                } else {
+                    value = new User()
+                }
+                setPlayer(value)
+                setOriginalPlayer(value)
+            });
+        }
+        fetchData();
         
     },[params])
 
@@ -61,8 +68,12 @@ export default function PlayerEditor(props){
         }
     }, [player, originalPlayer])
 
-    const savePlayer = function() {
-        Query("UpdateUser", updateDoc, {id:player.id, name:player.name, email:player.email})
+    const savePlayer = async function() {
+        var accessToken = undefined
+        if (user) {
+            accessToken = await getAccessTokenSilently()
+        }
+        Query("UpdateUser", updateDoc, {id:player.id, name:player.name, email:player.email}, accessToken)
         .then((data) => {
             const node = alertRef.current;
             // node.classList.add('show');
@@ -96,10 +107,10 @@ export default function PlayerEditor(props){
                         <label htmlFor="nameInput" className="form-label">Name</label>
                         <input type="text" id="nameInput" className="form-control" placeholder="Name" value={player.name || ''} onChange={(e) => setPlayerPartial({name: e.target.value})} />
                     </div>
-                    <div className="mb-3">
+                    {/* <div className="mb-3">
                         <label htmlFor="emailInput" className="form-label">Email</label>
                         <input type="text" id="emailInput" className="form-control" placeholder="Email" value={player.email || ''} onChange={(e) => setPlayerPartial({email: e.target.value})} />
-                    </div>
+                    </div> */}
                 </div>
                 <div className="d-flex gap-3">
                     <button className="btn btn-outline-success" onClick={savePlayer}  disabled={!hasEdits}>Save</button>
