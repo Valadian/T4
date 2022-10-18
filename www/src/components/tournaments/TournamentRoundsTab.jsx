@@ -28,7 +28,7 @@ export default function TournamentRoundsTab(props) {
     const { user, getAccessTokenSilently } = useAuth0();
     const [roundNum, setRoundNum] = useState(0);
     const [roundDesc, setRoundDesc] = useState("");
-    const [activeTab, setActiveTab] = useState()
+    const [activeTab, setActiveTab] = useState("round_1")
     const {rounds, ladder, tournament, updateTournament, isOwner} = useContext(TournamentHomeContext);
     
     useEffect(() => {
