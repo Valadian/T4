@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Query from "../../data/T4GraphContext";
 import { Form, Button, Col, FloatingLabel, Row } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import { useAuth0 } from "@auth0/auth0-react";
+import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 
 const updateRegistrationDoc = `
   mutation updateRegistration($signups_open: Boolean, $tournament_id: uuid = "") {
@@ -18,20 +19,21 @@ const updateRegistrationDoc = `
 export default function TournamentRegistrationToggle(props) {
     const [registrationIsOpen, setRegistrationIsOpen] = useState("");
     const { getAccessTokenSilently } = useAuth0();
+    const {tournament, updateTournament} = useContext(TournamentHomeContext);
 
     const updateTournamentRegistration = async() => {
-        if (!props || !props.tournament.id) {
+        if (!props || !tournament.id) {
             return;
         }
-        let registrationIsOpen = !props.tournament.signups_open;
+        let registrationIsOpen = !tournament.signups_open;
 
         const accessToken = await getAccessTokenSilently()
         Query("updateRegistration", updateRegistrationDoc, {
             signups_open: registrationIsOpen,
-            tournament_id: props.tournament.id,
+            tournament_id: tournament.id,
         },accessToken)
         .then((data) => setRegistrationIsOpen(data.signups_open))
-        .then(() => props.update_tournament());
+        .then(() => updateTournament());
     };
 
     const handleClose = () => {

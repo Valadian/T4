@@ -6,7 +6,7 @@ import Events from "./pages/Events";
 import Players from "./pages/Players";
 import PlayerEditor from "./pages/players/PlayerEditor";
 import TournamentEditor from "./pages/tournaments/TournamentEditor";
-import TournamentHome from "./pages/tournaments/TournamentHome";
+import {TournamentHome} from "./pages/tournaments/TournamentHome";
 import Search from "./pages/Search";
 import Profile from "./pages/Profile";
 import NoPage from "./pages/NoPage";

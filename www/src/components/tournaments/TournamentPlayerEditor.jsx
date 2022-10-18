@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Query from "../../data/T4GraphContext";
 import { Form, Button, Col, FloatingLabel, Row } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import { useAuth0 } from "@auth0/auth0-react";
+import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 
 const userByEmailDoc = `
   query UserByEmail($email_address: String = "") {
@@ -60,6 +61,7 @@ export default function TournamentPlayerEditor(props){
     const [newPlayerClub, setNewPlayerClub] = useState("");
     const [addedTournamentPlayer, setAddedTournamentPlayer] = useState("");
     const { getAccessTokenSilently } = useAuth0();
+    const {tournament, updateTournament} = useContext(TournamentHomeContext);
 
     //Email is not a readable property
     // const getUserByEmail = function(player_email) {
@@ -71,7 +73,7 @@ export default function TournamentPlayerEditor(props){
         const accessToken = await getAccessTokenSilently()
         Query("updateTournamentPlayerById", updateTournamentPlayerByIdDoc, {
             user_id: player_id,
-            tournament_id: props.tournament.id,
+            tournament_id: tournament.id,
         },accessToken).then((data) =>
             setAddedTournamentPlayer(data.TournamentPlayer)
         );
@@ -88,7 +90,7 @@ export default function TournamentPlayerEditor(props){
         const accessToken = await getAccessTokenSilently()
         Query("updateTournamentPlayerByName", updateTournamentPlayerByNameDoc, {
             player_name: newPlayerName,
-            tournament_id: props.tournament.id,
+            tournament_id: tournament.id,
             player_club: newPlayerClub,
         },accessToken)
         .then((data) => {
@@ -97,7 +99,7 @@ export default function TournamentPlayerEditor(props){
         .then(() => {
           setNewPlayerClub("");
           setNewPlayerName("");
-          props.update_tournament();
+          updateTournament();
           props.onHide();
         });
         // TODO: insert a "success" toast
@@ -115,7 +117,7 @@ export default function TournamentPlayerEditor(props){
         props.show = false;
     };
 
-    if (props && props.tournament) {
+    if (props && tournament) {
       return (
         <Modal
           onHide={props.onHide}

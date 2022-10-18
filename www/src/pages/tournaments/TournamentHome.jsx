@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, createContext } from "react";
 import { Link, useParams } from "react-router-dom";
 import Query from "../../data/T4GraphContext";
 import { Tournament } from "../../data/Models";
@@ -86,7 +86,10 @@ query AllTournamentRounds($tournament_id: uuid!) {
         description
     }
 }`;
-export default function TournamentHome(props) {
+
+const TournamentHomeContext = createContext()
+
+function TournamentHome(props) {
     const { id } = useParams();
     const { user, getAccessTokenSilently } = useAuth0();
     const [tournament, setTournament] = useState();
@@ -172,44 +175,43 @@ export default function TournamentHome(props) {
         </nav>
         );
     }
-
-
     if (tournament?.id) {
-        var is_owner = user?.sub === tournament.Creator.id;
+        var isOwner = user?.sub === tournament.Creator.id;
+        
+        const context = {
+            tournament, setTournament,
+            ladder, setLadder,
+            rounds, setRounds,
+            toaster,
+            updateTournament,
+            isOwner
+        }
         //var round_count = matches.map(m => m.)
         return (
-            <>
-            {breadcrumbs()}
-            <Toaster ref={toaster} />
-            {is_owner?
-            <TournamentAdminHeader
-                tournament={tournament}
-                update_tournament={updateTournament}
-            />:
-            <TournamentHeader tournament={tournament} />}
-            <Tabs
-                defaultActiveKey="ladder"
-                id="uncontrolled-tab-example"
-                className="mb-3"
-                fill
-            >
-                <Tab eventKey="ladder" title={<span><i className="bi bi-list-ol"></i> Ladder</span>}>
-                    <Ladder
-                        Ladder={ladder}
-                        update_tournament={updateTournament}
-                    />
-                </Tab>
-                <Tab eventKey="rounds" title={<span><i className="bi bi-play-circle-fill"></i> Rounds</span>}>
-                    <TournamentRoundsTab rounds={rounds} ladder={ladder} isOwner={is_owner} tournament_id={tournament.id} update_tournament={updateTournament}/>
-                </Tab>
-                <Tab eventKey="log" title={<span><i className="bi bi-journals"></i> Event Logs</span>}>
-                </Tab>
-                <Tab eventKey="submit" title={<span><i className="bi bi-trophy-fill"></i> Result Submission</span>}>
-                </Tab>
-                <Tab eventKey="signup" title={<span><i className="bi bi-person-plus-fill"></i> Sign Up</span>}>
-                </Tab>
-            </Tabs>
-            </>
+            <TournamentHomeContext.Provider value={context}>
+                {breadcrumbs()}
+                <Toaster ref={toaster} />
+                {isOwner?<TournamentAdminHeader/>:<TournamentHeader/>}
+                <Tabs
+                    defaultActiveKey="ladder"
+                    id="uncontrolled-tab-example"
+                    className="mb-3"
+                    fill
+                >
+                    <Tab eventKey="ladder" title={<span><i className="bi bi-list-ol"></i> Ladder</span>}>
+                        <Ladder />
+                    </Tab>
+                    <Tab eventKey="rounds" title={<span><i className="bi bi-play-circle-fill"></i> Rounds</span>}>
+                        <TournamentRoundsTab />
+                    </Tab>
+                    <Tab eventKey="log" title={<span><i className="bi bi-journals"></i> Event Logs</span>}>
+                    </Tab>
+                    <Tab eventKey="submit" title={<span><i className="bi bi-trophy-fill"></i> Result Submission</span>}>
+                    </Tab>
+                    <Tab eventKey="signup" title={<span><i className="bi bi-person-plus-fill"></i> Sign Up</span>}>
+                    </Tab>
+                </Tabs>
+            </TournamentHomeContext.Provider>
         );
     } else {
         return (
@@ -220,3 +222,4 @@ export default function TournamentHome(props) {
         );
     }
 }
+export {TournamentHome, TournamentHomeContext}

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Query from "../../data/T4GraphContext";
 import { Button, Col, Row } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useAuth0 } from "@auth0/auth0-react";
+import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 
 const updateTournamentDateDoc = `
   mutation UpdateTournamentDate($tournament_id: uuid = "", $start: date = "") {
@@ -18,15 +19,16 @@ const updateTournamentDateDoc = `
 `;
 
 export default function TournamentDateEditor(props) {
-    const [newTournamentDate, setNewTournamentDate] = useState(props.tournament.start);
+    const [newTournamentDate, setNewTournamentDate] = useState(tournament.start);
     const { getAccessTokenSilently } = useAuth0();
+    const {tournament, updateTournament} = useContext(TournamentHomeContext);
 
     const updateTournamentDate = async (new_tournament_date) => {
-        if (!(props?.tournament?.id)) {
+        if (!(tournament?.id)) {
         return;
         }
 
-        const id = props.tournament.id;
+        const id = tournament.id;
 
         const accessToken = await getAccessTokenSilently()
         Query("UpdateTournamentDate", updateTournamentDateDoc, {
@@ -36,7 +38,7 @@ export default function TournamentDateEditor(props) {
         // TODO: insert a "success" toast
         setNewTournamentDate(data.start)
         );
-        props.update_tournament();
+        updateTournament();
     }
 
     const handleClose = () => {
@@ -44,7 +46,7 @@ export default function TournamentDateEditor(props) {
     };
 
 
-    if (props && props.tournament && newTournamentDate) {
+    if (props && tournament && newTournamentDate) {
       return (
         <Modal
           onHide={props.onHide}

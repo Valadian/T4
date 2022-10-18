@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Query from "../../data/T4GraphContext";
 import { Form, Button, Col, FloatingLabel, Row } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import { useAuth0 } from "@auth0/auth0-react";
+import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 
 const updateTournamentDateDoc = `
 mutation updateTournamentPlayerByName($tournament_id: uuid = "", $player_name: String = "", $player_club: String = "") {
@@ -21,12 +22,13 @@ export default function TournamentAdminEditor(props){
     const [newTournamentDate, setNewTournamentDate] = useState("");
     const [newPlayerName, setNewPlayerName] = useState("");
     const { getAccessTokenSilently } = useAuth0();
+    const {tournament, updateTournament} = useContext(TournamentHomeContext);
 
     const updateTournamentDate = async (start_date) => {
         const accessToken = await getAccessTokenSilently()
         Query("updateTournamentDate", updateTournamentDateDoc, {
         start_date: start_date,
-        tournament_id: props.tournament.id,
+        tournament_id: tournament.id,
         }, accessToken).then((data) => setNewTournamentDate(data.start));
     }
 
@@ -35,7 +37,7 @@ export default function TournamentAdminEditor(props){
         return;
         }
 
-        const id = props.tournament.id;
+        const id = tournament.id;
 
         console.log(`New start date: ${newTournamentDate}`);
         console.log(`Tournament id: ${id}`);

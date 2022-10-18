@@ -1,9 +1,10 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Query from "../../data/T4GraphContext";
 import { Form, Button, Col, FloatingLabel, Row } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import { useAuth0 } from "@auth0/auth0-react";
+import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 
 const updateTournamentLocationDoc = `
   mutation updateTournamentLocation($location: String = "", $tournament_id: uuid = "") {
@@ -19,6 +20,7 @@ const updateTournamentLocationDoc = `
 export default function TournamentLocationEditor(props) {
     const [newTournamentLocation, setNewTournamentLocation] = useState("");
     const { getAccessTokenSilently } = useAuth0();
+    const {tournament, updateTournament} = useContext(TournamentHomeContext);
 
     const updateTournamentLocation = async () => {
         if (!newTournamentLocation) {
@@ -28,10 +30,10 @@ export default function TournamentLocationEditor(props) {
         const accessToken = await getAccessTokenSilently()
         Query("updateTournamentLocation", updateTournamentLocationDoc, {
         location: newTournamentLocation,
-        tournament_id: props.tournament.id,
+        tournament_id: tournament.id,
         },accessToken)
         .then(() => {
-            props.update_tournament();
+            updateTournament();
         })
         .then(() => {
             setNewTournamentLocation("");

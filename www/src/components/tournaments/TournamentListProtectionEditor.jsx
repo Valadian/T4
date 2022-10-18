@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Query from "../../data/T4GraphContext";
 import { Form, Button, Col, FloatingLabel, Row } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import { useAuth0 } from "@auth0/auth0-react";
+import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 
 const updateListLockDoc = `
   mutation updateListLock($tournament_id: uuid = "", $lists_locked: Boolean) {
@@ -30,38 +31,39 @@ export default function TournamentListProtectionEditor(props) {
     const [listsAreLocked, setListsAreLocked] = useState(false);
     const [listsAreVisible, setListsAreVisible] = useState(false);
     const { getAccessTokenSilently } = useAuth0();
+    const {tournament, updateTournament} = useContext(TournamentHomeContext);
 
     const updateTournamentListsLocked = async () => {
-        if (!props || !props.tournament.id) {
+        if (!props || !tournament.id) {
             return;
         }
-        let listsAreLocked = !props.tournament.lists_locked;
+        let listsAreLocked = !tournament.lists_locked;
 
         const accessToken = await getAccessTokenSilently()
         Query("updateListLock", updateListLockDoc, {
             lists_locked: listsAreLocked,
-            tournament_id: this.props.tournament.id,
+            tournament_id: this.tournament.id,
         },accessToken)
         .then((data) => setListsAreLocked(data.lists_locked))
-        .then(() => props.update_tournament());
+        .then(() => updateTournament());
     };
 
     const updateTournamentListsVisible = async () => {
-        if (!props || !props.tournament.id) {
+        if (!props || !tournament.id) {
             return;
         }
 
         // Almost certain this was a bug:
-        //let ladderIsVisible = !props.tournament.ladder_visible;
-        let listsAreVisible = props.tournament.lists_visible;
+        //let ladderIsVisible = !tournament.ladder_visible;
+        let listsAreVisible = tournament.lists_visible;
 
         const accessToken = await getAccessTokenSilently()
         Query("updateListVisibility", updateListVisibilityDoc, {
             lists_visible: listsAreVisible,
-            tournament_id: props.tournament.id,
+            tournament_id: tournament.id,
         },accessToken)
         .then((data) => setListsAreVisible(data.lists_visible))
-        .then(() => props.update_tournament());
+        .then(() => updateTournament());
     };
 
     const handleClose = () => {
@@ -92,7 +94,7 @@ export default function TournamentListProtectionEditor(props) {
                     type="switch"
                     label="Lock Lists?"
                     onChange={updateTournamentListsLocked}
-                    checked={props.tournament.lists_locked}
+                    checked={tournament.lists_locked}
                   />
                 </Form.Group>
                 <Form.Group controlId="formListsAreVisible">
@@ -100,7 +102,7 @@ export default function TournamentListProtectionEditor(props) {
                     id="lists_visible"
                     label="Lists Visible?"
                     onChange={updateTournamentListsVisible}
-                    checked={props.tournament.lists_visible}
+                    checked={tournament.lists_visible}
                   />
                 </Form.Group>
               </Row>

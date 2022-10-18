@@ -1,8 +1,9 @@
-import React, { useState, useEffect }  from "react";
+import React, { useState, useEffect, useContext }  from "react";
 import Query from "../../data/T4GraphContext";
 import { Form, Button, Col, FloatingLabel, Row } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import { useAuth0 } from "@auth0/auth0-react";
+import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 
 const updateLadderVisibilityDoc = `
   mutation UpdateLadderVisibility($ladder_visible: Boolean, $tournament_id: uuid = "") {
@@ -18,22 +19,23 @@ const updateLadderVisibilityDoc = `
 export default function TournamentLadderToggle(props) {
     const [isLadderVisible, setIsLadderVisible] = useState(false);
     const { getAccessTokenSilently } = useAuth0();
+    const {tournament, updateTournament} = useContext(TournamentHomeContext);
 
     const updateLadderVisibility = async () => {
-        if (!props || !props.tournament.id) {
+        if (!props || !tournament.id) {
             return;
         }
         // Almost certain this was a bug:
-        //let ladderIsVisible = !props.tournament.ladder_visible;
-        let ladderIsVisible = props.tournament.ladder_visible;
+        //let ladderIsVisible = !tournament.ladder_visible;
+        let ladderIsVisible = tournament.ladder_visible;
 
         const accessToken = await getAccessTokenSilently()
         Query("UpdateLadderVisibility", updateLadderVisibilityDoc, {
             ladder_visible: ladderIsVisible,
-            tournament_id: props.tournament.id,
+            tournament_id: tournament.id,
         },accessToken)
         .then((data) => setIsLadderVisible( data.ladder_visible ))
-        .then(() => props.update_tournament());
+        .then(() => updateTournament());
     };
 
     const handleClose = () => {

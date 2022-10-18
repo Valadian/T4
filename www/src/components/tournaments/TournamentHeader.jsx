@@ -1,7 +1,8 @@
-import { React, useState } from "react";
+import { React, useState, useContext } from "react";
 import format from "date-fns/format";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 
 export default function TournamentHeader(props) {
   const [showTournamentDateEditor, setShowTournamentDateEditor] =
@@ -22,25 +23,26 @@ export default function TournamentHeader(props) {
   ] = useState(false);
   const [showTournamentAdminEditor, setShowTournamentAdminEditor] =
     useState(false);
+  const {tournament} = useContext(TournamentHomeContext);
 
-  var list_visibility = props.tournament.lists_visible ? "visible" : "hidden";
-  var list_availability = props.tournament.lists_locked
+  var list_visibility = tournament.lists_visible ? "visible" : "hidden";
+  var list_availability = tournament.lists_locked
     ? `Lists ${list_visibility} & locked`
     : `Lists ${list_visibility} & unlocked`;
-  var ladder_visibility = props.tournament.ladder_visibility
+  var ladder_visibility = tournament.ladder_visibility
     ? "Ladder hidden"
     : "Ladder visible";
-  var signup_availability = props.tournament.signups_open
+  var signup_availability = tournament.signups_open
     ? "Signups open"
     : "Signups closed";
 
   return (
     <div>
-      <h2 className="">{props.tournament.name || "Fetching Event..."}</h2>
+      <h2 className="">{tournament.name || "Fetching Event..."}</h2>
       <h4 className="text-secondary" style={{ fontVariant: ["small-caps"] }}>
-        {props.tournament.Game.value || "Fetching Game..."}
+        {tournament.Game.value || "Fetching Game..."}
       </h4>
-      <p className="text-white">{props.tournament.description}</p>
+      <p className="text-white">{tournament.description}</p>
       <Row className="pt-3 small">
         {/* Timezone issue: day of the month off by one depending on tz; 
           need to figure out overall tz approach*/}
@@ -48,18 +50,18 @@ export default function TournamentHeader(props) {
           <Row>
             <Col>
               <i className="bi bi-calendar3 text-primary"></i>{" "}
-              {props.tournament.start?format(props.tournament.start, "eeee, dd MMM, yyyy"):""}
+              {tournament.start?format(tournament.start, "eeee, dd MMM, yyyy"):""}
               {/* <TournamentPlayerEditor
                 show={this.state.showTournamentPlayerEditor}
                 onHide={() => this.handleAddPlayerClose()}
-                tournament_id={props.tournament.id}
+                tournament_id={tournament.id}
               /> */}
             </Col>
           </Row>
           <Row>
             <Col>
               <i className="bi bi-globe text-primary"></i>{" "}
-              {props.tournament.location}
+              {tournament.location}
             </Col>
           </Row>
         </Col>
@@ -67,7 +69,7 @@ export default function TournamentHeader(props) {
           <Row>
             <Col>
               <i className="bi bi-people-fill text-primary"></i>{" "}
-              {props.tournament.Ladder_aggregate.aggregate.count}
+              {tournament.Ladder_aggregate.aggregate.count}
             </Col>
           </Row>
           <Row>
@@ -94,7 +96,7 @@ export default function TournamentHeader(props) {
       <Row className="pt-3 pb-s small text-light">
         <Col>
           <i className="bi bi-person-fill text-primary"></i>{" "}
-          {props.tournament.Creator.name}
+          {tournament.Creator.name}
         </Col>
       </Row>
       <hr />
