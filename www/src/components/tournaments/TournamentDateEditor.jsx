@@ -19,9 +19,9 @@ const updateTournamentDateDoc = `
 `;
 
 export default function TournamentDateEditor(props) {
+    const {tournament, updateTournament} = useContext(TournamentHomeContext);
     const [newTournamentDate, setNewTournamentDate] = useState(tournament.start);
     const { getAccessTokenSilently } = useAuth0();
-    const {tournament, updateTournament} = useContext(TournamentHomeContext);
 
     const updateTournamentDate = async (new_tournament_date) => {
         if (!(tournament?.id)) {
