@@ -68,6 +68,8 @@ query AllTournamentRounds($tournament_id: uuid!) {
             id
             table_num
             Players {
+                id
+                match_id
                 win
                 tournament_points
                 points

@@ -98,7 +98,7 @@ export default function TournamentRoundsTab(props) {
                     <Col></Col>
                     <Col>Points</Col>
                 </Row>
-                {r.Matches.map(m => <TournamentMatch key={m.id} match={m} />)}
+                {r.Matches.map(m => <TournamentMatch key={m.id} match={m} update_tournament={props.update_tournament}/>)}
                 {r.Matches.length==0?<span className="form-group"><a className="btn btn-outline-danger" onClick={() => deleteRound(r.id)}><i className="bi bi-x"></i> Delete Round</a></span>:<></>}
                 {r.Matches.length==0?<span className="form-group"><a className="btn btn-outline-success" onClick={() => generateRound(r.id)}><i className="bi bi-trophy-fill"></i> Generate Matches</a></span>:<></>}
             </Tab>)}

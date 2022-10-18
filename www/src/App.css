@@ -183,3 +183,8 @@ a.selfUserLink {
   border-bottom: #375a7f solid 3px;
   font-weight: bold;
 }
+.draggablePlayer:hover {
+  outline: #61dafb solid 1px;
+  cursor: move;
+  color: #61dafb
+}

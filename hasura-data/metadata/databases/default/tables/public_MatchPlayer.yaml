@@ -52,9 +52,24 @@ update_permissions:
     permission:
       columns:
         - confirmed
+        - match_id
       filter:
-        user_id:
-          _eq: X-Hasura-User-Id
-      check: null
+        _or:
+          - user_id:
+              _eq: X-Hasura-User-Id
+          - Match:
+              Round:
+                Tournament:
+                  creator_id:
+                    _eq: X-Hasura-User-Id
+      check:
+        _or:
+          - user_id:
+              _eq: X-Hasura-User-Id
+          - Match:
+              Round:
+                Tournament:
+                  creator_id:
+                    _eq: X-Hasura-User-Id
       set:
-        confirmed: x-hasura-
+        confirmed: "false"
