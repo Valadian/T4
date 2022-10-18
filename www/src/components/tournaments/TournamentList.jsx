@@ -34,7 +34,7 @@ const operationsDoc = `
 
 export default function TournamentList(props) {
   const [tournaments, setTournaments] = useState([]);
-  const { getAccessTokenSilently } = useAuth0();
+  const { user, getAccessTokenSilently } = useAuth0();
   useEffect(() => {
     let where_expression = null;
     if (props.filter) {
@@ -57,7 +57,10 @@ export default function TournamentList(props) {
       }
     }
     const fetchData = async () => {
-      const accessToken = await getAccessTokenSilently()
+      var accessToken = undefined
+      if (user) {
+        accessToken = await getAccessTokenSilently()
+      }
       Query("AllTournaments", operationsDoc,{
         whereExpr: where_expression
       },accessToken)

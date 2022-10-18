@@ -100,7 +100,10 @@ function TournamentHome(props) {
 
 
     const queryTournament = async () => {
-        const accessToken = await getAccessTokenSilently()
+        var accessToken = undefined
+        if (user) {
+            accessToken = await getAccessTokenSilently()
+        }
         Query("TournamentById", tournamentByIdDoc, { id: id },accessToken)
         .then((response) => {
             var tournament = null;
@@ -121,7 +124,10 @@ function TournamentHome(props) {
     useEffect(() => {
         if(tournament){
             const fetchData = async () => {
-                const accessToken = await getAccessTokenSilently()
+                var accessToken = undefined
+                if (user) {
+                    accessToken = await getAccessTokenSilently()
+                }
                 Query("AllTournamentPlayers", tournamentPlayersDoc, {
                     tournament_id: tournament.id,
                 },accessToken)
@@ -137,7 +143,10 @@ function TournamentHome(props) {
     useEffect(() => {
         if(tournament) {
             const fetchData = async () => {
-                const accessToken = await getAccessTokenSilently()
+                var accessToken = undefined
+                if (user) {
+                    accessToken = await getAccessTokenSilently()
+                }
                 Query("AllTournamentRounds", roundsDoc, {
                     tournament_id: tournament.id,
                 },accessToken)

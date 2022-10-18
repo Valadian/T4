@@ -13,11 +13,14 @@ const operationsDoc = `
 `;
 
 export default function LocationDropdown(props) {
-    const { getAccessTokenSilently } = useAuth0();
+    const { user, getAccessTokenSilently } = useAuth0();
     const [locations, setLocations] = useState([])
     useEffect(() => {
         const fetchData = async () => {
-            const accessToken = await getAccessTokenSilently()
+            var accessToken = undefined
+            if(user) {
+              accessToken = await getAccessTokenSilently()
+            }
             Query("AllLocations", operationsDoc,null,accessToken)
                 .then((data)=> setLocations(data.Tournament));
         }
