@@ -15,9 +15,21 @@ insert_permissions:
   - role: user
     permission:
       check:
-        Tournament:
-          creator_id:
-            _eq: X-Hasura-User-Id
+        _or:
+          - Tournament:
+              creator_id:
+                _eq: X-Hasura-User-Id
+          - _and:
+              - Tournament:
+                  signups_open: {}
+              - user_id:
+                  _eq: X-Hasura-User-Id
+              - Tournament:
+                  deleted:
+                    _eq: false
+              - Tournament:
+                  public:
+                    _eq: true
       columns:
         - club
         - group

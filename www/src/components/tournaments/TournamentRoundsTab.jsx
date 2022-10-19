@@ -69,13 +69,13 @@ export default function TournamentRoundsTab(props) {
             var player1 = ladder[table_num*2]
             var params = {
                 player1_name: player1.player_name,
-                user1_id: player1.user_name,
+                user1_id: player1.user_id,
                 round_id: id,
                 table_num: table_num}
             if(table_num*2+1<ladder.length){
                 var player2 = ladder[table_num*2+1]
                 params['player2_name'] = player2.player_name
-                params['user2_id'] = player2.user_name
+                params['user2_id'] = player2.user_id
             }
             Query("InsertMatch", insertMatchDoc, params ,accessToken)
             .then((data) => {

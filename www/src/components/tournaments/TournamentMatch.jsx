@@ -3,6 +3,7 @@ import { Col, Row } from "react-bootstrap";
 import { useAuth0 } from "@auth0/auth0-react";
 import Query from "../../data/T4GraphContext";
 import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
+import TournamentPlayerName from "./TournamentPlayerName";
 
 const swapDoc = `
 mutation SwapPlayers($id1: uuid!, $match_id1: uuid!, $id2: uuid!, $match_id2: uuid!) {
@@ -51,9 +52,13 @@ export default function TournamentMatch(props){
         return (
         <Row className="mb-3">
             <Col>{props.match.table_num}</Col>
-            <Col className="draggablePlayer" draggable="true"  onDragStart={dragPlayer1} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer1(e)}>{player1?.player_name}</Col>
+            <Col className="draggablePlayer" draggable="true"  onDragStart={dragPlayer1} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer1(e)}>
+                <TournamentPlayerName player={player1} />
+            </Col>
             <Col>{player1?.points}</Col>
-            <Col className="draggablePlayer" draggable="true"  onDragStart={dragPlayer2} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer2(e)}>{player2?.player_name}</Col>
+            <Col className="draggablePlayer" draggable="true"  onDragStart={dragPlayer2} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer2(e)}>
+                <TournamentPlayerName player={player2} />
+            </Col>
             <Col>{player2?.points}</Col>
         </Row>
         )
@@ -61,9 +66,9 @@ export default function TournamentMatch(props){
         return (
             <Row className="mb-3">
                 <Col>{props.match.table_num}</Col>
-                <Col>{player1?.player_name}</Col>
+                <Col><TournamentPlayerName player={player1} /></Col>
                 <Col>{player1?.points}</Col>
-                <Col>{player2?.player_name}</Col>
+                <Col><TournamentPlayerName player={player2} /></Col>
                 <Col>{player2?.points}</Col>
             </Row>
             )

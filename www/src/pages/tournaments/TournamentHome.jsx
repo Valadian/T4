@@ -11,6 +11,7 @@ import TournamentAdminHeader from "../../components/tournaments/TournamentAdminH
 import TournamentHeader from "../../components/tournaments/TournamentHeader";
 import TournamentRoundsTab from "../../components/tournaments/TournamentRoundsTab";
 import TournamentResultSubmission from "../../components/tournaments/TournamentResultSubmission"
+import TournamentSignUp from "../../components/tournaments/TournamentSignUp"
 
 
 const tournamentByIdDoc = `
@@ -57,6 +58,7 @@ query AllTournamentPlayers($tournament_id: uuid!) {
     tournament_id
     user_id
     User {
+      id
       name
     }
   }
@@ -96,8 +98,18 @@ function TournamentHome(props) {
     const [tournament, setTournament] = useState();
     const [ladder, setLadder] = useState([]);
     const [rounds, setRounds] = useState([]);
+    const [activeTab, setActiveTab] = useState("ladder")
     const toaster = useRef(null);
-
+    const [showSignUpTab, setShowSignUpTab] = useState(true);
+    
+    useEffect(() => {
+        if(ladder && tournament && user){
+            var registered = ladder.map(l => user && (l.User?.id===user.sub)).reduce((a,b) => a||b,false) 
+            setShowSignUpTab(tournament.signups_open && user && !registered)
+        } else {
+            setShowSignUpTab(false)
+        }
+    },[tournament, ladder, user])
 
     const queryTournament = async () => {
         var accessToken = undefined
@@ -166,7 +178,6 @@ function TournamentHome(props) {
     const updateTournament = () => {
         queryTournament();
     };
-
     const breadcrumbs = () => {
         return (
         <nav className="" aria-label="breadcrumb">
@@ -187,15 +198,19 @@ function TournamentHome(props) {
     }
     if (tournament?.id) {
         var isOwner = user?.sub === tournament.Creator.id;
-        
+        var isParticipant = user!=null && ladder.filter(l => l.User).map((l)=>l.User?.id).includes(user?.sub)
         const context = {
             tournament, setTournament,
             ladder, setLadder,
             rounds, setRounds,
             toaster,
             updateTournament,
-            isOwner
+            isOwner,
+            isParticipant,
+            activeTab,
+            setActiveTab
         }
+
         //var round_count = matches.map(m => m.)
         return (
             <TournamentHomeContext.Provider value={context}>
@@ -203,10 +218,12 @@ function TournamentHome(props) {
                 <Toaster ref={toaster} />
                 {isOwner?<TournamentAdminHeader/>:<TournamentHeader/>}
                 <Tabs
+                    activeKey={activeTab}
+                    onSelect={setActiveTab}
                     defaultActiveKey="ladder"
                     id="uncontrolled-tab-example"
                     className="mb-3"
-                    fill
+                    // fill
                 >
                     <Tab eventKey="ladder" title={<span><i className="bi bi-list-ol"></i> Ladder</span>}>
                         <Ladder />
@@ -216,11 +233,12 @@ function TournamentHome(props) {
                     </Tab>
                     <Tab eventKey="log" title={<span><i className="bi bi-journals"></i> Event Logs</span>}>
                     </Tab>
-                    <Tab eventKey="submit" title={<span><i className="bi bi-trophy-fill"></i> Result Submission</span>}>
+                    {isParticipant?<Tab eventKey="submit" title={<span><i className="bi bi-trophy-fill"></i> Result Submission</span>}>
                         <TournamentResultSubmission />
-                    </Tab>
-                    <Tab eventKey="signup" title={<span><i className="bi bi-person-plus-fill"></i> Sign Up</span>}>
-                    </Tab>
+                    </Tab>:<></>}
+                    {showSignUpTab?<Tab eventKey="signup" title={<span><i className="bi bi-person-plus-fill"></i> Sign Up</span>}>
+                        <TournamentSignUp />
+                    </Tab>:<></>}
                 </Tabs>
             </TournamentHomeContext.Provider>
         );

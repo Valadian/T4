@@ -7,7 +7,7 @@ export default function TournamentSummary(props) {
     const { user } = useAuth0();
 
     const isOwner = user?.sub === props.data.Creator.id
-    const isParticipant = props.data.Ladder.map((l)=>l.User?.id).includes(user?.sub)
+    const isParticipant = user!=null && props.data.Ladder.filter(l => l.User).map((l)=>l.User?.id).includes(user?.sub)
     return (
         <div className="row">
             <div className="row">
