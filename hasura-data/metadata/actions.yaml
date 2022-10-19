@@ -1,6 +1,11 @@
-actions: []
+actions:
+  - name: NextRoundMatches
+    definition:
+      kind: synchronous
+      handler: https://matchmaker.dev.advancedtransponder.net/NextRoundMatches
 custom_types:
   enums: []
   input_objects: []
-  objects: []
+  objects:
+    - name: NextRoundMatchesOutput
   scalars: []
