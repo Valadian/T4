@@ -16,7 +16,7 @@ export default function Ladder(props) {
             <Col>Rank</Col>
             <Col>W/L</Col>
             <Col>TP</Col>
-            <Col>MoV</Col>
+            <Col>MoV/SoS</Col>
             <Col>Club</Col>
           </Row>
           {ladder.map((player) => (
