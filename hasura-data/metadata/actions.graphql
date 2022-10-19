@@ -1,0 +1,10 @@
+type Mutation {
+  NextRoundMatches(
+    tournament_id: uuid
+  ): NextRoundMatchesOutput
+}
+
+type NextRoundMatchesOutput {
+  match_ids: [String!]!
+}
+

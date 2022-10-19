@@ -35,5 +35,26 @@ services:
       HASURA_GRAPHQL_ADMIN_SECRET: '${HASURA_GRAPHQL_ADMIN_SECRET}'
       HASURA_GRAPHQL_JWT_SECRET: '${HASURA_GRAPHQL_JWT_SECRET}'
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
+
+  matchmaker-service:
+    #image: sprintska/matchmaker:v0.1.6-arm
+    image: sprintska/matchmaker:v0.1.6-x64
+    ports:
+    - "80:80"
+    depends_on:
+    - "graphql-engine"
+    restart: always
+    environment:
+      # Matchmaker URL, ex: 'matchmaker.tabletoptournament.tools'
+      MATCHMAKER_DOMAIN: '${MATCHMAKER_DOMAIN}'
+      # Hasura URL from MM's perspective, ex: 'hasura.tabletoptournament.tools'
+      MATCHMAKER_HASURA_URL: '${MATCHMAKER_HASURA_URL}'
+      # Hasura admin secret, ex: 'sUpErSeKrIt'
+      MATCHMAKER_HASURA_ADMIN_SECRET: '${HASURA_GRAPHQL_ADMIN_SECRET}'
+      # Use HTTP when accessing MM instead of default HTTPS, ex: 1
+      MATCHMAKER_INSECURE_USE_HTTP: '${MATCHMAKER_INSECURE_USE_HTTP}'
+      # Enable debug-level logging on MM server instead of default info-level, ex: 1
+      MATCHMAKER_DEBUG: '${MATCHMAKER_DEBUG}'
+
 volumes:
   db_data:
