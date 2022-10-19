@@ -71,7 +71,7 @@ export default function TournamentRoundsTab(props) {
                 player1_name: player1.player_name,
                 user1_id: player1.user_id,
                 round_id: id,
-                table_num: table_num}
+                table_num: table_num+1}
             if(table_num*2+1<ladder.length){
                 var player2 = ladder[table_num*2+1]
                 params['player2_name'] = player2.player_name

@@ -13,7 +13,7 @@ export default function TournamentPlayerSummary(props) {
         <Col>{props.player.rank}</Col>
         <Col>{props.player.win} / {props.player.loss}</Col>
         <Col>{props.player.tournament_points}</Col>
-        <Col>{props.player.mov}/{props.player.sos}</Col>
+        <Col>{props.player.mov} / {props.player.sos}</Col>
         <Col>{props.player.club}</Col>
       </Row>
     );
