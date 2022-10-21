@@ -2,7 +2,7 @@ actions:
   - name: NextRoundMatches
     definition:
       kind: synchronous
-      handler: https://matchmaker.dev.advancedtransponder.net/NextRoundMatches
+      handler: http://matchmaker-service:8082/NextRoundMatches
     permissions:
       - role: user
 custom_types:
