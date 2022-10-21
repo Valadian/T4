@@ -231,9 +231,9 @@ function TournamentHome(props) {
                     <Tab eventKey="rounds" title={<span><i className="bi bi-play-circle-fill"></i> Rounds</span>}>
                         <TournamentRoundsTab />
                     </Tab>
-                    <Tab eventKey="log" title={<span><i className="bi bi-journals"></i> Event Logs</span>}>
+                    <Tab eventKey="log" title={<span><i className="bi bi-journals"></i> <span className="d-none d-md-inline">Event </span>Logs</span>}>
                     </Tab>
-                    {isParticipant?<Tab eventKey="submit" title={<span><i className="bi bi-trophy-fill"></i> Result Submission</span>}>
+                    {isParticipant?<Tab eventKey="submit" title={<span><i className="bi bi-trophy-fill"></i> Results<span className="d-none d-md-inline"> Submission</span></span>}>
                         <TournamentResultSubmission />
                     </Tab>:<></>}
                     {showSignUpTab?<Tab eventKey="signup" title={<span><i className="bi bi-person-plus-fill"></i> Sign Up</span>}>

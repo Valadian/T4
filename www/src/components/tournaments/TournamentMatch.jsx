@@ -51,25 +51,25 @@ export default function TournamentMatch(props){
     if(isOwner){
         return (
         <Row className="mb-3">
-            <Col>{props.match.table_num}</Col>
+            <Col className="col-1 col-md-2">{props.match.table_num}</Col>
             <Col className="draggablePlayer" draggable="true"  onDragStart={dragPlayer1} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer1(e)}>
                 <TournamentPlayerName player={player1} />
             </Col>
-            <Col>{player1?.points}</Col>
+            <Col className="col-1">{player1?.points}</Col>
             <Col className="draggablePlayer" draggable="true"  onDragStart={dragPlayer2} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer2(e)}>
                 <TournamentPlayerName player={player2} />
             </Col>
-            <Col>{player2?.points}</Col>
+            <Col className="col-1">{player2?.points}</Col>
         </Row>
         )
     } else {
         return (
             <Row className="mb-3">
-                <Col>{props.match.table_num}</Col>
+                <Col className="col-1 col-md-2">{props.match.table_num}</Col>
                 <Col><TournamentPlayerName player={player1} /></Col>
-                <Col>{player1?.points}</Col>
+                <Col className="col-1">{player1?.points}</Col>
                 <Col><TournamentPlayerName player={player2} /></Col>
-                <Col>{player2?.points}</Col>
+                <Col className="col-1">{player2?.points}</Col>
             </Row>
             )
     }

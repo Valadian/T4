@@ -17,26 +17,26 @@ export default function TournamentResultSubmission(props) {
     return (
     <>
         <Row className="pb-1 header mb-3">
-            <Col>Round #</Col>
-            <Col>Table #</Col>
-            <Col>Opponent</Col>
-            <Col>Points</Col>
-            <Col>TP</Col>
-            <Col>W/L</Col>
+            <Col className="col-1 col-md-2"><span className="d-none d-md-inline">Round #</span><span className="d-inline d-md-none">Rnd</span></Col>
+            <Col className="col-1 col-md-2"><span className="d-none d-md-inline">Table #</span><span className="d-inline d-md-none">Tbl</span></Col>
+            <Col className="col-4 col-md-3"><span className="d-none d-md-inline">Opponent</span><span className="d-inline d-md-none">Opp</span></Col>
+            <Col className="col-2">Points</Col>
+            <Col className="col-1">TP</Col>
+            <Col className="col-3 col-md-2">W/L</Col>
         </Row>
         {rounds.filter(roundHasMyGame).map(r => { 
             var m = myGame(r)
             var mp_self = myself(m)
             var mp_opp = opponent(m)
         return (<Row key={r.id}>
-                <Col>{r.round_num}</Col>
-                <Col>{m.table_num}</Col>
-                <Col><TournamentPlayerName player={opponent(m)}/></Col>
-                <Col>{mp_self.points}</Col>
-                <Col>{mp_self.tournament_points}</Col>
+                <Col className="col-1 col-md-2">{r.round_num}</Col>
+                <Col className="col-1 col-md-2">{m.table_num}</Col>
+                <Col className="col-4 col-md-3"><TournamentPlayerName player={opponent(m)}/></Col>
+                <Col className="col-2">{mp_self.points}</Col>
+                <Col className="col-1">{mp_self.tournament_points}</Col>
                 {mp_self.win?
-                <Col className="bg-success">WIN</Col>:
-                <Col className="bg-danger">LOSS</Col>}
+                <Col className="col-3 col-md-2" className="bg-success">WIN</Col>:
+                <Col className="col-3 col-md-2" className="bg-danger">LOSS</Col>}
         </Row>)
         })}
     </>

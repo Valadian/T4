@@ -11,17 +11,17 @@ export default function TournamentPlayerName(props){
     }
     if (props.player.User){
         return (
-            <>
+            <span className={isYou?"text-info":""}>
             {props.player.User.name}&nbsp;
-            <i className="bi bi-check-circle-fill" title="Registered User"></i>&nbsp;
-            {isYou?<span className="badge bg-info">You</span>:<></>}
-            </>
+            <i className="bi bi-check-circle-fill d-none d-md-inline" title="Registered User"></i><span className="d-inline d-md-none" title="Registered User">*</span>&nbsp;
+            {isYou?<span className="badge bg-info d-none d-md-inline">You</span>:<></>}
+            </span>
         )
     } else {
         return (
-            <>
+            <span>
             {props.player.player_name}
-            </>
+            </span>
         )
     }
 }
