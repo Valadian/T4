@@ -39,8 +39,8 @@ services:
   matchmaker-service:
     #image: sprintska/matchmaker:v0.1.6-arm
     image: sprintska/matchmaker:v0.1.6-x64
-    ports:
-    - "80:80"
+    #ports:
+    #- "80:80"
     depends_on:
     - "graphql-engine"
     restart: always
