@@ -5,7 +5,7 @@ async function Query(operationName, operationDoc, variables, accessToken) {
   if (accessToken) {
     headers["Authorization"] = `Bearer ${accessToken}`;
   }
-  graph_url = process.env.REACT_APP_GRAPH_URL;
+  var graph_url = process.env.REACT_APP_GRAPH_URL;
 
   return fetch(graph_url, {
     method: "POST",
