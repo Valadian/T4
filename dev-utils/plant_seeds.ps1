@@ -2,8 +2,8 @@ $ErrorActionPreference = "SilentlyContinue"
 
 $seeded_tables = @( # Names of non-enum tables for which we have exported seed data
     'User',
-    'Tournament',
-    'ScoringRuleset'
+    'ScoringRuleset',
+    'Tournament'
 )
 
 $dev_utils_folder = $MyInvocation.MyCommand.Path | Split-Path -Parent

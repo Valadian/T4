@@ -1,6 +1,6 @@
 #! /bin/bash
 
-export SEEDED_TABLES=("User" "Tournament" "ScoringRuleset") # Names of non-enum tables for which we have exported seed data
+export SEEDED_TABLES=("User" "ScoringRuleset" "Tournament") # Names of non-enum tables for which we have exported seed data
 
 export DEV_UTILS_FOLDER="${0%/*}"
 
