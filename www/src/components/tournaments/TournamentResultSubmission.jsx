@@ -92,7 +92,8 @@ export default function TournamentResultSubmission(props) {
                 </select>
             </Col>
             <Col className="col-2 col-lg-1">
-                <a className="btn btn-outline-success" onClick={() => saveMatch(mp_self)}><i className="bi bi-check-square"></i></a>
+                <a className="btn btn-outline-success" onClick={() => saveMatch(mp_self)} title="Save Match"><i className="bi bi-check-square"></i></a>
+                <a className="btn btn-outline-danger" onClick={cancelMatch} title="Cancel Edit"><i className="bi bi-x-square"></i></a>
             </Col>
         </>
     }
@@ -128,6 +129,7 @@ export default function TournamentResultSubmission(props) {
             
         </>
     }
+    const cancelMatch = () => setMatchId(null)
     const saveMatch = async (mp) => {
         if(win===""){
             return
