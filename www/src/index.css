@@ -23,3 +23,12 @@ input:disabled {
 input.form-control {
   background-color: #181818;
 }
+div.paddedLikeInput {
+  padding: .375rem .75rem
+}
+.roundRow {
+  border-bottom: #375a7f dotted 1px;
+}
+.roundVerified {
+  background-color: #204030
+}

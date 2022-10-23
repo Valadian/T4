@@ -69,6 +69,65 @@ export default function TournamentResultSubmission(props) {
         setOppPts(mp.opp_points??0);
         setWin(mp.win);
     }
+    const notNullAndEqual = (v1,v2) => v1!=null && v2!=null && v1===v2
+    const notNullAndNotEqual = (v1,v2) => v1!=null && v2!=null && v1!==v2
+    const notNullAndAddsTo11 = (v1,v2) => v1!=null && v2!=null && v1+v2===11
+    const EditCols = (props) => {
+        var mp_self =  props.mp_self
+        var mp_opp =  props.mp_opp
+        return <>
+            <Col className="col-2">
+                <input className="form-control bg-dark text-white w-100" value={points} onChange={(evt) => setPoints(evt.target.value)}></input>
+            </Col>
+            <Col className="col-2">
+                <input className="form-control bg-dark text-white w-100" value={oppPts} onChange={(evt) => setOppPts(evt.target.value)}></input>
+            </Col>
+            <Col className="col-2 col-lg-1 paddedLikeInput">{mov}</Col>
+            <Col className="col-2 col-lg-1 paddedLikeInput">{tp}</Col>
+            <Col className="col-2">
+                <select className={"form-select bg-dark"+(win==="true"?" text-success":(win==="false"?" text-danger":""))} value={win} onChange={(evt) => setWin(evt.target.value)}>
+                    <option value={true}>Win</option>
+                    <option value={false}>Loss</option>
+                    <option value="">?</option>
+                </select>
+            </Col>
+            <Col className="col-2 col-lg-1">
+                <a className="btn btn-outline-success" onClick={() => saveMatch(mp_self)}><i className="bi bi-check-square"></i></a>
+            </Col>
+        </>
+    }
+    const ViewCols = (props) => {
+        var mp_self =  props.mp_self
+        var mp_opp =  props.mp_opp
+
+        return <>
+            <Col className="col-2 paddedLikeInput">
+                <span>{mp_self.points}&nbsp;
+                    {notNullAndNotEqual(mp_opp.opp_points,mp_self.points)?<span className="text-danger" title="Opponent Reported Value">({mp_opp.opp_points})</span>:<></>}
+                    {notNullAndEqual(mp_opp.opp_points,mp_self.points)?<i className="bi bi-check-circle-fill d-none d-md-inline text-info" title="Verified"></i>:<></>}
+                </span>
+            </Col>
+            <Col className="col-2 paddedLikeInput">
+                <span>{mp_self.opp_points}&nbsp;
+                    {notNullAndNotEqual(mp_opp.points,mp_self.opp_points)?<span className="text-danger" title="Opponent Reported Value">({mp_opp.points})</span>:<></>}
+                    {notNullAndEqual(mp_opp.points,mp_self.opp_points)?<i className="bi bi-check-circle-fill d-none d-md-inline text-info" title="Verified"></i>:<></>}
+                </span>
+            </Col>
+            <Col className="col-2 col-lg-1 paddedLikeInput">{mp_self.mov}</Col>
+            <Col className="col-2 col-lg-1 paddedLikeInput">{mp_self.tournament_points}&nbsp;
+                    {notNullAndAddsTo11(mp_self.tournament_points,mp_opp.tournament_points)?<i className="bi bi-check-circle-fill d-none d-md-inline text-info" title="Verified"></i>:<></>}
+            </Col>
+            <Col className="col-2 paddedLikeInput">
+                <span>{mp_self.win?<span className="text-success">Win</span>:<span className="text-danger">Loss</span>}&nbsp;
+                    {notNullAndNotEqual(mp_opp.win,mp_self.win)?<i className="bi bi-check-circle-fill d-none d-md-inline text-info" title="Verified"></i>:<></>}
+                </span>
+            </Col>
+            <Col className="col-2 col-lg-1">
+                <a className="btn btn-outline-primary" onClick={() => editMatch(mp_self)}><i className="bi bi-pen"></i></a>
+            </Col>
+            
+        </>
+    }
     const saveMatch = async (mp) => {
         if(win===""){
             return
@@ -109,54 +168,18 @@ export default function TournamentResultSubmission(props) {
             var m = myGame(r)
             var mp_self = myself(m)
             var mp_opp = opponent(m)
+            var verified =  notNullAndEqual(mp_opp.opp_points,mp_self.points) && 
+                            notNullAndEqual(mp_opp.points,mp_self.opp_points) &&
+                            notNullAndAddsTo11(mp_self.tournament_points,mp_opp.tournament_points) &&
+                            notNullAndNotEqual(mp_opp.win,mp_self.win)
         return (
-        <Row key={r.id}>
-            <Col className="col-12 col-lg-3"><span title={"Round "+m.round_num}>Rnd {r.round_num}</span>, <span title={"Table "+m.table_num}>Tbl #{m.table_num}</span> vs. <TournamentPlayerName player={opponent(m)}/></Col>
+        <Row className={"roundRow"+(verified?" roundVerified":"")} key={r.id}>
+            <Col className="col-12 col-lg-3 paddedLikeInput"><span title={"Round "+m.round_num}>Rnd {r.round_num}</span>, <span title={"Table "+m.table_num}>Tbl #{m.table_num}</span> vs. <TournamentPlayerName player={opponent(m)}/></Col>
             
-            <Col className="col-2">
-                {mp_self.id===matchId?
-                <input className="form-control bg-dark text-white w-100" value={points} onChange={(evt) => setPoints(evt.target.value)}></input>:
-                <span>{mp_self.points}&nbsp;
-                    {mp_opp.opp_points!=null && mp_self.points!=null && mp_self.points!==mp_opp.opp_points?
-                    <span className="text-danger" title="Opponent Reported Value">({mp_opp.opp_points})</span>:
-                    (mp_self.points!=null && mp_opp.opp_points!=null?
-                        <i className="bi bi-check-circle-fill d-none d-md-inline text-info" title="Verified"></i>:
-                        <></>)
-                    }</span>}
-            </Col>
-            <Col className="col-2">
-                {mp_self.id===matchId?
-                <input className="form-control bg-dark text-white w-100" value={oppPts} onChange={(evt) => setOppPts(evt.target.value)}></input>:
-                <span>{mp_self.opp_points}&nbsp;
-                    {mp_opp.points!=null && mp_self.opp_points!=null && mp_self.opp_points!==mp_opp.points?
-                    <span className="text-danger" title="Opponent Reported Value">({mp_opp.points})</span>:
-                    (mp_self.opp_points!=null && mp_opp.points!=null?
-                        <i className="bi bi-check-circle-fill d-none d-md-inline text-info" title="Verified"></i>:
-                        <></>)
-                    }</span>}
-            </Col>
-            <Col className="col-2 col-lg-1" style={{padding: ".375rem .75rem"}}>{mp_self.id===matchId?mov:mp_self.mov}</Col>
-            <Col className="col-2 col-lg-1" style={{padding: ".375rem .75rem"}}>{mp_self.id===matchId?tp:mp_self.tournament_points}&nbsp;
-                    {mp_self.tournament_points!=null && mp_opp.tournament_points!=null && mp_self.tournament_points+mp_opp.tournament_points===11?<i className="bi bi-check-circle-fill d-none d-md-inline text-info" title="Verified"></i>:<></>}
-            </Col>
+            
             {mp_self.id===matchId?
-            <Col className="col-2">
-                <select className={"form-select bg-dark"+(win==="true"?" text-success":(win==="false"?" text-danger":""))} value={win} onChange={(evt) => setWin(evt.target.value)}>
-                    <option value={true}>Win</option>
-                    <option value={false}>Loss</option>
-                    <option value="">?</option>
-                </select>
-            </Col>:
-            <Col className="col-2" style={{padding: ".375rem .75rem"}}>
-                <span style={{padding: ".375rem .75rem"}}>{mp_self.win?<span className="text-success">Win</span>:<span className="text-danger">Loss</span>}&nbsp;
-                    {mp_opp.win!=null && mp_self.win!=null && mp_self.win===!mp_opp.win?<i className="bi bi-check-circle-fill d-none d-md-inline text-info" title="Verified"></i>:<></>}
-                </span>
-            </Col>}
-            <Col className="col-2 col-lg-1">
-                {mp_self.id===matchId?
-                <a className="btn btn-outline-success" onClick={() => saveMatch(mp_self)}><i className="bi bi-check-square"></i></a>:
-                <a className="btn btn-outline-primary" onClick={() => editMatch(mp_self)}><i className="bi bi-pen"></i></a>}
-            </Col>
+            <EditCols mp_self={mp_self} mp_opp={mp_opp}/>:
+            <ViewCols mp_self={mp_self} mp_opp={mp_opp}/>}
         </Row>)
         })}
     </>
