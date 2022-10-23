@@ -27,6 +27,8 @@ select_permissions:
         - confirmed
         - id
         - match_id
+        - mov
+        - opp_points
         - participant_list_id
         - player_name
         - points
@@ -40,6 +42,8 @@ select_permissions:
         - confirmed
         - id
         - match_id
+        - mov
+        - opp_points
         - participant_list_id
         - player_name
         - points
@@ -51,8 +55,12 @@ update_permissions:
   - role: user
     permission:
       columns:
-        - confirmed
         - match_id
+        - mov
+        - opp_points
+        - points
+        - tournament_points
+        - win
       filter:
         _or:
           - user_id:
