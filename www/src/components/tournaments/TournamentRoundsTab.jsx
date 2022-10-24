@@ -95,11 +95,16 @@ export default function TournamentRoundsTab(props) {
                 {rounds.map(r => <Tab key={r.id} eventKey={"round_"+r.round_num} title={<span><i className="bi bi-bullseye"></i> <span className="d-none d-md-inline">Round </span>{r.round_num}</span>}>
     
                 <Row className="pb-1 header mb-3">
-                    <Col className="col-1 col-md-2"><span className="d-none d-md-inline">Table #</span><span className="d-inline d-md-none">Tbl</span></Col>
-                    <Col></Col>
-                    <Col className="col-1"><span className="d-none d-md-inline">Points</span><span className="d-inline d-md-none">pts</span></Col>
-                    <Col></Col>
-                    <Col className="col-1"><span className="d-none d-md-inline">Points</span><span className="d-inline d-md-none">pts</span></Col>
+                    <Col className="col-2 col-sm-1"><span className="d-none d-lg-inline">Table #</span><span className="d-inline d-lg-none">Tbl</span></Col>
+                    <Col className="col-6 col-sm-8 col-md-9">
+                        <Row>
+                            <Col className="col-9 col-md-4"></Col>
+                            <Col className="col-3 col-md-2"><span className="d-none d-md-inline">Points</span><span className="d-inline d-md-none">pts</span></Col>
+                            <Col className="col-9 col-md-4 d-none d-md-block"></Col>
+                            <Col className="col-3 col-md-2 d-none d-md-block"><span className="d-none d-md-inline">Points</span><span className="d-inline d-md-none">pts</span></Col>
+                        </Row>
+                    </Col>
+                    <Col className="col-4 col-sm-3 col-md-2"></Col>
                 </Row>
                 {r.Matches.map(m => <TournamentMatch key={m.id} match={m}/>)}
                 {r.Matches.length===0?<span className="form-group"><a className="btn btn-outline-danger" onClick={() => deleteRound(r.id)}><i className="bi bi-x"></i> Delete Round</a></span>:<></>}

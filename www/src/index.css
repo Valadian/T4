@@ -29,6 +29,15 @@ div.paddedLikeInput {
 .roundRow {
   border-bottom: #375a7f dotted 1px;
 }
+.col-r-border {
+  border-right: #375a7f dotted 1px;
+}
 .roundVerified {
   background-color: #204030
+}
+.roundWin {
+  background-color: #204030
+}
+.roundLoss {
+  background-color: #402030
 }

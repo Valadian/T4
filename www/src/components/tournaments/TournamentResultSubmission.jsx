@@ -4,6 +4,7 @@ import Query from "../../data/T4GraphContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 import TournamentPlayerName from "./TournamentPlayerName";
+import ptsToTp from "../../util/armada";
 
 const updateDoc = `
 mutation updateMatchPlayer($id: uuid!, $points: Int!, $opp_points: Int!, $tournament_points: Int!, $win: Boolean!, $mov: Int!) {
@@ -42,19 +43,7 @@ export default function TournamentResultSubmission(props) {
     },[oppPts, points])
 
     useEffect(() => {
-        var mov = points-oppPts
-        var delta = Math.abs(points-oppPts)
-        if (delta < 60) {
-            setTP((mov>0||win)?6:5)
-        } else if (delta<140) {
-            setTP((mov>0||win)?7:4)
-        } else if (delta<220) {
-            setTP((mov>0||win)?8:3)
-        } else if (delta<300) {
-            setTP((mov>0||win)?9:2)
-        } else {
-            setTP((mov>0||win)?10:1)
-        }
+        setTP(ptsToTp(points, oppPts, win))
     },[points,oppPts,win])
 
     const isMine = (match) => match.Players.map(mp => mp.User?.id).includes(user?.sub)
@@ -175,7 +164,7 @@ export default function TournamentResultSubmission(props) {
                             notNullAndAddsTo11(mp_self.tournament_points,mp_opp.tournament_points) &&
                             notNullAndNotEqual(mp_opp.win,mp_self.win)
         return (
-        <Row className={"roundRow"+(verified?" roundVerified":"")} key={r.id}>
+        <Row className={"pb-3 roundRow"+(verified?" roundVerified":"")} key={r.id}>
             <Col className="col-12 col-lg-3 paddedLikeInput"><span title={"Round "+m.round_num}>Rnd {r.round_num}</span>, <span title={"Table "+m.table_num}>Tbl #{m.table_num}</span> vs. <TournamentPlayerName player={opponent(m)}/></Col>
             
             
