@@ -29,6 +29,7 @@ select_permissions:
     permission:
       columns:
         - description
+        - finalized
         - id
         - round_num
         - tournament_id
@@ -44,6 +45,7 @@ select_permissions:
     permission:
       columns:
         - description
+        - finalized
         - id
         - round_num
         - tournament_id
@@ -65,6 +67,7 @@ update_permissions:
     permission:
       columns:
         - description
+        - finalized
         - round_num
       filter:
         Tournament:

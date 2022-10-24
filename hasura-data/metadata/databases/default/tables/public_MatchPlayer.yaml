@@ -63,21 +63,31 @@ update_permissions:
         - win
       filter:
         _or:
-          - user_id:
-              _eq: X-Hasura-User-Id
           - Match:
               Round:
                 Tournament:
                   creator_id:
                     _eq: X-Hasura-User-Id
+          - _and:
+              - Match:
+                  Round:
+                    finalized:
+                      _eq: false
+              - user_id:
+                  _eq: X-Hasura-User-Id
       check:
         _or:
-          - user_id:
-              _eq: X-Hasura-User-Id
           - Match:
               Round:
                 Tournament:
                   creator_id:
                     _eq: X-Hasura-User-Id
+          - _and:
+              - Match:
+                  Round:
+                    finalized:
+                      _eq: false
+              - user_id:
+                  _eq: X-Hasura-User-Id
       set:
         confirmed: "false"
