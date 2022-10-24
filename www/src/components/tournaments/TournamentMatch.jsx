@@ -70,14 +70,17 @@ export default function TournamentMatch(props){
     }
     const edit = () => {
         setEditing(true)
-        setPlayer1Pts((player1?.points)??0)
-        setPlayer2Pts((player2?.points)??0)
+        setPlayer1Pts((player1?.points)??(player2?.opp_points)??0)
+        setPlayer2Pts((player2?.points)??(player1?.opp_points)??0)
     }
     const MatchPlayerBg = (mp) => {
         if(mp.win==null) { return ""}
         else if(mp.win) {return " roundWin"}
         else {return " roundLoss"}
     }
+    const notNullAndEqual = (v1,v2) => v1!=null && v2!=null && v1===v2
+    const notNullAndNotEqual = (v1,v2) => v1!=null && v2!=null && v1!==v2
+    
     const save = async () => {
         player1.points = player1Pts
         player1.opp_points = player2Pts
@@ -131,7 +134,11 @@ export default function TournamentMatch(props){
                     <Col className={"col-3 col-md-2 col-r-border pb-3"+MatchPlayerBg(player1)}>
                         {editing?
                         <input className="form-control bg-dark text-white w-100" value={player1Pts} onChange={(evt) => setPlayer1Pts(evt.target.value)}></input>:
-                        player1?.points}
+                        <>
+                        {player1?.points}
+                        {player1?.points===null && player2?.opp_points!==null?<span className="text-muted" title="Opponent Reported Value">({player2?.opp_points})</span>:<></>}
+                        {notNullAndNotEqual(player1?.points,player2?.opp_points)?<span className="text-danger" title="Opponent Reported Value">({player2?.opp_points})</span>:<></>}
+                        </>}
                     </Col>
                     <Col className={"draggablePlayer col-9 col-md-4 pb-3"+MatchPlayerBg(player2)} draggable="true"  onDragStart={dragPlayer2} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer2(e)}>
                         <TournamentPlayerName player={player2} />
@@ -139,7 +146,12 @@ export default function TournamentMatch(props){
                     <Col className={"col-3 col-md-2 pb-3"+MatchPlayerBg(player2)}>
                         {editing?
                         <input className="form-control bg-dark text-white w-100" value={player2Pts} onChange={(evt) => setPlayer2Pts(evt.target.value)}></input>:
-                        player2?.points}
+                        <>
+                        {player2?.points}
+                        {player2?.points===null && player1?.opp_points!==null?<span className="text-muted" title="Opponent Reported Value">({player1?.opp_points})</span>:<></>}
+                        {notNullAndNotEqual(player2?.points,player1?.opp_points)?<span className="text-danger" title="Opponent Reported Value">({player1?.opp_points})</span>:<></>}
+                        
+                        </>}
                     </Col>
                 </Row>
             </Col>
