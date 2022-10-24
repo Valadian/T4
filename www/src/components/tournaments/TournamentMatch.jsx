@@ -125,27 +125,33 @@ export default function TournamentMatch(props){
     if(isOwner){
         return (
         <Row className="roundRow">
-            <Col className="col-2 col-sm-1">{props.match.table_num}</Col>
-            <Col className="col-6 col-sm-8 col-md-9">
-                <Row>
-                    <Col className={"draggablePlayer col-9 col-md-4 pb-3"+MatchPlayerBg(player1)} draggable="true"  onDragStart={dragPlayer1} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer1(e)}>
+            <Col className="col-1">{props.match.table_num}</Col>
+            <Col className="col-9 col-md-10">
+                <Row className="h-100">
+                    <Col className={"draggablePlayer col-7 col-sm-8 col-lg-4 pb-3"+MatchPlayerBg(player1)} draggable="true"  onDragStart={dragPlayer1} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer1(e)}>
                         <TournamentPlayerName player={player1} />
                     </Col>
-                    <Col className={"col-3 col-md-2 col-r-border pb-3"+MatchPlayerBg(player1)}>
+                    <Col className={"col-5 col-sm-4 col-lg-2 col-r-border pb-3"+MatchPlayerBg(player1)}>
                         {editing?
-                        <input className="form-control bg-dark text-white w-100" value={player1Pts} onChange={(evt) => setPlayer1Pts(evt.target.value)}></input>:
+                        <div className="input-group">
+                            <input className="form-control bg-dark text-white" value={player1Pts} onChange={(evt) => setPlayer1Pts(evt.target.value)}></input>
+                            <button class={"btn "+(player1Win?"btn-warning":"btn-outline-secondary")} type="button" onClick={() => setPlayer1Win(true)}><i className="bi bi-trophy-fill" title="win"></i></button>
+                        </div>:
                         <>
                         {player1?.points}
                         {player1?.points===null && player2?.opp_points!==null?<span className="text-muted" title="Opponent Reported Value">({player2?.opp_points})</span>:<></>}
                         {notNullAndNotEqual(player1?.points,player2?.opp_points)?<span className="text-danger" title="Opponent Reported Value">({player2?.opp_points})</span>:<></>}
                         </>}
                     </Col>
-                    <Col className={"draggablePlayer col-9 col-md-4 pb-3"+MatchPlayerBg(player2)} draggable="true"  onDragStart={dragPlayer2} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer2(e)}>
+                    <Col className={"draggablePlayer col-7 col-sm-8 col-lg-4 pb-3"+MatchPlayerBg(player2)} draggable="true"  onDragStart={dragPlayer2} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer2(e)}>
                         <TournamentPlayerName player={player2} />
                     </Col>
-                    <Col className={"col-3 col-md-2 pb-3"+MatchPlayerBg(player2)}>
+                    <Col className={"col-5 col-sm-4 col-lg-2 pb-3"+MatchPlayerBg(player2)}>
                         {editing?
-                        <input className="form-control bg-dark text-white w-100" value={player2Pts} onChange={(evt) => setPlayer2Pts(evt.target.value)}></input>:
+                        <div className="input-group">
+                            <input className="form-control bg-dark text-white" value={player2Pts} onChange={(evt) => setPlayer2Pts(evt.target.value)}></input>
+                            <button class={"btn "+(player1Win?"btn-outline-secondary":"btn-warning")} type="button" onClick={() => setPlayer1Win(false)}><i className="bi bi-trophy-fill" title="win"></i></button>
+                        </div>:
                         <>
                         {player2?.points}
                         {player2?.points===null && player1?.opp_points!==null?<span className="text-muted" title="Opponent Reported Value">({player1?.opp_points})</span>:<></>}
@@ -155,7 +161,7 @@ export default function TournamentMatch(props){
                     </Col>
                 </Row>
             </Col>
-            <Col className="col-4 col-sm-3 col-md-2">
+            <Col className="col-2 col-md-1">
                 {editing?
                 <>
                     <a className="btn btn-outline-success" onClick={save}><i className="bi bi-check-square"></i></a>
@@ -171,16 +177,16 @@ export default function TournamentMatch(props){
     } else {
         return (
             <Row className="roundRow">
-                <Col className="col-2 col-sm-1">{props.match.table_num}</Col>
-                <Col className="col-8 col-sm-10">
+                <Col className="col-1">{props.match.table_num}</Col>
+                <Col className="col-9 col-md-10">
                     <Row>
-                        <Col className={"col-9 col-md-4 pb-3"+MatchPlayerBg(player1)}><TournamentPlayerName player={player1} /></Col>
-                        <Col className={"col-3 col-md-2 pb-3"+MatchPlayerBg(player1)}>{player1?.points}</Col>
-                        <Col className={"col-9 col-md-4 pb-3"+MatchPlayerBg(player2)}><TournamentPlayerName player={player2} /></Col>
-                        <Col className={"col-3 col-md-2 pb-3"+MatchPlayerBg(player2)}>{player2?.points}</Col>
+                        <Col className={"col-7 col-sm-8 col-lg-4 pb-3"+MatchPlayerBg(player1)}><TournamentPlayerName player={player1} /></Col>
+                        <Col className={"col-5 col-sm-4 col-lg-2 pb-3"+MatchPlayerBg(player1)}>{player1?.points}</Col>
+                        <Col className={"col-7 col-sm-8 col-lg-4 pb-3"+MatchPlayerBg(player2)}><TournamentPlayerName player={player2} /></Col>
+                        <Col className={"col-5 col-sm-4 col-lg-2 pb-3"+MatchPlayerBg(player2)}>{player2?.points}</Col>
                     </Row>
                 </Col>
-                <Col className="col-2 col-sm-1"></Col>
+                <Col className="col-2 col-md-1"></Col>
             </Row>
             )
     }
