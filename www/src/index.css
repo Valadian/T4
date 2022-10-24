@@ -35,6 +35,9 @@ div.paddedLikeInput {
 .roundVerified {
   background-color: #203040
 }
+.roundConflict {
+  background-color: #402030
+}
 .roundWin {
   background-color: #204030
 }

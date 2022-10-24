@@ -128,8 +128,12 @@ export default function TournamentResultSubmissionMatch(props){
                     notNullAndEqual(props.mp_opp.points,props.mp_self.opp_points) &&
                     notNullAndAddsTo11(props.mp_self.tournament_points,props.mp_opp.tournament_points) &&
                     notNullAndNotEqual(props.mp_opp.win,props.mp_self.win)
+                    
+    var conflict =  notNullAndNotEqual(props.mp_opp.opp_points,props.mp_self.points) || 
+                    notNullAndNotEqual(props.mp_opp.points,props.mp_self.opp_points) ||
+                    notNullAndEqual(props.mp_opp.win,props.mp_self.win)
     return (
-        <Row className={"pb-3 roundRow"+(verified?" roundVerified":"")}>
+        <Row className={"pb-3 roundRow"+(verified?" roundVerified":"")+(conflict?" roundConflict":"")}>
             <Col className="col-12 col-lg-3 paddedLikeInput"><span title={"Round "+props.round.round_num}>Rnd {props.round.round_num}</span>, <span title={"Table "+props.match.table_num}>Tbl #{props.match.table_num}</span> vs. <TournamentPlayerName player={props.mp_opp}/></Col>
             
             
