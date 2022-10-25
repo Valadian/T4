@@ -1,5 +1,5 @@
 import React, {useContext, useState, useEffect} from "react"
-import { Col, Row } from "react-bootstrap";
+import { Col, NavItem, Row } from "react-bootstrap";
 import { useAuth0 } from "@auth0/auth0-react";
 import Query from "../../data/T4GraphContext";
 import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
@@ -7,7 +7,7 @@ import TournamentPlayerName from "./TournamentPlayerName";
 import ptsToTp from "../../util/armada"
 
 const swapDoc = `
-mutation SwapPlayers($id1: uuid!, $match_id1: uuid!, $id2: uuid!, $match_id2: uuid!) {
+mutation SwapPlayers($id1: uuid, $match_id1: uuid!, $id2: uuid!, $match_id2: uuid!) {
     update1: update_MatchPlayer_by_pk(pk_columns: {id: $id1}, _set: {match_id: $match_id2}) {
         id
     }
@@ -23,6 +23,19 @@ mutation updateMatchPlayer($id: uuid!, $points: Int!, $opp_points: Int!, $tourna
     }
   }
   ` 
+const deleteDoc = `
+mutation deleteMatch($id: uuid!) {
+    delete_Match_by_pk(id: $id) {
+      id
+    }
+  }`
+const assignDoc = `
+mutation AssignPlayer($ladder_name: String = null, $ladder_user_id: String = null, $id: uuid!) {
+    update_MatchPlayer_by_pk(pk_columns: {id: $id}, _set: {player_name: $ladder_name, user_id: $ladder_user_id}) {
+        id
+    }
+}
+`
 export default function TournamentMatch(props){
     const { user, getAccessTokenSilently } = useAuth0();
     const {updateTournament, isOwner} = useContext(TournamentHomeContext);
@@ -36,6 +49,16 @@ export default function TournamentMatch(props){
     const allowDrop = (ev) => ev.preventDefault();
     const dragPlayer1 = (e) => e.dataTransfer.setData("player",JSON.stringify(player1));
     const dragPlayer2 = (e) => e.dataTransfer.setData("player",JSON.stringify(player2));
+    const assign = async (p1, p2) => {
+        const accessToken = await getAccessTokenSilently()
+        Query("AssignPlayer", assignDoc, { 
+            ladder_name: p1.player_name, 
+            ladder_user_id: p1.User?.id,
+            id: p2.id, },accessToken)
+        .then((response) => {
+            updateTournament();
+        })
+    }
     const swap = async (p1, p2) => {
         const accessToken = await getAccessTokenSilently()
         Query("SwapPlayers", swapDoc, { 
@@ -59,19 +82,32 @@ export default function TournamentMatch(props){
     const handleDropPlayer1 = (e) => {
         var from = JSON.parse(e.dataTransfer.getData("player"))
         var to = player1
-        swap(from, to);
+        if (from.match_id==null) {
+            if (to.player_name==null && to.User==null) {
+                assign(from, to);
+            }
+        } else {
+            swap(from, to);
+        }
         //console.log("Swapping: "+JSON.parse(e.dataTransfer.getData("player"))?.player_name+" for: "+player1?.player_name)
     }
     const handleDropPlayer2 = (e) => {
         var from = JSON.parse(e.dataTransfer.getData("player"))
         var to = player2
-        swap(from, to);
+        if (from.match_id==null) {
+            if (to.player_name==null && to.User==null) {
+                assign(from, to);
+            }
+        } else {
+            swap(from, to);
+        }
         //console.log("Swapping: "+JSON.parse(e.dataTransfer.getData("player"))?.player_name+" for: "+player2?.player_name)
     }
     const edit = () => {
         setEditing(true)
         setPlayer1Pts((player1?.points)??(player2?.opp_points)??0)
         setPlayer2Pts((player2?.points)??(player1?.opp_points)??0)
+        setPlayer1Win((player1?.win)??true)
     }
     const MatchPlayerBg = (mp) => {
         if(mp.win==null) { return ""}
@@ -121,6 +157,43 @@ export default function TournamentMatch(props){
     const cancel = () => {
         setEditing(false)
     }
+    const deleteMatch = async () => {
+        const accessToken = await getAccessTokenSilently()
+        Query("deleteMatch", deleteDoc, {
+            id: props.match.id
+        },accessToken)
+        .then(() => {
+            updateTournament();
+        })
+        .then(() => {
+            setEditing(false);
+        });
+    }
+    const wipe = async () => {
+        const accessToken = await getAccessTokenSilently()
+        Query("updateMatchPlayer", updateDoc, {
+            id: player1.id,
+            points: null,
+            opp_points: null,
+            mov: null,
+            tournament_points: null,
+            win: null
+        },accessToken)
+        .then(() => Query("updateMatchPlayer", updateDoc, {
+            id: player2.id,
+            points: null,
+            opp_points: null,
+            mov: null,
+            tournament_points: null,
+            win: null
+        },accessToken))
+        .then(() => {
+            updateTournament();
+        })
+        .then(() => {
+            setEditing(false);
+        });
+    }
     //TODO: Handle null player 2 (Buy)
     if(isOwner){
         return (
@@ -128,14 +201,14 @@ export default function TournamentMatch(props){
             <Col className="col-1">{props.match.table_num}</Col>
             <Col className="col-9 col-md-10">
                 <Row className="h-100">
-                    <Col className={"draggablePlayer col-7 col-sm-8 col-lg-4 pb-3"+MatchPlayerBg(player1)} draggable="true"  onDragStart={dragPlayer1} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer1(e)}>
+                    <Col className={"draggablePlayer col-7 col-sm-8 col-lg-4 pb-3 paddedLikeInput"+MatchPlayerBg(player1)} draggable="true"  onDragStart={dragPlayer1} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer1(e)}>
                         <TournamentPlayerName player={player1} />
                     </Col>
-                    <Col className={"col-5 col-sm-4 col-lg-2 col-r-border pb-3"+MatchPlayerBg(player1)}>
+                    <Col className={"col-5 col-sm-4 col-lg-2 col-r-border pb-3 paddedLikeInput"+MatchPlayerBg(player1)}>
                         {editing?
                         <div className="input-group">
                             <input className="form-control bg-dark text-white" value={player1Pts} onChange={(evt) => setPlayer1Pts(evt.target.value)}></input>
-                            <button class={"btn "+(player1Win?"btn-warning":"btn-outline-secondary")} type="button" onClick={() => setPlayer1Win(true)}><i className="bi bi-trophy-fill" title="win"></i></button>
+                            <button className={"btn "+(player1Win?"btn-warning":"btn-outline-secondary")} type="button" onClick={() => setPlayer1Win(true)}><i className="bi bi-trophy-fill" title="win"></i></button>
                         </div>:
                         <>
                         {player1?.points}
@@ -143,14 +216,14 @@ export default function TournamentMatch(props){
                         {notNullAndNotEqual(player1?.points,player2?.opp_points)?<span className="text-danger" title="Opponent Reported Value">({player2?.opp_points})</span>:<></>}
                         </>}
                     </Col>
-                    <Col className={"draggablePlayer col-7 col-sm-8 col-lg-4 pb-3"+MatchPlayerBg(player2)} draggable="true"  onDragStart={dragPlayer2} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer2(e)}>
+                    <Col className={"draggablePlayer col-7 col-sm-8 col-lg-4 pb-3 paddedLikeInput"+MatchPlayerBg(player2)} draggable="true"  onDragStart={dragPlayer2} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer2(e)}>
                         <TournamentPlayerName player={player2} />
                     </Col>
-                    <Col className={"col-5 col-sm-4 col-lg-2 pb-3"+MatchPlayerBg(player2)}>
+                    <Col className={"col-5 col-sm-4 col-lg-2 pb-3 paddedLikeInput"+MatchPlayerBg(player2)}>
                         {editing?
                         <div className="input-group">
                             <input className="form-control bg-dark text-white" value={player2Pts} onChange={(evt) => setPlayer2Pts(evt.target.value)}></input>
-                            <button class={"btn "+(player1Win?"btn-outline-secondary":"btn-warning")} type="button" onClick={() => setPlayer1Win(false)}><i className="bi bi-trophy-fill" title="win"></i></button>
+                            <button className={"btn "+(player1Win?"btn-outline-secondary":"btn-warning")} type="button" onClick={() => setPlayer1Win(false)}><i className="bi bi-trophy-fill" title="win"></i></button>
                         </div>:
                         <>
                         {player2?.points}
@@ -164,10 +237,14 @@ export default function TournamentMatch(props){
             <Col className="col-2 col-md-1">
                 {editing?
                 <>
-                    <a className="btn btn-outline-success" onClick={save}><i className="bi bi-check-square"></i></a>
-                    <a className="btn btn-outline-danger" onClick={cancel}><i className="bi bi-x-square"></i></a>
+                    <a className="btn btn-outline-primary" onClick={cancel} title="Cancel Edit"><i className="bi bi-pen"></i></a>
+                    <a className="btn btn-outline-success" onClick={save} title="Save Scores"><i className="bi bi-check-square"></i></a>
+                    <a className="btn btn-outline-danger" onClick={wipe} title="Wipe Scores"><i className="bi bi-recycle"></i></a>
+                    <a className="btn btn-danger" onClick={deleteMatch} title="Delete Match"><i className="bi bi-trash-fill"></i></a>
                 </>:
-                <a className="btn btn-outline-primary" onClick={edit}><i className="bi bi-pen"></i></a>
+                !props.round.finalized?
+                    <a className="btn btn-outline-primary" onClick={edit} title="Edit Scores"><i className="bi bi-pen"></i></a>:
+                    <></>
                 }
                 
             </Col>
@@ -180,10 +257,10 @@ export default function TournamentMatch(props){
                 <Col className="col-1">{props.match.table_num}</Col>
                 <Col className="col-9 col-md-10">
                     <Row>
-                        <Col className={"col-7 col-sm-8 col-lg-4 pb-3"+MatchPlayerBg(player1)}><TournamentPlayerName player={player1} /></Col>
-                        <Col className={"col-5 col-sm-4 col-lg-2 pb-3"+MatchPlayerBg(player1)}>{player1?.points}</Col>
-                        <Col className={"col-7 col-sm-8 col-lg-4 pb-3"+MatchPlayerBg(player2)}><TournamentPlayerName player={player2} /></Col>
-                        <Col className={"col-5 col-sm-4 col-lg-2 pb-3"+MatchPlayerBg(player2)}>{player2?.points}</Col>
+                        <Col className={"col-7 col-sm-8 col-lg-4 pb-3 paddedLikeInput"+MatchPlayerBg(player1)}><TournamentPlayerName player={player1} /></Col>
+                        <Col className={"col-5 col-sm-4 col-lg-2 pb-3 paddedLikeInput"+MatchPlayerBg(player1)}>{player1?.points}</Col>
+                        <Col className={"col-7 col-sm-8 col-lg-4 pb-3 paddedLikeInput"+MatchPlayerBg(player2)}><TournamentPlayerName player={player2} /></Col>
+                        <Col className={"col-5 col-sm-4 col-lg-2 pb-3 paddedLikeInput"+MatchPlayerBg(player2)}>{player2?.points}</Col>
                     </Row>
                 </Col>
                 <Col className="col-2 col-md-1"></Col>

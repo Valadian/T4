@@ -119,7 +119,9 @@ export default function TournamentResultSubmissionMatch(props){
                 </span>
             </Col>
             <Col className="col-2 col-lg-1">
-                <a className="btn btn-outline-primary" onClick={() => editMatch()}><i className="bi bi-pen"></i></a>
+                {!props.round.finalized?
+                <a className="btn btn-outline-primary" onClick={() => editMatch()}><i className="bi bi-pen"></i></a>:
+                <></>}
             </Col>
             
         </>

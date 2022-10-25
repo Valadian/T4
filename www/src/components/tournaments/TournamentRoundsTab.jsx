@@ -4,6 +4,7 @@ import Query from "../../data/T4GraphContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import TournamentMatch from "./TournamentMatch";
 import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
+import TournamentPlayerName from "./TournamentPlayerName";
 
 const insertDoc = `
 mutation addNewRound($tournament_id: uuid!, $round_num: numeric!, $description: String!) {
@@ -24,6 +25,21 @@ const insertMatchDoc = `
       }
     }
   `
+const finalizeDoc = `
+  mutation finalizeRound($id: uuid!, $finalized: Boolean!) {
+      update_TournamentRound_by_pk(pk_columns: {id: $id}, _set: {finalized: $finalized}) {
+        id
+      }
+    }
+    ` 
+const addMatchDoc = `
+mutation addMatch($round_id: uuid!, $table_num: Int!) {
+    insert_Match_one(object: {table_num: $table_num, round_id: $round_id, Players: {data: [{}, {}]}}) {
+        id
+    }
+}
+  
+`
 export default function TournamentRoundsTab(props) {
     const { user, getAccessTokenSilently } = useAuth0();
     const [roundNum, setRoundNum] = useState(0);
@@ -83,6 +99,43 @@ export default function TournamentRoundsTab(props) {
             });
         }
     }
+    const setRoundLocked = async (round_id, finalized) => {
+        const accessToken = await getAccessTokenSilently()
+        Query("finalizeRound", finalizeDoc, {
+            id: round_id,
+            finalized: finalized
+        },accessToken)
+        .then(() => {
+            updateTournament();
+        });
+    }
+    const addMatch = async (round) => {
+        var table_num = 1
+        for(var i=1;i<=round.Matches.length+1;i++){
+            // console.log(i,round.Matches[i-1]?.table_num)
+            if(round.Matches[i-1]){
+                if(i<round.Matches[i-1].table_num){
+                    table_num=i;
+                    break;
+                }
+            } else {
+                table_num=i;
+                break;
+            }
+        }
+        // console.log(table_num)
+        const accessToken = await getAccessTokenSilently()
+        Query("addMatch", addMatchDoc, {
+            round_id: round.id,
+            table_num: table_num
+        },accessToken)
+        .then(() => {
+            updateTournament();
+        });
+    }
+    const dragPlayer = (mp) => {
+        return (e) => e.dataTransfer.setData("player",JSON.stringify(mp));
+    }
     if (rounds) {
         return (
             <Tabs
@@ -92,24 +145,48 @@ export default function TournamentRoundsTab(props) {
                 id="uncontrolled-tab-example"
                 className="mb-3"
             >
-                {rounds.map(r => <Tab key={r.id} eventKey={"round_"+r.round_num} title={<span><i className="bi bi-bullseye"></i> <span className="d-none d-md-inline">Round </span>{r.round_num}</span>}>
-    
-                <Row className="pb-1 header mb-3">
-                    <Col className="col-1"><span className="d-none d-lg-inline">Table #</span><span className="d-inline d-lg-none">Tbl</span></Col>
-                    <Col className="col-9 col-md-10">
-                        <Row>
-                            <Col className="col-7 col-sm-8 col-lg-4"></Col>
-                            <Col className="col-5 col-sm-4 col-lg-2"><span className="d-none d-md-inline">Points</span><span className="d-inline d-md-none">pts</span></Col>
-                            <Col className="col-7 col-sm-8 col-lg-4 d-none d-lg-block"></Col>
-                            <Col className="col-5 col-sm-4 col-lg-2 d-none d-lg-block"><span className="d-none d-md-inline">Points</span><span className="d-inline d-md-none">pts</span></Col>
-                        </Row>
-                    </Col>
-                    <Col className="col-2 col-md-1"></Col>
-                </Row>
-                {r.Matches.map(m => <TournamentMatch key={m.id} match={m}/>)}
-                {r.Matches.length===0?<span className="form-group"><a className="btn btn-outline-danger" onClick={() => deleteRound(r.id)}><i className="bi bi-x"></i> Delete Round</a></span>:<></>}
-                {r.Matches.length===0?<span className="form-group"><a className="btn btn-outline-success" onClick={() => generateRound(r.id)}><i className="bi bi-trophy-fill"></i> Generate Matches</a></span>:<></>}
-            </Tab>)}
+                {rounds.map(r => {
+                var unmatched = []
+                if(isOwner&&r.Matches.length>0&&!r.finalized){
+                    var all_players = ladder.map(l => {return {'player_name':l.player_name, 'User':l.User}});
+                    var match_players = r.Matches.flatMap(m => m.Players.map(mp => {return {'player_name':mp.player_name, 'User':mp.User}}))
+                    unmatched = all_players.filter(p => match_players.filter(mp => mp.player_name===p.player_name && mp.User?.id===p.User?.id).length===0);
+                }
+                return <Tab key={r.id} eventKey={"round_"+r.round_num} title={<span><i className="bi bi-bullseye"></i> <span className="d-none d-md-inline">Round </span>{r.round_num}</span>}>
+                    <div className="d-flex flex-row-reverse">
+                        {isOwner&&r.Matches.length===0?<span className="form-group"><a className="btn btn-outline-danger" onClick={() => deleteRound(r.id)}><i className="bi bi-x"></i> Delete Round</a></span>:<></>}
+                        {isOwner&&r.Matches.length===0?<span className="form-group"><a className="btn btn-outline-success" onClick={() => generateRound(r.id)}><i className="bi bi-trophy-fill"></i> Generate Matches</a></span>:<></>}
+                        {isOwner&&r.Matches.length>0&&!r.finalized?<span className="form-group"><a className="btn btn-outline-warning" onClick={() => setRoundLocked(r.id, true)}><i className="bi bi-trophy-fill"></i> Finalize Round</a></span>:<></>}
+                        {isOwner&&r.Matches.length>0&&r.finalized?<span className="form-group"><a className="btn btn-outline-secondary" onClick={() => setRoundLocked(r.id, false)}><i className="bi bi-trophy-fill"></i> Reopen Round</a></span>:<></>}
+                    </div>
+                    <Row className="pb-1 header mb-3">
+                        <Col className="col-1"><span className="d-none d-lg-inline">Table #</span><span className="d-inline d-lg-none">Tbl</span></Col>
+                        <Col className="col-9 col-md-10">
+                            <Row>
+                                <Col className="col-7 col-sm-8 col-lg-4"></Col>
+                                <Col className="col-5 col-sm-4 col-lg-2"><span className="d-none d-md-inline">Points</span><span className="d-inline d-md-none">pts</span></Col>
+                                <Col className="col-7 col-sm-8 col-lg-4 d-none d-lg-block"></Col>
+                                <Col className="col-5 col-sm-4 col-lg-2 d-none d-lg-block"><span className="d-none d-md-inline">Points</span><span className="d-inline d-md-none">pts</span></Col>
+                            </Row>
+                        </Col>
+                        <Col className="col-2 col-md-1"></Col>
+                    </Row>
+                    {r.Matches.map(m => <TournamentMatch key={m.id} match={m} round={r}/>)}
+                    {isOwner&&r.Matches.length>0&&!r.finalized?<Row>
+                        <Col className="col-10 col-md-11"></Col>
+                        <Col className="col-2 col-md-1">
+                        <span className="form-group"><a className="btn btn-outline-success" onClick={() => addMatch(r)} title="Add Match"><i className="bi bi-plus"></i></a></span>
+                        </Col>
+                    </Row>
+                    :<></>}
+                    {isOwner&&r.Matches.length>0&&!r.finalized?
+                    <div className="d-flex flex-wrap gap-3">
+                        {unmatched.length>0?<span className="text-muted">Unassigned Players:</span>:<></>}
+                        {unmatched.map(mp => <span key={mp.User?.id??mp.player_name} className="draggablePlayer d-inline-flex" draggable="true" onDragStart={dragPlayer(mp)}>
+                            <TournamentPlayerName player={mp} />
+                        </span>)}
+                    </div>:<></>}
+                </Tab>})}
                 {isOwner?
                 <Tab eventKey="addRound" title={<span><i className="bi bi-plus-circle-fill"></i></span>}>
                     <div className="form-group mb-1">

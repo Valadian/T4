@@ -66,7 +66,7 @@ query AllTournamentPlayers($tournament_id: uuid!) {
 `;
 const roundsDoc = `
 query AllTournamentRounds($tournament_id: uuid!) {
-    TournamentRound(where: {tournament_id: {_eq: $tournament_id}}) {
+    TournamentRound(where: {tournament_id: {_eq: $tournament_id}},order_by: {round_num: asc}) {
         Matches(order_by: {table_num: asc}) {
             id
             table_num
@@ -89,6 +89,7 @@ query AllTournamentRounds($tournament_id: uuid!) {
         id
         round_num
         description
+        finalized
     }
 }`;
 

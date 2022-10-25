@@ -58,8 +58,10 @@ update_permissions:
         - match_id
         - mov
         - opp_points
+        - player_name
         - points
         - tournament_points
+        - user_id
         - win
       filter:
         _or:

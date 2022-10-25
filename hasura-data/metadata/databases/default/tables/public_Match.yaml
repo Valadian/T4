@@ -35,3 +35,16 @@ select_permissions:
         - round_id
         - table_num
       filter: {}
+delete_permissions:
+  - role: user
+    permission:
+      backend_only: false
+      filter:
+        _and:
+          - Round:
+              Tournament:
+                creator_id:
+                  _eq: X-Hasura-User-Id
+          - Round:
+              finalized:
+                _eq: false

@@ -20,7 +20,7 @@ export default function TournamentPlayerName(props){
     } else {
         return (
             <span>
-            {props.player.player_name}
+            {props.player.player_name??<span className="text-secondary">Empty</span>}
             </span>
         )
     }
