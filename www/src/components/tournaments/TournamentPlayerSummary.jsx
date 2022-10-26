@@ -9,11 +9,11 @@ export default function TournamentPlayerSummary(props) {
 
     return (
       <Row>
-        <Col className="col-5 col-md-4"><TournamentPlayerName player={props.player} /></Col>
         <Col className="col-1">{props.player.rank}</Col>
-        <Col className="col-2 col-md-1">{props.player.win} / {props.player.loss}</Col>
+        <Col className="col-5 col-md-4"><TournamentPlayerName player={props.player} /></Col>
+        <Col className="col-2 col-md-1"><span className={props.player.win>0?"text-info":""}>{props.player.win}</span> / <span className={props.player.loss>0?"text-danger":""}>{props.player.loss}</span></Col>
         <Col className="col-1">{props.player.tournament_points}</Col>
-        <Col className="col-3 col-md-2">{props.player.mov} / {props.player.sos.toFixed(2)}</Col>
+        <Col className="col-3 col-md-2">{props.player.mov} <span className="d-none d-md-inline">/ {props.player.sos.toFixed(2)}</span></Col>
         <Col className="col-3 d-none d-md-block">{props.player.club}</Col>
       </Row>
     );
