@@ -114,6 +114,77 @@ function TournamentHome(props) {
         }
     },[tournament, ladder, user])
 
+    useEffect(() => {
+        if(ladder){
+            for(var l of ladder){
+                l.mov = 0
+                l.tournament_points=0
+                l.win=0
+                l.loss=0
+                l.sos=0
+            }
+            let ladderDict = Object.assign({}, ...ladder.map((l)=>({[l.User?.id??l.player_name]: l})))
+            for(var r of rounds){
+                if(r.finalized){
+                    for(var m of r.Matches){
+                        for(var p of m.Players){
+                            var key = p.User?.id??p.player_name
+                            var l = ladderDict[key]
+                            if(l){
+                                l.mov+=p.mov
+                                l.tournament_points+=p.tournament_points
+                                if (p.win){
+                                    l.win++
+                                } else {
+                                    l.loss++
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            for(var r of rounds){
+                if(r.finalized){
+                    for(var m of r.Matches){
+                        var p1 = m.Players[0]
+                        var p2 = m.Players[1]
+                        if(p1 && p2){
+                            var p1_key = p1.User?.id??p1.player_name
+                            var p2_key = p2.User?.id??p2.player_name
+                            var p1_l = ladderDict[p1_key]
+                            var p2_l = ladderDict[p2_key]
+                            if(p1_l && p2_l){
+                                p1_l.sos = (p1_l.sos_num??0)*(p1_l.sos??0) + p2_l.tournament_points/(p2_l.win+p2_l.loss)
+                                p1_l.sos_num = (p1_l.sos_num??0) + 1
+                                p1_l.sos = p1_l.sos/p1_l.sos_num
+                                p2_l.sos = (p2_l.sos_num??0)*(p2_l.sos??0) + p1_l.tournament_points/(p1_l.win+p1_l.loss)
+                                p2_l.sos_num = (p2_l.sos_num??0) + 1
+                                p2_l.sos = p2_l.sos/p2_l.sos_num
+                            }
+                            if(p2_l && p1_l==null){
+                                p2_l.sos = (p2_l.sos_num??0)*(p2_l.sos??0) + 3 //Bye
+                                p2_l.sos_num = (p2_l.sos_num??0) + 1
+                                p2_l.sos = p2_l.sos/p2_l.sos_num
+                            }
+                            if(p1_l && p2_l==null){
+                                p1_l.sos = (p1_l.sos_num??0)*(p1_l.sos??0) + 3 //Bye
+                                p1_l.sos_num = (p1_l.sos_num??0) + 1
+                                p1_l.sos = p1_l.sos/p1_l.sos_num
+                            }
+                        }
+                    }
+                }
+            }
+            ladder.sort((a,b) => (b.tournament_points - a.tournament_points) || (b.mov - a.mov) || (b.sos - a.sos))
+            var rank = 1 
+            for(var l of ladder){
+                l.rank = rank
+                rank++
+            }
+            setLadder(ladder)
+            //Go through again for SoS
+        }
+    },[ladder, rounds])
     const queryTournament = async () => {
         var accessToken = undefined
         if (user) {

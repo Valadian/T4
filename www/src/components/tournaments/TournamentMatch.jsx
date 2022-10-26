@@ -7,7 +7,7 @@ import TournamentPlayerName from "./TournamentPlayerName";
 import ptsToTp from "../../util/armada"
 
 const swapDoc = `
-mutation SwapPlayers($id1: uuid, $match_id1: uuid!, $id2: uuid!, $match_id2: uuid!) {
+mutation SwapPlayers($id1: uuid!, $match_id1: uuid!, $id2: uuid!, $match_id2: uuid!) {
     update1: update_MatchPlayer_by_pk(pk_columns: {id: $id1}, _set: {match_id: $match_id2}) {
         id
     }
@@ -71,10 +71,10 @@ export default function TournamentMatch(props){
         })
     }
     useEffect(() => {
-        if(player1Pts>player2Pts){
+        if(+player1Pts>+player2Pts){
             setPlayer1Win(true)
         }
-        if(player1Pts<player2Pts){
+        if(+player1Pts<+player2Pts){
             setPlayer1Win(false)
         }
     },[player1Pts,player2Pts])
