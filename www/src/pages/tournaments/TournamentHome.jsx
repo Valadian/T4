@@ -61,8 +61,10 @@ query AllTournamentPlayers($tournament_id: uuid!) {
         id
         name
       }
-      Matches {
+      Matches(order_by: {Match: {Round: {round_num: asc}}}) {
         confirmed
+        points
+        opp_points
         mov
         win
         tournament_points
