@@ -1,0 +1,43 @@
+table:
+  name: TournamentMatchOpponent
+  schema: public
+object_relationships:
+  - name: MatchPlayer
+    using:
+      foreign_key_constraint_on: match_player_id
+  - name: TournamentPlayer
+    using:
+      foreign_key_constraint_on: tournament_player_id
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        TournamentPlayer:
+          Tournament:
+            creator_id:
+              _eq: X-Hasura-User-Id
+      columns:
+        - match_player_id
+        - tournament_player_id
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - match_player_id
+        - tournament_player_id
+      filter: {}
+  - role: user
+    permission:
+      columns:
+        - match_player_id
+        - tournament_player_id
+      filter: {}
+delete_permissions:
+  - role: user
+    permission:
+      backend_only: false
+      filter:
+        TournamentPlayer:
+          Tournament:
+            creator_id:
+              _eq: X-Hasura-User-Id

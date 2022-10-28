@@ -8,18 +8,36 @@ object_relationships:
   - name: PlayerList
     using:
       foreign_key_constraint_on: participant_list_id
+  - name: TournamentOpponent
+    using:
+      foreign_key_constraint_on: tournament_opponent_id
+  - name: TournamentPlayer
+    using:
+      foreign_key_constraint_on: tournament_player_id
   - name: User
     using:
       foreign_key_constraint_on: user_id
 insert_permissions:
   - role: user
     permission:
-      check: {}
+      check:
+        Match:
+          Round:
+            Tournament:
+              creator_id:
+                _eq: X-Hasura-User-Id
       columns:
         - match_id
+        - mov
+        - opp_points
         - participant_list_id
         - player_name
+        - points
+        - tournament_opponent_id
+        - tournament_player_id
+        - tournament_points
         - user_id
+        - win
 select_permissions:
   - role: anonymous
     permission:

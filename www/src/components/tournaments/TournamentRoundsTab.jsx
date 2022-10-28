@@ -19,8 +19,44 @@ const deleteDoc = `
       }
   }`
 const insertMatchDoc = `
-  mutation InsertMatch($player1_name: String = "", $player2_name: String = "", $user1_id: String = null, $user2_id: String = null, $round_id: uuid = "", $table_num: Int = null) {
-      insert_Match(objects: {round_id: $round_id, table_num: $table_num, Players: {data: [{user_id: $user1_id, player_name: $player1_name},{user_id: $user2_id, player_name: $player2_name}]}}) {
+  mutation InsertMatch(
+    $player1_name: String = "", 
+    $player2_name: String = "", 
+    $user1_id: String = null,
+    $user2_id: String = null, 
+    $tournament_user_id1: uuid!, 
+    $tournament_user_id2: uuid = null, 
+    $round_id: uuid = "", 
+    $table_num: Int = null, 
+    $player1_points: Int = null,
+    $player1_mov: Int = null, 
+    $player1_tp: Int = null,
+    $player1_win: Boolean = null,
+    $player2_points: Int = null,
+    $player2_mov: Int = null, 
+    $player2_tp: Int = null,
+    $player2_win: Boolean = null,) {
+      insert_Match(objects: {round_id: $round_id, table_num: $table_num, Players: {data: [
+        {
+            user_id: $user1_id, 
+            player_name: $player1_name, 
+            tournament_player_id: $tournament_user_id1, 
+            tournament_opponent_id: $tournament_user_id2, 
+            points: $player1_points, 
+            opp_points: $player2_points, 
+            mov: $player1_mov, 
+            tournament_points: $player1_tp, 
+            win: $player1_win
+        },{
+            user_id: $user2_id, 
+            player_name: $player2_name, 
+            tournament_player_id: $tournament_user_id2, 
+            tournament_opponent_id: $tournament_user_id1, 
+            points: $player2_points, 
+            opp_points: $player1_points, 
+            mov: $player2_mov, 
+            tournament_points: $player2_tp, 
+            win: $player2_win}]}}) {
         affected_rows
       }
     }
@@ -87,11 +123,22 @@ export default function TournamentRoundsTab(props) {
                 player1_name: player1.player_name,
                 user1_id: player1.user_id,
                 round_id: id,
-                table_num: table_num+1}
+                table_num: table_num+1,
+                tournament_user_id1: player1.id}
             if(table_num*2+1<ladder.length){
                 var player2 = ladder[table_num*2+1]
                 params['player2_name'] = player2.player_name
                 params['user2_id'] = player2.user_id
+                params['tournament_user_id2'] = player2.id
+            } else {
+                params['player1_points'] = 140
+                params['player1_mov'] = 140
+                params['player1_tp'] = 8
+                params['player1_win'] = true
+                params['player2_points'] = 0
+                params['player2_mov'] = 0
+                params['player2_tp'] = 3
+                params['player2_win'] = false
             }
             Query("InsertMatch", insertMatchDoc, params ,accessToken)
             .then((data) => {

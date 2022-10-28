@@ -43,26 +43,51 @@ const tournamentByIdDoc = `
 `;
 const tournamentPlayersDoc = `
 query AllTournamentPlayers($tournament_id: uuid!) {
-  TournamentPlayer(where: {Tournament: {id: {_eq: $tournament_id}}}) {
-    player_list_id
-    rank
-    player_name
-    mov
-    loss
-    win
-    tournament_points
-    sos
-    club
-    group
-    id
-    tournament_id
-    user_id
-    User {
+    TournamentPlayer(where: {Tournament: {id: {_eq: $tournament_id}}}) {
+      player_list_id
+      rank
+      player_name
+      mov
+      loss
+      win
+      tournament_points
+      sos
+      club
+      group
       id
-      name
+      tournament_id
+      user_id
+      User {
+        id
+        name
+      }
+      Matches {
+        confirmed
+        mov
+        win
+        tournament_points
+        TournamentOpponent {
+          player_name
+          User {
+            id
+            name
+          }
+          Matches {
+            tournament_points
+            confirmed
+          }
+        }
+        Match {
+          table_num
+          Round {
+            round_num
+            finalized
+          }
+        }
+      }
     }
   }
-}
+  
 `;
 const roundsDoc = `
 query AllTournamentRounds($tournament_id: uuid!) {
@@ -100,6 +125,7 @@ function TournamentHome(props) {
     const { user, getAccessTokenSilently } = useAuth0();
     const [tournament, setTournament] = useState();
     const [ladder, setLadder] = useState([]);
+    // const [ladderMap, setLadderMap] = useState();
     const [rounds, setRounds] = useState([]);
     const [activeTab, setActiveTab] = useState("ladder")
     const toaster = useRef(null);
@@ -113,78 +139,27 @@ function TournamentHome(props) {
             setShowSignUpTab(false)
         }
     },[tournament, ladder, user])
-
-    useEffect(() => {
-        if(ladder){
-            for(var l of ladder){
-                l.mov = 0
-                l.tournament_points=0
-                l.win=0
-                l.loss=0
-                l.sos=0
-            }
-            let ladderDict = Object.assign({}, ...ladder.map((l)=>({[l.User?.id??l.player_name]: l})))
-            for(var r of rounds){
-                if(r.finalized){
-                    for(var m of r.Matches){
-                        for(var p of m.Players){
-                            var key = p.User?.id??p.player_name
-                            var l = ladderDict[key]
-                            if(l){
-                                l.mov+=p.mov
-                                l.tournament_points+=p.tournament_points
-                                if (p.win){
-                                    l.win++
-                                } else {
-                                    l.loss++
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            for(var r of rounds){
-                if(r.finalized){
-                    for(var m of r.Matches){
-                        var p1 = m.Players[0]
-                        var p2 = m.Players[1]
-                        if(p1 && p2){
-                            var p1_key = p1.User?.id??p1.player_name
-                            var p2_key = p2.User?.id??p2.player_name
-                            var p1_l = ladderDict[p1_key]
-                            var p2_l = ladderDict[p2_key]
-                            if(p1_l && p2_l){
-                                p1_l.sos = (p1_l.sos_num??0)*(p1_l.sos??0) + p2_l.tournament_points/(p2_l.win+p2_l.loss)
-                                p1_l.sos_num = (p1_l.sos_num??0) + 1
-                                p1_l.sos = p1_l.sos/p1_l.sos_num
-                                p2_l.sos = (p2_l.sos_num??0)*(p2_l.sos??0) + p1_l.tournament_points/(p1_l.win+p1_l.loss)
-                                p2_l.sos_num = (p2_l.sos_num??0) + 1
-                                p2_l.sos = p2_l.sos/p2_l.sos_num
-                            }
-                            if(p2_l && p1_l==null){
-                                p2_l.sos = (p2_l.sos_num??0)*(p2_l.sos??0) + 3 //Bye
-                                p2_l.sos_num = (p2_l.sos_num??0) + 1
-                                p2_l.sos = p2_l.sos/p2_l.sos_num
-                            }
-                            if(p1_l && p2_l==null){
-                                p1_l.sos = (p1_l.sos_num??0)*(p1_l.sos??0) + 3 //Bye
-                                p1_l.sos_num = (p1_l.sos_num??0) + 1
-                                p1_l.sos = p1_l.sos/p1_l.sos_num
-                            }
-                        }
-                    }
-                }
-            }
-            ladder.sort((a,b) => (b.tournament_points - a.tournament_points) || (b.mov - a.mov) || (b.sos - a.sos))
-            var rank = 1 
-            for(var l of ladder){
-                l.rank = rank
-                rank++
-            }
-            setLadder(ladder)
-            //Go through again for SoS
+    const sum = (arr) => arr.reduce((a, b) => a + b,0)
+    const avg = (arr) => sum(arr)/arr.length
+    const bakeLadder = (ladder) => {
+        for(let l of ladder){
+            l.tournament_points = sum(l.Matches.map(m => m.tournament_points))
+            l.mov = sum(l.Matches.map(m => m.mov))
+            l.win = sum(l.Matches.map(m => m.win===true?1:0))
+            l.loss = sum(l.Matches.map(m => m.win===false?1:0))
+            l.tournament_points_avg = l.tournament_points/(l.win+l.loss)
+            l.mov_avg = l.mov/(l.win+l.loss)
+            l.sos = avg(l.Matches.map(m => avg(m.TournamentOpponent?.Matches.map(om => om.tournament_points)??[3])))
         }
-    },[ladder, rounds])
+        ladder.sort((a,b) => (b.tournament_points - a.tournament_points) || (b.mov - a.mov) || (b.sos - a.sos))
+        //ladder.sort((a,b) => (b.tournament_points_avg - a.tournament_points_avg) || (b.mov_avg - a.mov_avg) || (b.sos - a.sos))
+        
+        let rank = 1 
+        for(let l of ladder){
+            l.rank = rank
+            rank++
+        }
+    }
     const queryTournament = async () => {
         var accessToken = undefined
         if (user) {
@@ -218,8 +193,10 @@ function TournamentHome(props) {
                     tournament_id: tournament.id,
                 },accessToken)
                 .then((response) => {
-                    if (response){ //Why is response undefined?
+                    if (response && response.TournamentPlayer){ //Why is response undefined?
+                        bakeLadder(response.TournamentPlayer)
                         setLadder(response.TournamentPlayer)
+                        //setLadderMap(Object.assign({}, ...response.TournamentPlayer.map((l)=>({[l.User?.id??l.player_name]: l}))))
                     }
                 })
             }

@@ -11,6 +11,21 @@ object_relationships:
   - name: User
     using:
       foreign_key_constraint_on: user_id
+array_relationships:
+  - name: Matches
+    using:
+      foreign_key_constraint_on:
+        column: tournament_player_id
+        table:
+          name: MatchPlayer
+          schema: public
+  - name: OpponentMatches
+    using:
+      foreign_key_constraint_on:
+        column: tournament_opponent_id
+        table:
+          name: MatchPlayer
+          schema: public
 insert_permissions:
   - role: user
     permission:
