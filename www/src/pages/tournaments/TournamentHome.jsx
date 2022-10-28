@@ -151,7 +151,7 @@ function TournamentHome(props) {
             l.loss = sum(l.Matches.map(m => m.win===false?1:0))
             l.tournament_points_avg = l.tournament_points/(l.win+l.loss)
             l.mov_avg = l.mov/(l.win+l.loss)
-            l.sos = avg(l.Matches.map(m => avg(m.TournamentOpponent?.Matches.map(om => om.tournament_points)??[3])))
+            l.sos = avg(l.Matches.filter(m=>m.win!=null).map(m => avg(m.TournamentOpponent?.Matches.filter(m=>m.tournament_points!=null).map(om => om.tournament_points)??[3])))
         }
         ladder.sort((a,b) => (b.tournament_points - a.tournament_points) || (b.mov - a.mov) || (b.sos - a.sos))
         //ladder.sort((a,b) => (b.tournament_points_avg - a.tournament_points_avg) || (b.mov_avg - a.mov_avg) || (b.sos - a.sos))
