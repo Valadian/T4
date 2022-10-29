@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, createContext } from "react";
+import React, { useState, useEffect, useRef, createContext, useReducer } from "react";
 import { Link, useParams } from "react-router-dom";
 import Query from "../../data/T4GraphContext";
 import { Tournament } from "../../data/Models";
@@ -77,6 +77,11 @@ query AllTournamentPlayers($tournament_id: uuid!) {
           Matches {
             tournament_points
             confirmed
+            Match {
+                Round {
+                  finalized
+                }
+              }
           }
         }
         Match {
@@ -126,32 +131,36 @@ function TournamentHome(props) {
     const { id } = useParams();
     const { user, getAccessTokenSilently } = useAuth0();
     const [tournament, setTournament] = useState();
-    const [ladder, setLadder] = useState([]);
-    // const [ladderMap, setLadderMap] = useState();
+    const [finalizedOnly, setFinalizedOnly] = useState(true);
     const [rounds, setRounds] = useState([]);
     const [activeTab, setActiveTab] = useState("ladder")
     const toaster = useRef(null);
     const [showSignUpTab, setShowSignUpTab] = useState(true);
-    
-    useEffect(() => {
-        if(ladder && tournament && user){
-            var registered = ladder.map(l => user && (l.User?.id===user.sub)).reduce((a,b) => a||b,false) 
-            setShowSignUpTab(tournament.signups_open && user && !registered)
-        } else {
-            setShowSignUpTab(false)
-        }
-    },[tournament, ladder, user])
+    // const [ladder, setLadder] = useState([]);
     const sum = (arr) => arr.reduce((a, b) => a + b,0)
     const avg = (arr) => sum(arr)/arr.length
-    const bakeLadder = (ladder) => {
+    const max = (arr) => arr.reduce((a, b) => Math.max(a, b),0)
+    const bakeLadder = (ladder, finalOnly) => {
+        console.log("BAKING!")
+        console.log(finalOnly)
         for(let l of ladder){
-            l.tournament_points = sum(l.Matches.map(m => m.tournament_points))
-            l.mov = sum(l.Matches.map(m => m.mov))
-            l.win = sum(l.Matches.map(m => m.win===true?1:0))
-            l.loss = sum(l.Matches.map(m => m.win===false?1:0))
-            l.tournament_points_avg = l.tournament_points/(l.win+l.loss)
-            l.mov_avg = l.mov/(l.win+l.loss)
-            l.sos = avg(l.Matches.filter(m=>m.win!=null).map(m => avg(m.TournamentOpponent?.Matches.filter(m=>m.tournament_points!=null).map(om => om.tournament_points)??[3])))
+            if(finalOnly){
+                l.tournament_points = sum(l.Matches.filter(mp => mp.Match.Round.finalized).map(m => m.tournament_points))
+                l.mov = sum(l.Matches.filter(mp => mp.Match.Round.finalized).map(m => m.mov))
+                l.win = sum(l.Matches.filter(mp => mp.Match.Round.finalized).map(m => m.win===true?1:0))
+                l.loss = sum(l.Matches.filter(mp => mp.Match.Round.finalized).map(m => m.win===false?1:0))
+                l.tournament_points_avg = l.tournament_points/(l.win+l.loss)
+                l.mov_avg = l.mov/(l.win+l.loss)
+                l.sos = avg(l.Matches.filter(mp => mp.Match.Round.finalized).filter(m=>m.win!=null).map(m => avg(m.TournamentOpponent?.Matches.filter(mp => mp.Match.Round.finalized).filter(m=>m.tournament_points!=null).map(om => om.tournament_points)??[3])))
+            } else {
+                l.tournament_points = sum(l.Matches.map(m => m.tournament_points))
+                l.mov = sum(l.Matches.map(m => m.mov))
+                l.win = sum(l.Matches.map(m => m.win===true?1:0))
+                l.loss = sum(l.Matches.map(m => m.win===false?1:0))
+                l.tournament_points_avg = l.tournament_points/(l.win+l.loss)
+                l.mov_avg = l.mov/(l.win+l.loss)
+                l.sos = avg(l.Matches.filter(m=>m.win!=null).map(m => avg(m.TournamentOpponent?.Matches.filter(m=>m.tournament_points!=null).map(om => om.tournament_points)??[3])))
+            }
         }
         ladder.sort((a,b) => (b.tournament_points - a.tournament_points) || (b.mov - a.mov) || (b.sos - a.sos))
         //ladder.sort((a,b) => (b.tournament_points_avg - a.tournament_points_avg) || (b.mov_avg - a.mov_avg) || (b.sos - a.sos))
@@ -161,7 +170,42 @@ function TournamentHome(props) {
             l.rank = rank
             rank++
         }
+        return ladder
     }
+    const ladderReducer = (state, action) => {
+        switch(action.type){
+            case 'live':
+                return bakeLadder(state, false)
+            case 'finalized':
+                return bakeLadder(state, true)
+            case 'reset':
+                bakeLadder(action.payload, finalizedOnly)
+                return action.payload
+            default:
+                throw new Error();
+        }
+    }
+    const [ladder, dispatchLadder] = useReducer(ladderReducer, []);
+    // const [ladderMap, setLadderMap] = useState();
+    
+    useEffect(() => {
+        if(ladder && tournament && user){
+            var registered = ladder.map(l => user && (l.User?.id===user.sub)).reduce((a,b) => a||b,false) 
+            setShowSignUpTab(tournament.signups_open && user && !registered)
+        } else {
+            setShowSignUpTab(false)
+        }
+    },[tournament, ladder, user])
+    // const rebakeLadder = (finalizedOnlyOverride) => {
+    //     bakeLadder(ladder)
+    //     console.log(max(ladder.map(l => l.win+l.loss)))
+    //     setLadder(ladder)
+    // }
+    // useEffect(() => {
+    //     rebakeLadder(ladder)
+        
+    // },[ladder])
+
     const queryTournament = async () => {
         var accessToken = undefined
         if (user) {
@@ -196,8 +240,9 @@ function TournamentHome(props) {
                 },accessToken)
                 .then((response) => {
                     if (response && response.TournamentPlayer){ //Why is response undefined?
-                        bakeLadder(response.TournamentPlayer)
-                        setLadder(response.TournamentPlayer)
+                        //bakeLadder(response.TournamentPlayer)
+                        dispatchLadder({type: 'reset', payload: response.TournamentPlayer})
+                        // setLadder(response.TournamentPlayer)
                         //setLadderMap(Object.assign({}, ...response.TournamentPlayer.map((l)=>({[l.User?.id??l.player_name]: l}))))
                     }
                 })
@@ -254,14 +299,17 @@ function TournamentHome(props) {
         var isParticipant = user!=null && ladder.filter(l => l.User).map((l)=>l.User?.id).includes(user?.sub)
         const context = {
             tournament, setTournament,
-            ladder, setLadder,
+            ladder, dispatchLadder,
             rounds, setRounds,
             toaster,
             updateTournament,
             isOwner,
             isParticipant,
             activeTab,
-            setActiveTab
+            setActiveTab,
+            finalizedOnly,
+            setFinalizedOnly
+            // rebakeLadder
         }
 
         //var round_count = matches.map(m => m.)

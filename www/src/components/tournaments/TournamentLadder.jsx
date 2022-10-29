@@ -6,11 +6,25 @@ import TournamentPlayerSummary from "./TournamentPlayerSummary";
 import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 
 export default function Ladder(props) {
-    const {ladder, updateTournament, isOwner} = useContext(TournamentHomeContext);
+    const {ladder, dispatchLadder, updateTournament, isOwner, finalizedOnly, setFinalizedOnly } = useContext(TournamentHomeContext);
+    const toggleFinalizedOnly = () => {
+      let next = !finalizedOnly
+      setFinalizedOnly(next)
+      if(next){
+        dispatchLadder({type: 'finalized'})
+      } else{
+        dispatchLadder({type: 'live'})
+      }
+      // rebakeLadder(!finalizedOnly)
+    }
     if (ladder) {
       //console.log("Got past the state check...");
       return (
         <div>
+          <div className="d-flex flex-row-reverse">
+            {finalizedOnly?<span className="form-group"><a className="btn btn-outline-secondary" onClick={toggleFinalizedOnly}>Last Round</a></span>:<></>}
+            {!finalizedOnly?<span className="form-group"><a className="btn btn-outline-danger" onClick={toggleFinalizedOnly}>LIVE</a></span>:<></>}
+          </div>
           <Row className="pb-1 header mb-3">
             <Col className="col-1 col-md-1"><span className="d-none d-md-inline">Rank</span><span className="d-inline d-md-none">#</span></Col>
             <Col className="col-5 col-md-4">Player</Col>
