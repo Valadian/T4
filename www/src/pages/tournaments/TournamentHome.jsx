@@ -141,8 +141,6 @@ function TournamentHome(props) {
     const avg = (arr) => sum(arr)/arr.length
     const max = (arr) => arr.reduce((a, b) => Math.max(a, b),0)
     const bakeLadder = (ladder, finalOnly) => {
-        console.log("BAKING!")
-        console.log(finalOnly)
         for(let l of ladder){
             if(finalOnly){
                 l.tournament_points = sum(l.Matches.filter(mp => mp.Match.Round.finalized).map(m => m.tournament_points))
