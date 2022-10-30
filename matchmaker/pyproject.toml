@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+# name="matchmaker_t4_arm"
+name="matchmaker_t4"
+version="0.1.6"
+authors=[{ name="Cory Benson",email="ardaedhel@gmail.com"},]
+description="Matchmaker service for tabletoptournament.tools"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: POSIX :: Linux",
+]
+dependencies = ["flask", "requests", "gunicorn"]
+
+[project.urls]
+"Homepage" = "https://github.com/sprintska/t4_matchmaker"

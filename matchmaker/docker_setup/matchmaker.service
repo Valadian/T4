@@ -1,0 +1,12 @@
+[Unit]
+Description=Gunicorn instance to serve Matchmaker
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/usr/local/lib/python3.10/site-packages/matchmaker
+ExecStart=/usr/local/bin/gunicorn --workers 3 --bind unix:matchmaker.sock -m 007 matchmaker.wsgi:app
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+# belongs at /etc/nginx/sites-available/matchmaker 
+server{
+    listen 80;
+    server_name _;
+
+    location /NextRoundMatches {
+        include proxy_params;
+        proxy_pass http://unix://usr/local/lib/python3.10/site-packages/matchmaker/matchmaker.sock;
+    }
+}
