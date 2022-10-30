@@ -7,11 +7,19 @@ import TournamentPlayerName from "./TournamentPlayerName";
 import ptsToTp from "../../util/armada"
 
 const swapDoc = `
-mutation SwapPlayers($id1: uuid!, $match_id1: uuid!, $id2: uuid!, $match_id2: uuid!) {
-    update1: update_MatchPlayer_by_pk(pk_columns: {id: $id1}, _set: {match_id: $match_id2}) {
+mutation SwapPlayers($id1: uuid!, $match_id1: uuid!, $id2: uuid!, $match_id2: uuid!, $tournament_opponent_id1: uuid = null, $tournament_opponent_id2: uuid = null, $tournament_player_id1: uuid = null, $tournament_player_id2: uuid = null) {
+    update1: update_MatchPlayer(where: {match_id: {_eq: $match_id1}, id: {_neq: $id1}}, _set: {tournament_opponent_id: $tournament_player_id2}) {
+        affected_rows
+    }
+    
+    update2: update_MatchPlayer(where: {match_id: {_eq: $match_id2}, id: {_neq: $id2}}, _set: {tournament_opponent_id: $tournament_player_id1}) {
+        affected_rows
+    }
+
+    update3: update_MatchPlayer_by_pk(pk_columns: {id: $id1}, _set: {match_id: $match_id2, tournament_opponent_id: $tournament_opponent_id2}) {
         id
     }
-    update2: update_MatchPlayer_by_pk(pk_columns: {id: $id2}, _set: {match_id: $match_id1}) {
+    update4: update_MatchPlayer_by_pk(pk_columns: {id: $id2}, _set: {match_id: $match_id1, tournament_opponent_id: $tournament_opponent_id1}) {
         id
     }
 }
@@ -19,23 +27,25 @@ mutation SwapPlayers($id1: uuid!, $match_id1: uuid!, $id2: uuid!, $match_id2: uu
 const updateDoc = `
 mutation updateMatchPlayer($id: uuid!, $points: Int!, $opp_points: Int!, $tournament_points: Int!, $win: Boolean!, $mov: Int!) {
     update_MatchPlayer_by_pk(pk_columns: {id: $id}, _set: {points: $points, opp_points: $opp_points, tournament_points: $tournament_points, win: $win, mov: $mov}) {
-      id
+        id
     }
-  }
-  ` 
+}` 
 const deleteDoc = `
 mutation deleteMatch($id: uuid!) {
     delete_Match_by_pk(id: $id) {
-      id
-    }
-  }`
-const assignDoc = `
-mutation AssignPlayer($ladder_name: String = null, $ladder_user_id: String = null, $id: uuid!) {
-    update_MatchPlayer_by_pk(pk_columns: {id: $id}, _set: {player_name: $ladder_name, user_id: $ladder_user_id}) {
         id
     }
-}
-`
+}`
+const assignDoc = `
+mutation AssignPlayer($ladder_name: String = null, $ladder_user_id: String = null, $id: uuid!, $match_id: uuid!, $tournament_player_id: uuid!) {
+    update1: update_MatchPlayer(where: {match_id: {_eq: $match_id}, id: {_neq: $id}}, _set: {tournament_opponent_id: $tournament_player_id}) {
+        affected_rows
+    }
+    
+    update2: update_MatchPlayer_by_pk(pk_columns: {id: $id}, _set: {player_name: $ladder_name, user_id: $ladder_user_id, tournament_player_id: $tournament_player_id}) {
+        id
+    }
+}`
 export default function TournamentMatch(props){
     const { user, getAccessTokenSilently } = useAuth0();
     const {updateTournament, isOwner} = useContext(TournamentHomeContext);
@@ -49,12 +59,17 @@ export default function TournamentMatch(props){
     const allowDrop = (ev) => ev.preventDefault();
     const dragPlayer1 = (e) => e.dataTransfer.setData("player",JSON.stringify(player1));
     const dragPlayer2 = (e) => e.dataTransfer.setData("player",JSON.stringify(player2));
-    const assign = async (p1, p2) => {
+    const assign = async (tp1, p2) => {
         const accessToken = await getAccessTokenSilently()
+        //let omp = MatchPlayer.OpponentMatchPlayer(p2);
         Query("AssignPlayer", assignDoc, { 
-            ladder_name: p1.player_name, 
-            ladder_user_id: p1.User?.id,
-            id: p2.id, },accessToken)
+            ladder_name: tp1.player_name, 
+            ladder_user_id: tp1.User?.id,
+            id: p2.id,
+            match_id: p2.match_id,
+            // id2: omp?.id,
+            // tournament_opponent_id: omp?.tournament_player_id,
+            tournament_player_id: tp1.id },accessToken)
         .then((response) => {
             updateTournament();
         })
@@ -64,8 +79,12 @@ export default function TournamentMatch(props){
         Query("SwapPlayers", swapDoc, { 
             id1: p1.id, 
             match_id1: p1.match_id,
+            tournament_opponent_id1: p1.TournamentOpponent.id,
+            tournament_player_id1: p1.TournamentPlayer.id,
             id2: p2.id, 
-            match_id2: p2.match_id, },accessToken)
+            match_id2: p2.match_id,
+            tournament_opponent_id2: p2.TournamentOpponent.id,
+            tournament_player_id2: p2.TournamentPlayer.id },accessToken)
         .then((response) => {
             updateTournament();
         })

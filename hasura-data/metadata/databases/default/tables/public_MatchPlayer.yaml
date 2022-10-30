@@ -78,6 +78,8 @@ update_permissions:
         - opp_points
         - player_name
         - points
+        - tournament_opponent_id
+        - tournament_player_id
         - tournament_points
         - user_id
         - win

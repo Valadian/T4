@@ -14,7 +14,7 @@ export default function TournamentPlayerSummary(props) {
           }
           return "ROUND "+m.Match.Round.round_num+" "+(m.win?"WIN":"LOSS")+" ("+m.points+" : "+m.opp_points+") vs ["+(m.TournamentOpponent.User?.name??m.TournamentOpponent.player_name)+"] for "+m.tournament_points+" TP"
         } else {
-          return "ROUND "+m.Match.Round.round_num+" "+(m.win?"BYE":"D/Q")+" ("+m.points+" : "+m.opp_points+")"
+          return "ROUND "+m.Match.Round.round_num+" "+(m.win===false?"D/Q":"BYE")+" ("+m.points+" : "+m.opp_points+")"
         }
       })
       .reduce((a,b) => a+b+"\n","")

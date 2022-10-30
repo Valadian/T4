@@ -116,6 +116,22 @@ query AllTournamentRounds($tournament_id: uuid!) {
                     id
                     name
                 }
+                TournamentOpponent {
+                    id
+                    player_name
+                    User {
+                        id
+                        name
+                    }
+                }
+                TournamentPlayer {
+                    id
+                    player_name
+                    User {
+                        id
+                        name
+                    }
+                }
             }
         }
         id

@@ -22,7 +22,7 @@ export default function Ladder(props) {
       return (
         <div>
           <div className="d-flex flex-row-reverse">
-            {finalizedOnly?<span className="form-group"><a className="btn btn-outline-secondary" onClick={toggleFinalizedOnly}>Last Round</a></span>:<></>}
+            {finalizedOnly?<span className="form-group"><a className="btn btn-outline-secondary" onClick={toggleFinalizedOnly}>Finalized</a></span>:<></>}
             {!finalizedOnly?<span className="form-group"><a className="btn btn-outline-danger" onClick={toggleFinalizedOnly}>LIVE</a></span>:<></>}
           </div>
           <Row className="pb-1 header mb-3">

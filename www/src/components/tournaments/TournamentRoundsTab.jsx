@@ -195,7 +195,7 @@ export default function TournamentRoundsTab(props) {
                 {rounds.map(r => {
                 var unmatched = []
                 if(isOwner&&r.Matches.length>0&&!r.finalized){
-                    var all_players = ladder.map(l => {return {'player_name':l.player_name, 'User':l.User}});
+                    var all_players = ladder.map(l => {return {'player_name':l.player_name, 'User':l.User, 'id':l.id}});
                     var match_players = r.Matches.flatMap(m => m.Players.map(mp => {return {'player_name':mp.player_name, 'User':mp.User}}))
                     unmatched = all_players.filter(p => match_players.filter(mp => mp.player_name===p.player_name && mp.User?.id===p.User?.id).length===0);
                 }
