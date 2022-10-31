@@ -49,7 +49,7 @@ export default function TournamentDateEditor(props) {
   const handleClose = () => {
     props.show = false;
   };
-  console.log(tournament);
+  // console.log(tournament);
 
   if (tournament && newTournamentDate) {
     return (

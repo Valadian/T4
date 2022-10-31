@@ -19,6 +19,7 @@ function App() {
         <Route index element={<Home />} />
         <Route path="events" element={<Events />} />
         <Route path="events/:id" element={<TournamentHome />} />
+        <Route path="events/add" element={<TournamentEditor />} />
         <Route path="events/edit/:id" element={<TournamentEditor />} />
         <Route path="players" element={<Players />} />
         <Route path="players/:id" element={<PlayerEditor />} />

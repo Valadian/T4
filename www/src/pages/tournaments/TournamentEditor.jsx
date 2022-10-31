@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import Query from "../../data/T4GraphContext"
 import { Tournament } from "../../data/Models"
 import DatePicker from "react-datepicker";
@@ -57,25 +57,6 @@ mutation UpdateTournament($name: String = "", $location: String = "", $start: da
   update_Tournament(_set: {name: $name, location: $location, start: $start, game: $game, scoring_ruleset_id: $scoring_ruleset_id}, where: {id: {_eq: $id}}) {
     returning {
       id
-      name
-      location
-      start
-      Ladder_aggregate {
-        aggregate {
-          count
-        }
-      }
-      Game {
-        key
-        value
-      }
-      Creator {
-        name
-      }
-      ScoringRuleset {
-        id
-        name
-      }
     }
   }
 }  
@@ -85,25 +66,6 @@ mutation InsertTournament($name: String = "", $location: String = "", $start: da
   insert_Tournament(objects: {name: $name, location: $location, start: $start, game: $game, scoring_ruleset_id: $scoring_ruleset_id}) {
     returning {
       id
-      name
-      location
-      start
-      Ladder_aggregate {
-        aggregate {
-          count
-        }
-      }
-      Game {
-        key
-        value
-      }
-      Creator {
-        name
-      }
-      ScoringRuleset {
-        id
-        name
-      }
     }
   }
 }  
@@ -116,15 +78,15 @@ export default function TournamentEditor(props) {
     const [gameOptions, setGameOptions] = useState([])
     const [scoringOptions, setScoringOptions] = useState([])
     const { getAccessTokenSilently } = useAuth0()
+    const navigate = useNavigate();
 
     const setTournamentPartial = function(valueKeys){
       setTournament(prevTourn => ({...prevTourn, ...valueKeys}))
     }
     useEffect(() => {
-      const fetchData = async () => {
-        const accessToken = await getAccessTokenSilently()
+      const fetchData = () => {
         if(tournament.Game && tournament.Game.key){
-          Query("ScoringByGame", allScoringDoc, {gameKey:tournament.Game.key}, accessToken)
+          Query("ScoringByGame", allScoringDoc, {gameKey:tournament.Game.key})
             .then((data)=> {
               if(data && data.ScoringRuleset){
                 setScoringOptions(data.ScoringRuleset.map(g => {return {value:g.id, label:g.name}}))
@@ -136,7 +98,7 @@ export default function TournamentEditor(props) {
         }
       }
       fetchData();
-    }, [tournament.Game, getAccessTokenSilently])
+    }, [tournament.Game])
     // const loadScoringRulesets = function(game){
     //   if(game){
     //     Query("ScoringByGame", allScoringDoc, {gameKey:game})
@@ -156,25 +118,27 @@ export default function TournamentEditor(props) {
     }
     useEffect(() => {
       const fetchData = async () => {
+        if(params.name){
         const accessToken = await getAccessTokenSilently()
-        Query("TournamentByName", operationsDoc, {name:params.name},accessToken)
-        .then((data)=> {
-            var value = null
-            if(data && data.Tournament && data.Tournament.length>0){
-              value = data.Tournament[0]
-            } else {
-              value = new Tournament()
-            }
-            value.start = Date.parse(value.start)
-            setTournament(value)
-            return Promise.resolve(value)
-        })
+          Query("TournamentByName", operationsDoc, {name:params.name},accessToken)
+          .then((data)=> {
+              var value = null
+              if(data && data.Tournament && data.Tournament.length>0){
+                value = data.Tournament[0]
+              } else {
+                value = new Tournament()
+              }
+              value.start = Date.parse(value.start)
+              setTournament(value)
+              return Promise.resolve(value)
+          })
+        }
         // .then((data) => {
         //   loadScoringRulesets(data.Game.key)
         //   return Promise.resolve()
         // })
 
-        Query("AllGames", allGamesDoc, {},accessToken)
+        Query("AllGames", allGamesDoc, {})
         .then((data)=> {
           if(data && data.Game && data.Game.length>0){
             setGameOptions(data.Game.map(g => {return {value:g.key, label:g.value}}))
@@ -214,10 +178,14 @@ export default function TournamentEditor(props) {
           game: tournament.Game?.key, 
           scoring_ruleset_id: tournament.ScoringRuleset?.id}, accessToken) //TODO: Get logged in user
         .then((data) => {
+            if(data.insert_Tournament.returning.length > 0) {
+              navigate("/events/"+data.insert_Tournament.returning[0].id)
+            }
             var node = successRef.current;
-            if(data.update_Tournament.returning.length === 0){
+            if(data.insert_Tournament.returning.length === 0){
               node = failureRef.current;
             }
+            
             // node.classList.add('show');
             new Collapse(node)
             // setTimeout(() => node.classList.remove('show'), 2000);
