@@ -5,6 +5,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import TournamentMatch from "./TournamentMatch";
 import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 import TournamentPlayerName from "./TournamentPlayerName";
+import generatePairings from "../../util/swiss";
 
 const insertDoc = `
 mutation addNewRound($tournament_id: uuid!, $round_num: numeric!, $description: String!) {
@@ -18,49 +19,6 @@ const deleteDoc = `
           id
       }
   }`
-const insertMatchDoc = `
-  mutation InsertMatch(
-    $player1_name: String = "", 
-    $player2_name: String = "", 
-    $user1_id: String = null,
-    $user2_id: String = null, 
-    $tournament_user_id1: uuid!, 
-    $tournament_user_id2: uuid = null, 
-    $round_id: uuid = "", 
-    $table_num: Int = null, 
-    $player1_points: Int = null,
-    $player1_mov: Int = null, 
-    $player1_tp: Int = null,
-    $player1_win: Boolean = null,
-    $player2_points: Int = null,
-    $player2_mov: Int = null, 
-    $player2_tp: Int = null,
-    $player2_win: Boolean = null,) {
-      insert_Match(objects: {round_id: $round_id, table_num: $table_num, Players: {data: [
-        {
-            user_id: $user1_id, 
-            player_name: $player1_name, 
-            tournament_player_id: $tournament_user_id1, 
-            tournament_opponent_id: $tournament_user_id2, 
-            points: $player1_points, 
-            opp_points: $player2_points, 
-            mov: $player1_mov, 
-            tournament_points: $player1_tp, 
-            win: $player1_win
-        },{
-            user_id: $user2_id, 
-            player_name: $player2_name, 
-            tournament_player_id: $tournament_user_id2, 
-            tournament_opponent_id: $tournament_user_id1, 
-            points: $player2_points, 
-            opp_points: $player1_points, 
-            mov: $player2_mov, 
-            tournament_points: $player2_tp, 
-            win: $player2_win}]}}) {
-        affected_rows
-      }
-    }
-  `
 const finalizeDoc = `
   mutation finalizeRound($id: uuid!, $finalized: Boolean!) {
       update_TournamentRound_by_pk(pk_columns: {id: $id}, _set: {finalized: $finalized}) {
@@ -117,34 +75,7 @@ export default function TournamentRoundsTab(props) {
     }
     const generateRound = async (id) => {
         const accessToken = await getAccessTokenSilently()
-        for (var table_num=0;table_num*2<ladder.length;table_num++){
-            var player1 = ladder[table_num*2]
-            var params = {
-                player1_name: player1.player_name,
-                user1_id: player1.user_id,
-                round_id: id,
-                table_num: table_num+1,
-                tournament_user_id1: player1.id}
-            if(table_num*2+1<ladder.length){
-                var player2 = ladder[table_num*2+1]
-                params['player2_name'] = player2.player_name
-                params['user2_id'] = player2.user_id
-                params['tournament_user_id2'] = player2.id
-            } else {
-                params['player1_points'] = 140
-                params['player1_mov'] = 140
-                params['player1_tp'] = 8
-                params['player1_win'] = true
-                params['player2_points'] = 0
-                params['player2_mov'] = 0
-                params['player2_tp'] = 3
-                params['player2_win'] = false
-            }
-            Query("InsertMatch", insertMatchDoc, params ,accessToken)
-            .then((data) => {
-                updateTournament()
-            });
-        }
+        generatePairings(tournament.id, id, accessToken, updateTournament)
     }
     const setRoundLocked = async (round_id, finalized) => {
         const accessToken = await getAccessTokenSilently()
@@ -159,7 +90,6 @@ export default function TournamentRoundsTab(props) {
     const addMatch = async (round) => {
         var table_num = 1
         for(var i=1;i<=round.Matches.length+1;i++){
-            // console.log(i,round.Matches[i-1]?.table_num)
             if(round.Matches[i-1]){
                 if(i<round.Matches[i-1].table_num){
                     table_num=i;
@@ -170,7 +100,6 @@ export default function TournamentRoundsTab(props) {
                 break;
             }
         }
-        // console.log(table_num)
         const accessToken = await getAccessTokenSilently()
         Query("addMatch", addMatchDoc, {
             round_id: round.id,

@@ -46,7 +46,7 @@ class Matchmaker:
         # Rank players to find last place for the bye
         players_ranked = sorted(
             self.players,
-            key=itemgetter("tournament_points", "mov", "sos"),
+            key=itemgetter("tournament_points"), #JB: Do not sort on mov/sos, "mov", "sos"
             reverse=True,
         )
 

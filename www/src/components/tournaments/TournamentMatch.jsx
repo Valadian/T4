@@ -79,12 +79,12 @@ export default function TournamentMatch(props){
         Query("SwapPlayers", swapDoc, { 
             id1: p1.id, 
             match_id1: p1.match_id,
-            tournament_opponent_id1: p1.TournamentOpponent.id,
-            tournament_player_id1: p1.TournamentPlayer.id,
+            tournament_opponent_id1: p1.TournamentOpponent?.id,
+            tournament_player_id1: p1.TournamentPlayer?.id,
             id2: p2.id, 
             match_id2: p2.match_id,
-            tournament_opponent_id2: p2.TournamentOpponent.id,
-            tournament_player_id2: p2.TournamentPlayer.id },accessToken)
+            tournament_opponent_id2: p2.TournamentOpponent?.id,
+            tournament_player_id2: p2.TournamentPlayer?.id },accessToken)
         .then((response) => {
             updateTournament();
         })
