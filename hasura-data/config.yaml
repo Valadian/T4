@@ -1,6 +1,7 @@
 version: 3
-endpoint: http://localhost:8080/
+endpoint: https://hasura.dev.advancedtransponder.net:443
+admin_secret: SuperSekritHasura
 metadata_directory: metadata
 actions:
   kind: synchronous
-  handler_webhook_baseurl: http://localhost:3000
+  handler_webhook_baseurl: http://matchmaker-service:80

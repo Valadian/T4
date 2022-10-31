@@ -19,7 +19,10 @@ async function Query(operationName, operationDoc, variables, accessToken) {
     .then((response) => response.json())
     .then((json) => {
       if (json.errors && json.errors.length > 0) {
-        // console.error(json.errors);
+        console.error(json.errors);
+        console.log(operationDoc);
+        console.log(variables);
+        console.log(accessToken);
         // throw new Error("Graphql query has error, see console")
         return Promise.reject(json.errors);
       }

@@ -10,17 +10,11 @@ import TournamentListProtectionEditor from "./TournamentListProtectionEditor";
 import TournamentLocationEditor from "./TournamentLocationEditor";
 import TournamentPlayerEditor from "./TournamentPlayerEditor";
 import TournamentRegistrationToggle from "./TournamentRegistrationToggle";
-import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
+import { TournamentHomeContext } from "../../pages/tournaments/TournamentHome";
 
 function TournamentAdminHeader(props) {
-  const [
-    showTournamentDateEditor, 
-    setShowTournamentDateEditor
-  ] = useState(false);
-  // const [
-  //   showTournamentRegistrationEditor,
-  //   setShowTournamentRegistrationEditor,
-  // ] = useState(false);
+  const [showTournamentDateEditor, setShowTournamentDateEditor] =
+    useState(false);
   const [
     showTournamentListProtectionEditor,
     setShowTournamentListProtectionEditor,
@@ -35,7 +29,7 @@ function TournamentAdminHeader(props) {
     useState(false);
   const [showTournamentPlayerEditor, setShowTournamentPlayerEditor] =
     useState(false);
-  const {tournament, updateTournament} = useContext(TournamentHomeContext);
+  const { tournament, updateTournament } = useContext(TournamentHomeContext);
 
   var list_visibility = tournament.lists_visible ? "visible" : "hidden";
   var list_availability = tournament.lists_locked
@@ -72,7 +66,9 @@ function TournamentAdminHeader(props) {
                 >
                   <i className="bi bi-calendar3 text-primary"></i>{" "}
                   <span className="text-white">
-                    {tournament.start ? format(tournament.start, "eeee, dd MMM, yyyy") : "N/A"}
+                    {tournament.start
+                      ? format(tournament.start, "eeee, dd MMM, yyyy")
+                      : "N/A"}
                   </span>
                 </Button>
               </div>
@@ -94,9 +90,7 @@ function TournamentAdminHeader(props) {
                   size="sm"
                 >
                   <i className="bi bi-globe text-primary"></i>{" "}
-                  <span className="text-white">
-                    {tournament.location}
-                  </span>
+                  <span className="text-white">{tournament.location}</span>
                 </Button>
               </div>
               <TournamentLocationEditor
@@ -169,9 +163,7 @@ function TournamentAdminHeader(props) {
               <div className="d-grid">
                 {/* Ladder Availability: different because it's just a 
                 button, not a modal */}
-                <TournamentLadderToggle
-                  button_text={ladder_visibility}
-                />
+                <TournamentLadderToggle button_text={ladder_visibility} />
               </div>
             </Col>
           </Row>
@@ -189,9 +181,7 @@ function TournamentAdminHeader(props) {
               size="sm"
             >
               <i className="bi bi-person-fill text-primary"></i>{" "}
-              <span className="text-white">
-                {tournament.Creator.name}
-              </span>
+              <span className="text-white">{tournament.Creator.name}</span>
             </Button>
           </div>
           <TournamentAdminEditor
