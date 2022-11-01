@@ -1,10 +1,14 @@
 import React from 'react';
 import TournamentList from '../components/tournaments/TournamentList';
+import { useAuth0 } from "@auth0/auth0-react";
 
 function Home() {
+    const { user } = useAuth0();
     return (
         <>
-        
+        {user?<></>:<div className="d-flex flex-row-reverse">
+            <h4 className="text-success">Log in to create Event <i className="bi bi-arrow-up-circle-fill"></i></h4>
+        </div>}
         <nav className="" aria-label="breadcrumb">
             <ol className="breadcrumb">
                 <li className="breadcrumb-item">Home</li>
