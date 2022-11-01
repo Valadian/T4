@@ -17,26 +17,20 @@ function Navbar(props){
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                     <li className="nav-item">
                         <Link className="nav-link active" to="/">Home</Link>
-                        {/* <a className="nav-link active" aria-current="page" href="#">Home</a> */}
                     </li>
                     <li className="nav-item">
                         <Link className="nav-link" to="/events">Events</Link>
-                        {/* <a className="nav-link" href="#">Events</a> */}
-                    </li>
-                    <li className="nav-item">
-                        <Link className="nav-link" to="/players">Players</Link>
-                        {/* <a className="nav-link" href="#">Players</a> */}
                     </li>
                     {/* <li className="nav-item">
-                        Logged in: {user?.name}
+                        <Link className="nav-link" to="/players">Players</Link>
                     </li> */}
                     
                     </ul>
                     <div className="d-flex gap-3">
-                        <div className="input-group">
+                        {/* <div className="input-group">
                             <input className="form-control" type="search" placeholder="Search" aria-label="Search"/>
                             <Link className="btn btn-outline-secondary" to="/search"><i className="bi bi-search"></i></Link>
-                        </div>
+                        </div> */}
                         <AuthenticationButton/>
                     </div>
                 </div>
