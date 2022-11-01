@@ -48,7 +48,7 @@ function TournamentAdminHeader(props) {
       <h4 className="text-secondary" style={{ fontVariant: ["small-caps"] }}>
         {tournament.Game.value || "Fetching Game..."}
       </h4>
-      <p className="text-white">{tournament.description}</p>
+      <p>{tournament.description}</p>
       <Row className="pt-3 small">
         {/* Timezone issue: day of the month may be off by one depending on tz; 
           may have details to iron out on overall tz approach*/}
@@ -58,14 +58,14 @@ function TournamentAdminHeader(props) {
               <div className="d-grid">
                 {/* Start Date */}
                 <Button
-                  variant="outline-primary"
+                  variant="outline-secondary"
                   onClick={() => {
                     setShowTournamentDateEditor(true);
                   }}
                   size="sm"
                 >
                   <i className="bi bi-calendar3 text-primary"></i>{" "}
-                  <span className="text-white">
+                  <span>
                     {tournament.start
                       ? format(tournament.start, "eeee, dd MMM, yyyy")
                       : "N/A"}
@@ -83,14 +83,14 @@ function TournamentAdminHeader(props) {
               <div className="d-grid">
                 {/* Location */}
                 <Button
-                  variant="outline-primary"
+                  variant="outline-secondary"
                   onClick={() => {
                     setShowTournamentLocationEditor(true);
                   }}
                   size="sm"
                 >
                   <i className="bi bi-globe text-primary"></i>{" "}
-                  <span className="text-white">{tournament.location}</span>
+                  <span>{tournament.location}</span>
                 </Button>
               </div>
               <TournamentLocationEditor
@@ -106,14 +106,14 @@ function TournamentAdminHeader(props) {
               <div className="d-grid">
                 {/* Players Registered */}
                 <Button
-                  variant="outline-primary"
+                  variant="outline-secondary"
                   onClick={() => {
                     setShowTournamentPlayerEditor(true);
                   }}
                   size="sm"
                 >
                   <i className="bi bi-people-fill text-primary"></i>{" "}
-                  <span className="text-white">
+                  <span>
                     {tournament.Ladder_aggregate.aggregate.count}
                   </span>
                 </Button>
@@ -142,14 +142,14 @@ function TournamentAdminHeader(props) {
               <div className="d-grid">
                 {/* List Availability */}
                 <Button
-                  variant="outline-primary"
+                  variant="outline-secondary"
                   onClick={() => {
                     setShowTournamentListProtectionEditor(true);
                   }}
                   size="sm"
                 >
                   <i className="bi bi-file-text text-primary"></i>{" "}
-                  <span className="text-white">{list_availability}</span>
+                  <span>{list_availability}</span>
                 </Button>
               </div>
               <TournamentListProtectionEditor
@@ -174,14 +174,14 @@ function TournamentAdminHeader(props) {
           <div className="d-grid">
             {/* Administrator */}
             <Button
-              variant="outline-primary"
+              variant="outline-secondary"
               onClick={() => {
                 setShowTournamentAdminEditor(true);
               }}
               size="sm"
             >
               <i className="bi bi-person-fill text-primary"></i>{" "}
-              <span className="text-white">{tournament.Creator.name}</span>
+              <span>{tournament.Creator.name}</span>
             </Button>
           </div>
           <TournamentAdminEditor

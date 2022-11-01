@@ -42,7 +42,7 @@ export default function TournamentHeader(props) {
       <h4 className="text-secondary" style={{ fontVariant: ["small-caps"] }}>
         {tournament.Game.value || "Fetching Game..."}
       </h4>
-      <p className="text-white">{tournament.description}</p>
+      <p>{tournament.description}</p>
       <Row className="pt-3 small">
         {/* Timezone issue: day of the month off by one depending on tz; 
           need to figure out overall tz approach*/}

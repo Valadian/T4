@@ -226,7 +226,7 @@ export default function TournamentMatch(props){
                     <Col className={"col-5 col-sm-4 col-lg-2 col-r-border pb-3 paddedLikeInput"+MatchPlayerBg(player1)}>
                         {editing?
                         <div className="input-group">
-                            <input className="form-control bg-dark text-white" value={player1Pts} onChange={(evt) => setPlayer1Pts(evt.target.value)}></input>
+                            <input className="form-control" value={player1Pts} onChange={(evt) => setPlayer1Pts(evt.target.value)}></input>
                             <button className={"btn "+(player1Win?"btn-warning":"btn-outline-secondary")} type="button" onClick={() => setPlayer1Win(true)}><i className="bi bi-trophy-fill" title="win"></i></button>
                         </div>:
                         <>
@@ -241,7 +241,7 @@ export default function TournamentMatch(props){
                     <Col className={"col-5 col-sm-4 col-lg-2 pb-3 paddedLikeInput"+MatchPlayerBg(player2)}>
                         {editing?
                         <div className="input-group">
-                            <input className="form-control bg-dark text-white" value={player2Pts} onChange={(evt) => setPlayer2Pts(evt.target.value)}></input>
+                            <input className="form-control" value={player2Pts} onChange={(evt) => setPlayer2Pts(evt.target.value)}></input>
                             <button className={"btn "+(player1Win?"btn-outline-secondary":"btn-warning")} type="button" onClick={() => setPlayer1Win(false)}><i className="bi bi-trophy-fill" title="win"></i></button>
                         </div>:
                         <>

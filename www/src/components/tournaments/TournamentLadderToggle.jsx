@@ -52,12 +52,12 @@ export default function TournamentLadderToggle(props) {
   if (props) {
     return (
       <Button
-        variant="outline-primary"
+        variant="outline-secondary"
         onClick={updateLadderVisibility}
         size="sm"
       >
         <i className="bi bi-list-ol text-primary"></i>{" "}
-        <span className="text-white">{props.button_text}</span>
+        <span>{props.button_text}</span>
       </Button>
     );
   } else {
@@ -71,13 +71,13 @@ export default function TournamentLadderToggle(props) {
 
 /*{
    <Button
-variant="outline-primary"
+variant="outline-secondary"
 onClick={() => {
   setShowTournamentLadderProtectionEditor(true);
 }}
 size="sm"
 >
 <i className="bi bi-list-ol text-primary"></i>{" "}
-<span className="text-white">{ladder_visibility}</span>
+<span>{ladder_visibility}</span>
 </Button> 
 }*/

@@ -75,10 +75,10 @@ export default function TournamentResultSubmissionMatch(props){
     const EditCols = () => {
         return <>
             <Col className="col-2">
-                <input className="form-control bg-dark text-white w-100" value={points} onChange={(evt) => setPoints(evt.target.value)}></input>
+                <input className="form-control w-100" value={points} onChange={(evt) => setPoints(evt.target.value)}></input>
             </Col>
             <Col className="col-2">
-                <input className="form-control bg-dark text-white w-100" value={oppPts} onChange={(evt) => setOppPts(evt.target.value)}></input>
+                <input className="form-control w-100" value={oppPts} onChange={(evt) => setOppPts(evt.target.value)}></input>
             </Col>
             <Col className="col-2 col-lg-1 paddedLikeInput">{mov}</Col>
             <Col className="col-2 col-lg-1 paddedLikeInput">{tp}</Col>

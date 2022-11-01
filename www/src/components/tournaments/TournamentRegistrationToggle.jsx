@@ -43,14 +43,14 @@ export default function TournamentRegistrationToggle(props) {
     if (props) {
         return (
             <Button
-                variant="outline-primary"
+                variant="outline-secondary"
                 onClick={() => {
                     updateTournamentRegistration();
                 }}
                 size="sm"
             >
                 <i className="bi bi-person-plus-fill text-primary"></i>{" "}
-                <span className="text-white">{props.button_text}</span>
+                <span>{props.button_text}</span>
             </Button>
         );
     } else {
