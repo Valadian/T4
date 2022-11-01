@@ -2,28 +2,10 @@ import { React, useState, useContext } from "react";
 import format from "date-fns/format";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
+import { TournamentHomeContext } from "../../pages/tournaments/TournamentHome";
 
 export default function TournamentHeader(props) {
-  const [showTournamentDateEditor, setShowTournamentDateEditor] =
-    useState(false);
-  const [
-    showTournamentRegistrationEditor,
-    setShowTournamentRegistrationEditor,
-  ] = useState(false);
-  const [
-    showTournamentListProtectionEditor,
-    setShowTournamentListProtectionEditor,
-  ] = useState(false);
-  const [showTournamentLocationEditor, setShowTournamentLocationEditor] =
-    useState(false);
-  const [
-    showTournamentLadderProtectionEditor,
-    setShowTournamentLadderProtectionEditor,
-  ] = useState(false);
-  const [showTournamentAdminEditor, setShowTournamentAdminEditor] =
-    useState(false);
-  const {tournament} = useContext(TournamentHomeContext);
+  const { tournament } = useContext(TournamentHomeContext);
 
   var list_visibility = tournament.lists_visible ? "visible" : "hidden";
   var list_availability = tournament.lists_locked
@@ -50,7 +32,9 @@ export default function TournamentHeader(props) {
           <Row>
             <Col>
               <i className="bi bi-calendar3 text-primary"></i>{" "}
-              {tournament.start?format(tournament.start, "eeee, dd MMM, yyyy"):""}
+              {tournament.start
+                ? format(tournament.start, "eeee, dd MMM, yyyy")
+                : ""}
               {/* <TournamentPlayerEditor
                 show={this.state.showTournamentPlayerEditor}
                 onHide={() => this.handleAddPlayerClose()}
@@ -60,8 +44,7 @@ export default function TournamentHeader(props) {
           </Row>
           <Row>
             <Col>
-              <i className="bi bi-globe text-primary"></i>{" "}
-              {tournament.location}
+              <i className="bi bi-globe text-primary"></i> {tournament.location}
             </Col>
           </Row>
         </Col>
