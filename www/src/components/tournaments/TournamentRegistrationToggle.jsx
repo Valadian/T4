@@ -17,7 +17,6 @@ const updateRegistrationDoc = `
 `;
 
 export default function TournamentRegistrationToggle(props) {
-    const [registrationIsOpen, setRegistrationIsOpen] = useState("");
     const { getAccessTokenSilently } = useAuth0();
     const {tournament, updateTournament} = useContext(TournamentHomeContext);
 
@@ -32,7 +31,6 @@ export default function TournamentRegistrationToggle(props) {
             signups_open: registrationIsOpen,
             tournament_id: tournament.id,
         },accessToken)
-        .then((data) => setRegistrationIsOpen(data.signups_open))
         .then(() => updateTournament());
     };
 
@@ -43,7 +41,7 @@ export default function TournamentRegistrationToggle(props) {
     if (props) {
         return (
             <Button
-                variant="outline-secondary"
+                variant={tournament.signups_open?"outline-success":"outline-secondary"}
                 onClick={() => {
                     updateTournamentRegistration();
                 }}

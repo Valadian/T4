@@ -28,8 +28,6 @@ const updateListVisibilityDoc = `
 `;
 
 export default function TournamentListProtectionEditor(props) {
-  const [listsAreLocked, setListsAreLocked] = useState(false);
-  const [listsAreVisible, setListsAreVisible] = useState(false);
   const { getAccessTokenSilently } = useAuth0();
   const { tournament, updateTournament } = useContext(TournamentHomeContext);
 
@@ -50,10 +48,6 @@ export default function TournamentListProtectionEditor(props) {
       },
       accessToken
     )
-      .then((data) => {
-        setListsAreLocked(data.lists_locked);
-        console.log(data.lists_locked);
-      })
       .then(() => updateTournament());
   };
 
@@ -77,7 +71,6 @@ export default function TournamentListProtectionEditor(props) {
       },
       accessToken
     )
-      .then((data) => setListsAreVisible(data.lists_visible))
       .then(() => updateTournament());
   };
 

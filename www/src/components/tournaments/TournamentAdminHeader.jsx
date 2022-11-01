@@ -6,6 +6,7 @@ import Col from "react-bootstrap/Col";
 import TournamentAdminEditor from "./TournamentAdminEditor";
 import TournamentDateEditor from "./TournamentDateEditor";
 import TournamentLadderToggle from "./TournamentLadderToggle";
+import TournamentPublicToggle from "./TournamentPublicToggle";
 import TournamentListProtectionEditor from "./TournamentListProtectionEditor";
 import TournamentLocationEditor from "./TournamentLocationEditor";
 import TournamentPlayerEditor from "./TournamentPlayerEditor";
@@ -38,6 +39,9 @@ function TournamentAdminHeader(props) {
   var ladder_visibility = tournament.ladder_visible
     ? "Ladder visible"
     : "Ladder hidden";
+  var public_label = tournament.public
+    ? "Public"
+    : "Draft";
   var signup_availability = tournament.signups_open
     ? "Signups open"
     : "Signups closed";
@@ -99,6 +103,27 @@ function TournamentAdminHeader(props) {
               />
             </Col>
           </Row>
+          <Row>
+            <Col>
+              <div className="d-grid">
+                {/* Administrator */}
+                <Button
+                  variant="outline-secondary"
+                  onClick={() => {
+                    setShowTournamentAdminEditor(true);
+                  }}
+                  size="sm"
+                >
+                  <i className="bi bi-person-fill text-primary"></i>{" "}
+                  <span>{tournament.Creator.name}</span>
+                </Button>
+              </div>
+              <TournamentAdminEditor
+                show={showTournamentAdminEditor}
+                onHide={() => setShowTournamentAdminEditor(false)}
+              />
+            </Col>
+          </Row>
         </Col>
         <Col xs={12} md={3}>
           <Row>
@@ -142,7 +167,7 @@ function TournamentAdminHeader(props) {
               <div className="d-grid">
                 {/* List Availability */}
                 <Button
-                  variant="outline-secondary"
+                  variant={tournament.lists_visible?"outline-secondary":"outline-danger"}
                   onClick={() => {
                     setShowTournamentListProtectionEditor(true);
                   }}
@@ -167,27 +192,13 @@ function TournamentAdminHeader(props) {
               </div>
             </Col>
           </Row>
-        </Col>
-      </Row>
-      <Row className="pt-3 pb-s small text-light">
-        <Col xs={12} md={6}>
-          <div className="d-grid">
-            {/* Administrator */}
-            <Button
-              variant="outline-secondary"
-              onClick={() => {
-                setShowTournamentAdminEditor(true);
-              }}
-              size="sm"
-            >
-              <i className="bi bi-person-fill text-primary"></i>{" "}
-              <span>{tournament.Creator.name}</span>
-            </Button>
-          </div>
-          <TournamentAdminEditor
-            show={showTournamentAdminEditor}
-            onHide={() => setShowTournamentAdminEditor(false)}
-          />
+          <Row>
+            <Col>
+              <div className="d-grid">
+                <TournamentPublicToggle button_text={public_label} />
+              </div>
+            </Col>
+          </Row>
         </Col>
       </Row>
       <hr />

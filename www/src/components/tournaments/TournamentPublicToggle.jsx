@@ -5,36 +5,32 @@ import Modal from "react-bootstrap/Modal";
 import { useAuth0 } from "@auth0/auth0-react";
 import { TournamentHomeContext } from "../../pages/tournaments/TournamentHome";
 
-const updateLadderVisibilityDoc = `
-  mutation UpdateLadderVisibility($ladder_visible: Boolean, $tournament_id: uuid = "") {
-    update_Tournament(where: {id: {_eq: $tournament_id}}, _set: {ladder_visible: $ladder_visible}) {
+const updatePublicDoc = `
+  mutation UpdatePublic($public: Boolean, $tournament_id: uuid = "") {
+    update_Tournament(where: {id: {_eq: $tournament_id}}, _set: {public: $public}) {
       returning {
         id
-        ladder_visible
+        public
       }
     }
   }
 `;
 
-export default function TournamentLadderToggle(props) {
+export default function TournamentPublicToggle(props) {
   const { getAccessTokenSilently } = useAuth0();
   const { tournament, updateTournament } = useContext(TournamentHomeContext);
 
-  const updateLadderVisibility = async () => {
+  const updatePublic = async () => {
     if (!props || !tournament.id) {
       return;
     }
-    // Almost certain this was a bug:
-    //let ladderIsVisible = !tournament.ladder_visible;
-    // Not a bug, it's a toggle.
-    let ladderIsVisible = !tournament.ladder_visible;
 
     const accessToken = await getAccessTokenSilently();
     Query(
-      "UpdateLadderVisibility",
-      updateLadderVisibilityDoc,
+      "UpdatePublic",
+      updatePublicDoc,
       {
-        ladder_visible: ladderIsVisible,
+        public: !tournament.public,
         tournament_id: tournament.id,
       },
       accessToken
@@ -50,8 +46,8 @@ export default function TournamentLadderToggle(props) {
   if (props) {
     return (
       <Button
-        variant={tournament.ladder_visible?"outline-secondary":"outline-danger"}
-        onClick={updateLadderVisibility}
+        variant={tournament.public?"outline-success":"outline-warning"}
+        onClick={updatePublic}
         size="sm"
       >
         <i className="bi bi-list-ol text-primary"></i>{" "}

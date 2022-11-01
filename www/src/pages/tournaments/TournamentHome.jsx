@@ -26,6 +26,7 @@ const tournamentByIdDoc = `
       lists_locked
       ladder_visible
       signups_open
+      public
       Ladder_aggregate {
         aggregate {
           count
@@ -330,6 +331,10 @@ function TournamentHome(props) {
         return (
             <TournamentHomeContext.Provider value={context}>
                 {breadcrumbs()}
+                {isOwner && !tournament.public?<>
+                    <h2 className="text-warning">This event is a Draft and hidden</h2>
+                    <p className="text-muted">Click <b>Draft</b> toggle below to make public</p>
+                </>:<></>}
                 <Toaster ref={toaster} />
                 {isOwner?<TournamentAdminHeader/>:<TournamentHeader/>}
                 <Tabs
