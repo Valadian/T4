@@ -46,7 +46,7 @@ class Matchmaker:
         # Rank players to find last place for the bye
         players_ranked = sorted(
             self.players,
-            key=itemgetter("tournament_points"), #JB: Do not sort on mov/sos, "mov", "sos"
+            key=itemgetter("tournament_points", "mov", "sos"),
             reverse=True,
         )
 
@@ -71,8 +71,10 @@ class Matchmaker:
         # iterate through the micro-shuffled list and generate pairings
         for p_idx, player in enumerate(self.players_in_pairing_order):
 
-            if player in self.unpaired_players:
-                self.pairings.append(self.matchmakePlayer(player, p_idx))
+            if (player in self.unpaired_players) and (
+                player_pair := self.matchmakePlayer(player, p_idx)
+            ):
+                self.pairings.append(player_pair)
 
         if self.bye:
             app.logger.debug("{} has the bye".format(self.bye["user_id"]))
@@ -100,7 +102,7 @@ class Matchmaker:
         """Recurse through the pairings order until we find the first player
         this player hasn't played against before, then pair them."""
 
-        if (len(self.players_in_pairing_order) == player_index + 1) or (
+        if (
             self.players_in_pairing_order[player_index + 1]
             not in player["previous_opponents"]
         ):
@@ -114,6 +116,8 @@ class Matchmaker:
                 )
             )
             return [player, self.players_in_pairing_order[player_index + 1]]
+        elif len(self.players_in_pairing_order) == player_index + 1:
+            return
         else:
             return self.matchmakePlayer(player, player_index + 1)
 
@@ -146,7 +150,6 @@ class Matchmaker:
                             player, match_id
                         )
                     )
-                    
 
         if self.bye:
             bye_match_id = self.new_match_ids.pop()
