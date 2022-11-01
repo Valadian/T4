@@ -1,10 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Form, Button, Col, FloatingLabel, Row } from "react-bootstrap";
 import { useAuth0 } from "@auth0/auth0-react";
+import Query from "../../data/T4GraphContext";
 import TournamentPlayerName from "./TournamentPlayerName"
+import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 
+const deleteDoc = `
+mutation DeleteTournamentPlayer($id: uuid = "") {
+    delete_TournamentPlayer_by_pk(id: $id) {
+        id
+    }
+}`
 export default function TournamentPlayerSummary(props) {
+    const {updateTournament, isOwner} = useContext(TournamentHomeContext);
     const { user, getAccessTokenSilently } = useAuth0();
+
+    const deletePlayer = async (id) =>{
+      let accessToken = await getAccessTokenSilently()
+      Query("DeleteTournamentPlayer", deleteDoc, { id: id },accessToken)
+        .then((response) => {
+          updateTournament()
+        })
+    }
     //console.log(JSON.stringify(props));
     const TournamentPlayerMatchSummary = (tp)=>{
       return tp.Matches.map(m => {
@@ -26,7 +43,10 @@ export default function TournamentPlayerSummary(props) {
         <Col className="col-2 col-md-1"><span className={props.player.win>0?"text-info":""}>{props.player.win}</span><span className="d-none d-md-inline"> </span>/<span className="d-none d-md-inline"> </span><span className={props.player.loss>0?"text-danger":""}>{props.player.loss}</span></Col>
         <Col className="col-1">{props.player.tournament_points}</Col>
         <Col className="col-3 col-md-2">{props.player.mov}<span className="d-none d-md-inline"> / {props.player.sos.toFixed(2)}</span></Col>
-        <Col className="col-3 d-none d-md-block">{props.player.club}</Col>
+        <Col className="col-3 d-none d-md-flex"><span className="me-auto">{props.player.club}</span>
+        
+        {isOwner && props.player.Matches.length===0?<a className="btn btn-sm btn-outline-danger" onClick={() => deletePlayer(props.player.id)}><i className="bi bi-x"></i></a>:<></>}
+        </Col>
       </Row>
     );
 }

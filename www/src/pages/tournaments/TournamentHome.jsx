@@ -154,7 +154,7 @@ function TournamentHome(props) {
     const [showSignUpTab, setShowSignUpTab] = useState(true);
     // const [ladder, setLadder] = useState([]);
     const sum = (arr) => arr.reduce((a, b) => a + b,0)
-    const avg = (arr) => sum(arr)/arr.length
+    const avg = (arr) => arr.length===0?0:sum(arr)/arr.length
     const max = (arr) => arr.reduce((a, b) => Math.max(a, b),0)
     const bakeLadder = (ladder, finalOnly) => {
         for(let l of ladder){
