@@ -9,6 +9,7 @@ import TournamentLadderToggle from "./TournamentLadderToggle";
 import TournamentPublicToggle from "./TournamentPublicToggle";
 import TournamentListProtectionEditor from "./TournamentListProtectionEditor";
 import TournamentLocationEditor from "./TournamentLocationEditor";
+import TournamentDescriptionEditor from "./TournamentDescriptionEditor";
 import TournamentPlayerEditor from "./TournamentPlayerEditor";
 import TournamentRegistrationToggle from "./TournamentRegistrationToggle";
 import { TournamentHomeContext } from "../../pages/tournaments/TournamentHome";
@@ -32,6 +33,10 @@ function TournamentAdminHeader(props) {
     useState(false);
   const { tournament, updateTournament } = useContext(TournamentHomeContext);
 
+
+  const [showTournamentDescriptionEditor, setShowTournamentDescriptionEditor] =
+    useState(false);
+
   var list_visibility = tournament.lists_visible ? "visible" : "hidden";
   var list_availability = tournament.lists_locked
     ? `Lists ${list_visibility} & locked`
@@ -52,7 +57,21 @@ function TournamentAdminHeader(props) {
       <h4 className="text-secondary" style={{ fontVariant: ["small-caps"] }}>
         {tournament.Game.value || "Fetching Game..."}
       </h4>
-      <p>{tournament.description}</p>
+      <Row>
+        <Col xs={10} md={11} >
+          <p>{tournament.description}</p>
+        </Col>
+        <Col xs={2} md={1}>
+          <a className="btn btn-outline-primary" onClick={() => {
+                    setShowTournamentDescriptionEditor(true);
+                  }} title="Edit Description"><i className="bi bi-pen"></i></a>
+                  
+          <TournamentDescriptionEditor
+            show={showTournamentDescriptionEditor}
+            onHide={() => setShowTournamentDescriptionEditor(false)}
+          />
+        </Col>
+      </Row>
       <Row className="pt-3 small">
         {/* Timezone issue: day of the month may be off by one depending on tz; 
           may have details to iron out on overall tz approach*/}
