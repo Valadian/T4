@@ -1,8 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import FilteredTournamentList from '../components/tournaments/FilteredTournamentList';
+import { useAuth0 } from "@auth0/auth0-react";
 
 function Events() {
+    const { user, getAccessTokenSilently } = useAuth0();
+
     return (
         <>
         
@@ -18,7 +21,7 @@ function Events() {
                 <h1>All Events</h1>
             </div>
             <div className="col-1 p-1">
-                <Link className="btn btn-sm btn-outline-success" to="/events/add"><i className="bi bi-plus"></i></Link>
+                {user?<Link className="btn btn-sm btn-outline-success" to="/events/add"><i className="bi bi-plus"></i></Link>:<></>}
             </div>
         </div>
         <FilteredTournamentList />
