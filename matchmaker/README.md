@@ -20,7 +20,11 @@ _Packaging and build references here: https://packaging.python.org/en/latest/tut
 - Ensure `build.dockerfile` is updated.
 - From ./docker_setup/, build the Docker image.
   `docker build -t sprintska/matchmaker:vX.Y.Z -f ./build.dockerfile .`
+- Tag it as alternatives as appropriate.
+  `docker tage sprintska/matchmaker:vX.Y.Z sprintska/matchmaker:latest`
+  `docker tage sprintska/matchmaker:vX.Y.Z sprintska/matchmaker:vX.Y.Z-x64`
 - Push the Docker image to Docker Hub (update target repo as appropriate or request access).
+  `docker login -u docker_hub_user_name`
   `docker push sprintska/matchmaker:vX.Y.Z`
 
 ## Deploy

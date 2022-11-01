@@ -5,10 +5,10 @@ build-backend = "setuptools.build_meta"
 [project]
 # name="matchmaker_t4_arm"
 name="matchmaker_t4"
-version="0.1.6"
+version="0.2.0"
 authors=[{ name="Cory Benson",email="ardaedhel@gmail.com"},]
 description="Matchmaker service for tabletoptournament.tools"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
