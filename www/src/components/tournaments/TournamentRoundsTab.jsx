@@ -43,7 +43,7 @@ export default function TournamentRoundsTab(props) {
     
     useEffect(() => {
         //console.log(props.rounds.length)
-        setRoundNum(rounds.length+1)
+        setRoundNum(rounds.map(r => r.round_num).reduce((a,b) => Math.max(a,b),0)+1)
     },[rounds])
     const addRound = async () => {
         const accessToken = await getAccessTokenSilently()
@@ -52,6 +52,7 @@ export default function TournamentRoundsTab(props) {
             round_num: roundNum,
             description: roundDesc,
         },accessToken).then((data) => {
+            setActiveTab("round_"+roundNum)
             //setRoundNum(+roundNum+1);
             updateTournament()
         });
@@ -63,7 +64,7 @@ export default function TournamentRoundsTab(props) {
             id: round_id
         },accessToken).then((data) => {
             //setRoundNum(+roundNum+1);
-            var remaining_rounds = rounds.filter(r => r.id != data.delete_TournamentRound_by_pk.id)
+            var remaining_rounds = rounds.filter(r => r.id !== data.delete_TournamentRound_by_pk.id)
             if(remaining_rounds.length>0){
                 var last_round_num = remaining_rounds[remaining_rounds.length - 1].round_num
                 setActiveTab("round_"+last_round_num)
