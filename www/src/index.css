@@ -24,6 +24,33 @@ code {
   input.form-control {
     background-color: #181818;
   }
+  .roundVerified {
+    background-color: #203040;
+    color: white;
+  }
+  .roundConflict {
+    background-color: #402030
+  }
+  .roundWin {
+    background-color: #203040
+  }
+  .roundLoss {
+    background-color: #402030
+  }
+}
+@media (prefers-color-scheme: light) {
+  .roundVerified {
+    background-color: #DFEFFF
+  }
+  .roundConflict {
+    background-color: #FFDFEF
+  }
+  .roundWin {
+    background-color: #DFEFFF
+  }
+  .roundLoss {
+    background-color: #FFDFEF
+  }
 }
 div.paddedLikeInput {
   padding: .375rem .75rem
@@ -33,16 +60,4 @@ div.paddedLikeInput {
 }
 .col-r-border {
   border-right: #375a7f dotted 1px;
-}
-.roundVerified {
-  background-color: #203040
-}
-.roundConflict {
-  background-color: #402030
-}
-.roundWin {
-  background-color: #203040
-}
-.roundLoss {
-  background-color: #402030
 }

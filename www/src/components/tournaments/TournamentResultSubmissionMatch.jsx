@@ -83,7 +83,7 @@ export default function TournamentResultSubmissionMatch(props){
             <Col className="col-2 col-lg-1 paddedLikeInput">{mov}</Col>
             <Col className="col-2 col-lg-1 paddedLikeInput">{tp}</Col>
             <Col className="col-2">
-                <select className={"form-select bg-dark"+(win==="true"?" text-success":(win==="false"?" text-danger":""))} value={win} onChange={(evt) => setWin(evt.target.value)}>
+                <select className={"form-select"+(win==="true"?" text-success":(win==="false"?" text-danger":""))} value={win} onChange={(evt) => setWin(evt.target.value)}>
                     <option value={true}>Win</option>
                     <option value={false}>Loss</option>
                     <option value="">?</option>

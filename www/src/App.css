@@ -38,11 +38,6 @@
 }
 
 
-.form-select {
-  background-color: #545b62;
-  color: #ced4da;
-  border: 1px solid rgba(255,255,255,.125);
-}
 .analysis-footer {
   padding: 2.5rem 0;
   color: #999;
@@ -137,31 +132,39 @@ button.react-datepicker__close-icon::after{
   background-color: #e74c3c;
   font-weight: bolder;
 }
-.react-select__contrl:active {
-  background-color: #222 !important;
-}
-.react-select__control {
-  background-color: #181818 !important;
-  border: 1px solid #515151 !important;
-  color: #b1b1b1;
-  box-shadow:none !important;
-}
-.react-select__control:hover{
-  background-color: transparent !important;
-  border: 1px solid #ffffffA0 !important;
-}
-.react-select__menu {
-  background-color: #181818 !important;
-  color: #b1b1b1;
+@media (prefers-color-scheme: dark) {
+  .form-select {
+    background-color: #545b62;
+    color: #ced4da;
+    border: 1px solid rgba(255,255,255,.125);
+  }
+  
+  .react-select__contrl:active {
+    background-color: #222 !important;
+  }
+  .react-select__control {
+    background-color: #181818 !important;
+    border: 1px solid #515151 !important;
+    color: #b1b1b1;
+    box-shadow:none !important;
+  }
+  .react-select__control:hover{
+    background-color: transparent !important;
+    border: 1px solid #ffffffA0 !important;
+  }
+  .react-select__menu {
+    background-color: #181818 !important;
+    color: #b1b1b1;
 
-}
-.react-select__single-value {
-  color: #b1b1b1 !important;
-}
-.react-select__option:hover,
-.react-select__option:focus,
-.react-select__option:active{
-  background-color: #222 !important;
+  }
+  .react-select__single-value {
+    color: #b1b1b1 !important;
+  }
+  .react-select__option:hover,
+  .react-select__option:focus,
+  .react-select__option:active{
+    background-color: #222 !important;
+  }
 }
 /* .react-select__value-container,
 .react-select__input-container,
