@@ -114,6 +114,9 @@ export default function TournamentRoundsTab(props) {
     }
     if (rounds) {
         return (
+        <>
+            
+            {isOwner?<div className="mb-3 text-muted">TOs can <b>set/override</b> all <b>match scores</b> in this tab</div>:<></>}
             <Tabs
                 activeKey={activeTab}
                 onSelect={setActiveTab}
@@ -176,6 +179,7 @@ export default function TournamentRoundsTab(props) {
                     <div className="form-group"><a className="btn btn-outline-success" onClick={addRound}><i className="bi bi-plus"></i> Add Round</a></div>
                 </Tab>:<></>}
             </Tabs>
+        </>
         )
     } else {
       return <div>Loading...</div>;
