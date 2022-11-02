@@ -19,8 +19,8 @@ function Home() {
         </nav>
         <Row>
             <Col xs={9}>
-                <div className="mt-0" style={{'border':'#FF8000 solid 1px', 'border-radius': '.25rem', 'fontSize': 'smaller'}}>
-                    <div className="progress" style={{'border-radius': '0rem'}}>
+                <div className="mt-0" style={{'border':'#FF8000 solid 1px', 'borderRadius': '.25rem', 'fontSize': 'smaller'}}>
+                    <div className="progress" style={{'borderRadius': '0rem'}}>
                         <div className="progress-bar progress-bar-striped bg-warning progress-bar-animated" role="progressbar" style={{width: '100%'}}></div>
                     </div>
                     <div className="p-2">
@@ -29,7 +29,7 @@ function Home() {
                         <div>discord: <a href="https://discord.gg/TVsGh9fKkp">https://discord.gg/TVsGh9fKkp</a> (#tabletop-to-software-testing channel)</div>
                         <div>github: <a href="https://github.com/Valadian/T4/issues">https://github.com/Valadian/T4/issues</a></div>
                     </div>
-                    <div className="progress" style={{'border-radius': '0rem'}}>
+                    <div className="progress" style={{'borderRadius': '0rem'}}>
                         <div className="progress-bar progress-bar-striped bg-warning progress-bar-animated" role="progressbar" style={{width: '100%'}}></div>
                     </div>
                 </div>
