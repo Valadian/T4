@@ -52,6 +52,12 @@ code {
     background-color: #FFDFEF
   }
 }
+
+.homeIcon {
+  height:60px;
+  width:60px;
+  font-size: x-small;
+}
 div.paddedLikeInput {
   padding: .375rem .75rem
 }

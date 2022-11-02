@@ -1,34 +1,55 @@
 import React from 'react';
 import TournamentList from '../components/tournaments/TournamentList';
+import { Link, useNavigate } from "react-router-dom";
+import {Col, Row} from 'react-bootstrap'
 import { useAuth0 } from "@auth0/auth0-react";
 
 function Home() {
-    const { user } = useAuth0();
+    const { user, loginWithRedirect } = useAuth0();
+    const navigate = useNavigate()
     return (
         <>
-        {user?<></>:<div className="d-flex flex-row-reverse">
+        {/* {user?<></>:<div className="d-flex flex-row-reverse">
             <h4 className="text-success">Log in to create Event <i className="bi bi-arrow-up-circle-fill"></i></h4>
-        </div>}
+        </div>} */}
         <nav className="" aria-label="breadcrumb">
             <ol className="breadcrumb">
                 <li className="breadcrumb-item">Home</li>
             </ol>
         </nav>
-        <div style={{'border':'#FF8000 solid 1px', 'border-radius': '.25rem'}}>
-            <div className="progress" style={{'border-radius': '0rem'}}>
-                <div className="progress-bar progress-bar-striped bg-warning progress-bar-animated" role="progressbar" style={{width: '100%'}}></div>
-            </div>
-            <div className="p-3">
-            <p>This site is an early prototype under active development. Please report any issues found!</p>
-            <p>email: <a href="mailto:admin@jesseberger.me">admin@jesseberger.me</a></p>
-            <p>discord: <a href="https://discord.gg/TVsGh9fKkp">https://discord.gg/TVsGh9fKkp</a> (#tabletop-to-software-testing channel)</p>
-            <p>github: <a href="https://github.com/Valadian/T4/issues">https://github.com/Valadian/T4/issues</a></p>
-            </div>
-            <div className="progress" style={{'border-radius': '0rem'}}>
-                <div className="progress-bar progress-bar-striped bg-warning progress-bar-animated" role="progressbar" style={{width: '100%'}}></div>
-            </div>
-        </div>
-        <br />
+        <Row>
+            <Col xs={9}>
+                <div className="mt-0" style={{'border':'#FF8000 solid 1px', 'border-radius': '.25rem', 'fontSize': 'smaller'}}>
+                    <div className="progress" style={{'border-radius': '0rem'}}>
+                        <div className="progress-bar progress-bar-striped bg-warning progress-bar-animated" role="progressbar" style={{width: '100%'}}></div>
+                    </div>
+                    <div className="p-2">
+                        <p>This site is an early prototype under active development. Please report any issues found!</p>
+                        <div>email: <a href="mailto:admin@jesseberger.me">admin@jesseberger.me</a></div>
+                        <div>discord: <a href="https://discord.gg/TVsGh9fKkp">https://discord.gg/TVsGh9fKkp</a> (#tabletop-to-software-testing channel)</div>
+                        <div>github: <a href="https://github.com/Valadian/T4/issues">https://github.com/Valadian/T4/issues</a></div>
+                    </div>
+                    <div className="progress" style={{'border-radius': '0rem'}}>
+                        <div className="progress-bar progress-bar-striped bg-warning progress-bar-animated" role="progressbar" style={{width: '100%'}}></div>
+                    </div>
+                </div>
+            </Col>
+            <Col xs={3}>
+                <div className=" float-end homeIcon btn btn-outline-secondary" onClick={() => navigate("/events")}>
+                    <span>
+                        <h3 className="mb-0"><i class="bi bi-trophy-fill"></i></h3>
+                        <span>Events</span>
+                    </span>
+                </div>
+                {user?<></>:<div className="float-end homeIcon btn btn-outline-primary" onClick={() => loginWithRedirect()}>
+                    <span>
+                        <h3 className="mb-0"><i class="bi bi-box-arrow-in-right"></i></h3>
+                        <span>Login</span>
+                    </span>
+                </div>}
+            </Col>
+        </Row>
+        
         <h2>
             Welcome to TableTop Tournament Tools (T4)!
         </h2>

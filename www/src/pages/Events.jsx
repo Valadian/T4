@@ -4,7 +4,7 @@ import FilteredTournamentList from '../components/tournaments/FilteredTournament
 import { useAuth0 } from "@auth0/auth0-react";
 
 function Events() {
-    const { user, getAccessTokenSilently } = useAuth0();
+    const { user } = useAuth0();
 
     return (
         <>
@@ -17,12 +17,12 @@ function Events() {
         </nav>
         
         <div className="row">
-            <div className="col-11">
+            <div className="col-8">
                 <h1>All Events</h1>
             </div>
-            <div className="col-1 p-1">
-                {user?<Link className="btn btn-sm btn-outline-success" to="/events/add"><i className="bi bi-plus"></i></Link>:<></>}
-            </div>
+            {/* <div className="col-4 p-1 d-flex flex-row-reverse">
+                {user?<Link className="btn btn-outline-success" to="/events/add"><i className="bi bi-plus"></i> Create</Link>:<></>}
+            </div> */}
         </div>
         <FilteredTournamentList />
         </>
