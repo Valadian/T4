@@ -36,8 +36,24 @@ export default function TournamentPlayerSummary(props) {
       })
       .reduce((a,b) => a+b+"\n","")
     }
+    const TournamentPlayerMatchSummaryRows = (tp)=>{
+      return tp.Matches.map(m => {
+        let state = m.TournamentOpponent?(m.win===null?"PENDING":(m.win?"WIN":"LOSS")):(m.win===false?"D/Q":"BYE")
+        let oppname = m.TournamentOpponent?(m.TournamentOpponent.User?.name??m.TournamentOpponent.player_name):""
+
+        return <>
+          <Col xs={1}></Col>
+          <Col xs={5} md={4}>&nbsp;- R{m.Match.Round.round_num} vs {oppname}</Col>
+          <Col xs={2} md={1} className={state==="PENDING"?"text-warning":(m.win?"text-info":"text-danger")}>{state}</Col>
+          <Col xs={1}>{m.tournament_points}</Col>
+          <Col xs={3} md={2}>{m.points&&m.opp_points?"("+m.points+":"+m.opp_points+")":""}</Col>
+          <Col xs={3} className="d-none d-md-flex"></Col>
+        </>
+      })
+    }
     return (
-      <Row>
+      <>
+      <Row className="accordion-row" data-bs-toggle="collapse" data-bs-target={"#TP"+props.player.id.replaceAll("-","")}>
         <Col className="col-1">{props.player.rank}</Col>
         <Col className="col-5 col-md-4" title={TournamentPlayerMatchSummary(props.player)}><TournamentPlayerName player={props.player} /></Col>
         <Col className="col-2 col-md-1"><span className={props.player.win>0?"text-info":""}>{props.player.win}</span><span className="d-none d-md-inline"> </span>/<span className="d-none d-md-inline"> </span><span className={props.player.loss>0?"text-danger":""}>{props.player.loss}</span></Col>
@@ -48,5 +64,9 @@ export default function TournamentPlayerSummary(props) {
         {isOwner && props.player.Matches.length===0?<a className="btn btn-sm btn-outline-danger" onClick={() => deletePlayer(props.player.id)}><i className="bi bi-x"></i></a>:<></>}
         </Col>
       </Row>
+      <Row id={"TP"+props.player.id.replaceAll("-","")} data-bs-parent="#ladder" className="roundRow accordion-collapse collapse">
+        {TournamentPlayerMatchSummaryRows(props.player)}
+      </Row>
+      </>
     );
 }

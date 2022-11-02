@@ -22,7 +22,7 @@ export default function Ladder(props) {
     if (ladder) {
       //console.log("Got past the state check...");
       return (
-        <div>
+        <div id="ladder">
           <div className="d-flex mb-3">
             {isOwner?<a className="btn btn-outline-success" onClick={() => {
                     setShowTournamentPlayerEditor(true);
