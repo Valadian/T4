@@ -36,20 +36,19 @@ export default function TournamentPlayerSummary(props) {
       })
       .reduce((a,b) => a+b+"\n","")
     }
-    const TournamentPlayerMatchSummaryRows = (tp)=>{
-      return tp.Matches.map(m => {
-        let state = m.TournamentOpponent?(m.win===null?"PENDING":(m.win?"WIN":"LOSS")):(m.win===false?"D/Q":"BYE")
-        let oppname = m.TournamentOpponent?(m.TournamentOpponent.User?.name??m.TournamentOpponent.player_name):""
+    const TournamentPlayerMatchSummaryRows = (props)=>{
+      let m = props.match
+      let state = m.TournamentOpponent?(m.win===null?"PENDING":(m.win?"WIN":"LOSS")):(m.win===false?"D/Q":"BYE")
+      let oppname = m.TournamentOpponent?(m.TournamentOpponent.User?.name??m.TournamentOpponent.player_name):""
 
-        return <>
-          <Col xs={1}></Col>
-          <Col xs={5} md={4}>&nbsp;- R{m.Match.Round.round_num} vs {oppname}</Col>
-          <Col xs={2} md={1} className={state==="PENDING"?"text-warning":(m.win?"text-info":"text-danger")}>{state}</Col>
-          <Col xs={1}>{m.tournament_points}</Col>
-          <Col xs={3} md={2}>{m.points&&m.opp_points?"("+m.points+":"+m.opp_points+")":""}</Col>
-          <Col xs={3} className="d-none d-md-flex"></Col>
-        </>
-      })
+      return (<>
+        <Col xs={1}></Col>
+        <Col xs={5} md={4}>&nbsp;- R{m.Match.Round.round_num} vs {oppname}</Col>
+        <Col xs={2} md={1} className={state==="PENDING"?"text-warning":(m.win?"text-info":"text-danger")}>{state}</Col>
+        <Col xs={1}>{m.tournament_points}</Col>
+        <Col xs={3} md={2}>{m.points&&m.opp_points?"("+m.points+":"+m.opp_points+")":""}</Col>
+        <Col xs={3} className="d-none d-md-flex"></Col>
+      </>)
     }
     return (
       <>
@@ -65,7 +64,7 @@ export default function TournamentPlayerSummary(props) {
         </Col>
       </Row>
       <Row id={"TP"+props.player.id.replaceAll("-","")} data-bs-parent="#ladder" className="roundRow accordion-collapse collapse">
-        {TournamentPlayerMatchSummaryRows(props.player)}
+        {props.player.Matches.map(m=> <TournamentPlayerMatchSummaryRows key={m.id} match={m}/>)}
       </Row>
       </>
     );
