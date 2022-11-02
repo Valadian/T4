@@ -37,13 +37,13 @@ function Home() {
             <Col xs={3}>
                 <div className=" float-end homeIcon btn btn-outline-secondary" onClick={() => navigate("/events")}>
                     <span>
-                        <h3 className="mb-0"><i class="bi bi-trophy-fill"></i></h3>
+                        <h3 className="mb-0"><i className="bi bi-trophy-fill"></i></h3>
                         <span>Events</span>
                     </span>
                 </div>
                 {user?<></>:<div className="float-end homeIcon btn btn-outline-primary" onClick={() => loginWithRedirect()}>
                     <span>
-                        <h3 className="mb-0"><i class="bi bi-box-arrow-in-right"></i></h3>
+                        <h3 className="mb-0"><i className="bi bi-box-arrow-in-right"></i></h3>
                         <span>Login</span>
                     </span>
                 </div>}
