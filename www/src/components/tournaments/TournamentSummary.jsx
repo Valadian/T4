@@ -14,7 +14,7 @@ export default function TournamentSummary(props) {
                 <Link to={"/events/"+props.data.id} className="tournament-link">{props.data.name}&nbsp;
                     {isOwner ? <span className="badge bg-info">Owner</span>:<></>}&nbsp;
                     {isParticipant ? <span className="badge bg-success">Participant</span>:<></>}&nbsp;
-                    {!props.data.public ? <span className="badge bg-warning">Private</span>:<></>}
+                    {!(props.data.public) ? <span className="badge bg-warning">Private</span>:<></>}
                 </Link>
             </div>
             <div className="row text-muted small">

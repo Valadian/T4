@@ -10,6 +10,7 @@ const operationsDoc = `
       name
       location
       start
+      public
       Ladder_aggregate {
         aggregate {
           count
