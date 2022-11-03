@@ -6,20 +6,20 @@ import TournamentPlayerEditor from "./TournamentPlayerEditor";
 import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 
 export default function Ladder(props) {
-    const {ladder, dispatchLadder, updateTournament, isOwner, finalizedOnly, setFinalizedOnly } = useContext(TournamentHomeContext);
+    const {tournament, dispatchTournament, isOwner, finalizedOnly, setFinalizedOnly } = useContext(TournamentHomeContext);
     const [showTournamentPlayerEditor, setShowTournamentPlayerEditor] = useState(false);
 
     const toggleFinalizedOnly = () => {
       let next = !finalizedOnly
       setFinalizedOnly(next)
       if(next){
-        dispatchLadder({type: 'finalized'})
+        dispatchTournament({type: 'finalized'})
       } else{
-        dispatchLadder({type: 'live'})
+        dispatchTournament({type: 'live'})
       }
       // rebakeLadder(!finalizedOnly)
     }
-    if (ladder) {
+    if (tournament?.Ladder) {
       //console.log("Got past the state check...");
       return (
         <div id="ladder">
@@ -41,7 +41,7 @@ export default function Ladder(props) {
             <Col className="col-3 d-none d-md-block">Club
             </Col>
           </Row>
-          {ladder.map((player) => (
+          {tournament.Ladder.map((player) => (
             <TournamentPlayerSummary key={player.id} player={player} />
           ))}
           <TournamentPlayerEditor

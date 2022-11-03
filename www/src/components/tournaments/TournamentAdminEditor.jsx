@@ -22,7 +22,7 @@ export default function TournamentAdminEditor(props){
     const [newTournamentDate, setNewTournamentDate] = useState("");
     const [newPlayerName, setNewPlayerName] = useState("");
     const { getAccessTokenSilently } = useAuth0();
-    const {tournament, updateTournament} = useContext(TournamentHomeContext);
+    const {tournament} = useContext(TournamentHomeContext);
 
     const updateTournamentDate = async (start_date) => {
         const accessToken = await getAccessTokenSilently()

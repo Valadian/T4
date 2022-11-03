@@ -16,8 +16,8 @@ mutation updateMatchPlayer($id: uuid!, $points: Int!, $opp_points: Int!, $tourna
   ` 
 
 export default function TournamentResultSubmission(props) {
-    const {rounds, ladder, tournament, updateTournament, isOwner, isParticipant} = useContext(TournamentHomeContext);
-    const { user, getAccessTokenSilently } = useAuth0();
+    const {tournament} = useContext(TournamentHomeContext);
+    const { user } = useAuth0();
 
     const isMine = (match) => match.Players.map(mp => mp.User?.id).includes(user?.sub)
     const myGame = (round) => round.Matches.filter(isMine)[0]
@@ -25,23 +25,29 @@ export default function TournamentResultSubmission(props) {
     const myself = (match) => match.Players.filter(p => p.User?.id===user?.sub)[0]
     const opponent = (match) => match.Players.filter(p => p.User?.id!==user?.sub)[0]
 
-    return (
-    <>
-        <Row className="pb-1 header mb-3">
-            <Col className="col-12 col-lg-3">Opponent</Col>
-            <Col className="col-2">Self</Col>
-            <Col className="col-2">Opp</Col>
-            <Col className="col-2 col-lg-1">Mov</Col>
-            <Col className="col-2 col-lg-1">TP</Col>
-            <Col className="col-2">W/L</Col>
-            <Col className="col-2 col-lg-1"></Col>
-        </Row>
-        {rounds.filter(roundHasMyGame).map(r => { 
-            var m = myGame(r)
-            var mp_self = myself(m)
-            var mp_opp = opponent(m)
-        return <TournamentResultSubmissionMatch key={r.id} round={r} match={m} mp_self={mp_self} mp_opp={mp_opp} />
-        })}
-    </>
-    )
+    if(tournament){
+        return (
+        <>
+            <Row className="pb-1 header mb-3">
+                <Col className="col-12 col-lg-3">Opponent</Col>
+                <Col className="col-2">Self</Col>
+                <Col className="col-2">Opp</Col>
+                <Col className="col-2 col-lg-1">Mov</Col>
+                <Col className="col-2 col-lg-1">TP</Col>
+                <Col className="col-2">W/L</Col>
+                <Col className="col-2 col-lg-1"></Col>
+            </Row>
+            {tournament?.Rounds.filter(roundHasMyGame).map(r => { 
+                var m = myGame(r)
+                var mp_self = myself(m)
+                var mp_opp = opponent(m)
+            return <TournamentResultSubmissionMatch key={r.id} round={r} match={m} mp_self={mp_self} mp_opp={mp_opp} />
+            })}
+        </>
+        )
+    } else {
+        return (
+            <></>
+        )
+    }
 }

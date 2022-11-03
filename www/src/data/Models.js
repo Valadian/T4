@@ -27,4 +27,6 @@ export class Tournament {
     Game = new Game()
     Creator = new User()
     ScoringRuleset = new ScoringRuleset()
+    Ladder = []
+    Rounds = []
 }

@@ -35,16 +35,15 @@ mutation addMatch($round_id: uuid!, $table_num: Int!) {
   
 `
 export default function TournamentRoundsTab(props) {
-    const { user, getAccessTokenSilently } = useAuth0();
+    const { getAccessTokenSilently } = useAuth0();
     const [roundNum, setRoundNum] = useState(0);
     const [roundDesc, setRoundDesc] = useState("");
     const [activeTab, setActiveTab] = useState("round_1")
-    const {rounds, ladder, tournament, updateTournament, isOwner} = useContext(TournamentHomeContext);
+    const {tournament, updateTournament, isOwner} = useContext(TournamentHomeContext);
     
     useEffect(() => {
-        //console.log(props.rounds.length)
-        setRoundNum(rounds.map(r => r.round_num).reduce((a,b) => Math.max(a,b),0)+1)
-    },[rounds])
+        setRoundNum(tournament?.Rounds.map(r => r.round_num).reduce((a,b) => Math.max(a,b),0)+1)
+    },[tournament])
     const addRound = async () => {
         const accessToken = await getAccessTokenSilently()
         Query("addNewRound", insertDoc, {
@@ -64,7 +63,7 @@ export default function TournamentRoundsTab(props) {
             id: round_id
         },accessToken).then((data) => {
             //setRoundNum(+roundNum+1);
-            var remaining_rounds = rounds.filter(r => r.id !== data.delete_TournamentRound_by_pk.id)
+            var remaining_rounds = tournament?.Rounds.filter(r => r.id !== data.delete_TournamentRound_by_pk.id)
             if(remaining_rounds.length>0){
                 var last_round_num = remaining_rounds[remaining_rounds.length - 1].round_num
                 setActiveTab("round_"+last_round_num)
@@ -113,7 +112,7 @@ export default function TournamentRoundsTab(props) {
     const dragPlayer = (mp) => {
         return (e) => e.dataTransfer.setData("player",JSON.stringify(mp));
     }
-    if (rounds) {
+    if (tournament) {
         return (
         <>
             
@@ -121,14 +120,14 @@ export default function TournamentRoundsTab(props) {
             <Tabs
                 activeKey={activeTab}
                 onSelect={setActiveTab}
-                defaultActiveKey={rounds.length>0?"round_1":"addRound"}
+                defaultActiveKey={tournament.Rounds.length>0?"round_1":"addRound"}
                 id="uncontrolled-tab-example"
                 className="mb-3"
             >
-                {rounds.map(r => {
+                {tournament.Rounds.map(r => {
                 var unmatched = []
                 if(isOwner&&r.Matches.length>0&&!r.finalized){
-                    var all_players = ladder.map(l => {return {'player_name':l.player_name, 'User':l.User, 'id':l.id}});
+                    var all_players = tournament.Ladder.map(l => {return {'player_name':l.player_name, 'User':l.User, 'id':l.id}});
                     var match_players = r.Matches.flatMap(m => m.Players.map(mp => {return {'player_name':mp.player_name, 'User':mp.User}}))
                     unmatched = all_players.filter(p => match_players.filter(mp => mp.player_name===p.player_name && mp.User?.id===p.User?.id).length===0);
                 }

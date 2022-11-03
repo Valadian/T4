@@ -15,8 +15,8 @@ mutation updateMatchPlayer($id: uuid!, $points: Int!, $opp_points: Int!, $tourna
 }` 
 
 export default function TournamentResultSubmissionMatch(props){
-    const {rounds, ladder, tournament, updateTournament, isOwner, isParticipant} = useContext(TournamentHomeContext);
-    const { user, getAccessTokenSilently } = useAuth0();
+    const {updateTournament} = useContext(TournamentHomeContext);
+    const {getAccessTokenSilently } = useAuth0();
 
     const [oppPts, setOppPts] = useState(0);
     const [points, setPoints] = useState(0);

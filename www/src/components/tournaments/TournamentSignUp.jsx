@@ -10,7 +10,7 @@ const signup_doc = `mutation TournamentSignUp($user_id: String!, $tournament_id:
     }
   }`
 export default function TournamentSignUp (props) {
-    const {rounds, ladder, tournament, updateTournament, isOwner, setActiveTab} = useContext(TournamentHomeContext);
+    const {tournament, updateTournament, setActiveTab} = useContext(TournamentHomeContext);
     const { user, getAccessTokenSilently } = useAuth0();
     const [club, setClub] = useState("");
 

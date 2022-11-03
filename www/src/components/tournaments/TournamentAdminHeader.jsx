@@ -31,7 +31,7 @@ function TournamentAdminHeader(props) {
     useState(false);
   const [showTournamentPlayerEditor, setShowTournamentPlayerEditor] =
     useState(false);
-  const { tournament, updateTournament } = useContext(TournamentHomeContext);
+  const { tournament } = useContext(TournamentHomeContext);
 
 
   const [showTournamentDescriptionEditor, setShowTournamentDescriptionEditor] =
@@ -181,10 +181,10 @@ function TournamentAdminHeader(props) {
           </Row>
         </Col>
         <Col xs={12} md={3}>
-          <Row>
+          {/* <Row>
             <Col>
               <div className="d-grid">
-                {/* List Availability */}
+                {/ * List Availability * /}
                 <Button
                   variant={tournament.lists_visible?"outline-secondary":"outline-danger"}
                   onClick={() => {
@@ -201,7 +201,7 @@ function TournamentAdminHeader(props) {
                 onHide={() => setShowTournamentListProtectionEditor(false)}
               />
             </Col>
-          </Row>
+          </Row> */}
           <Row>
             <Col>
               <div className="d-grid">
