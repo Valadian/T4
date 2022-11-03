@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useContext } from "react";
 import Query from "../../data/T4GraphContext";
-import { Form, Button, Col, FloatingLabel, Row } from "react-bootstrap";
-import Modal from "react-bootstrap/Modal";
+import { Button} from "react-bootstrap";
 import { useAuth0 } from "@auth0/auth0-react";
 import { TournamentHomeContext } from "../../pages/tournaments/TournamentHome";
 
@@ -38,9 +37,9 @@ export default function TournamentPublicToggle(props) {
       .then(() => updateTournament());
   };
 
-  const handleClose = () => {
-    props.show = false;
-  };
+  // const handleClose = () => {
+  //   props.show = false;
+  // };
 
   //console.log(`Got here with... ${JSON.stringify(props)}`);
   if (props) {

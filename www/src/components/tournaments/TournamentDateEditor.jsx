@@ -39,16 +39,16 @@ export default function TournamentDateEditor(props) {
         tournament_id: id,
       },
       accessToken
-    ).then((data) =>
+    ).then((data) => {
       // TODO: insert a "success" toast
-      setNewTournamentDate(data.start)
-    );
-    updateTournament();
+      // setNewTournamentDate(data.start)
+      updateTournament();
+    });
   };
 
-  const handleClose = () => {
-    props.show = false;
-  };
+  // const handleClose = () => {
+  //   props.show = false;
+  // };
   // console.log(tournament);
 
   if (tournament && newTournamentDate) {

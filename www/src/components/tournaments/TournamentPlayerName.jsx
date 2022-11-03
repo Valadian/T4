@@ -1,10 +1,10 @@
 import { useAuth0 } from "@auth0/auth0-react";
 
 export default function TournamentPlayerName(props){
-    const { user, getAccessTokenSilently } = useAuth0();
+    const { user } = useAuth0();
 
     const isYou = (props.player.User && user && props.player.User.id===user.sub)
-    if (props.player == undefined){
+    if (props.player === undefined){
         return (
             <>**Player is null**</>
         )

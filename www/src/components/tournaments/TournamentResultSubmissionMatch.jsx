@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from "react"
-import {Tab, Col, Row} from 'react-bootstrap'
+import {Col, Row} from 'react-bootstrap'
 import Query from "../../data/T4GraphContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
@@ -90,8 +90,8 @@ export default function TournamentResultSubmissionMatch(props){
                 </select>
             </Col>
             <Col className="col-2 col-lg-1">
-                <a className="btn btn-outline-success" onClick={() => saveMatch()} title="Save Match"><i className="bi bi-check-square"></i></a>
-                <a className="btn btn-outline-danger" onClick={cancelMatch} title="Cancel Edit"><i className="bi bi-x-square"></i></a>
+                <button className="btn btn-outline-success" onClick={() => saveMatch()} title="Save Match"><i className="bi bi-check-square"></i></button>
+                <button className="btn btn-outline-danger" onClick={cancelMatch} title="Cancel Edit"><i className="bi bi-x-square"></i></button>
             </Col>
         </>
     }
@@ -120,7 +120,7 @@ export default function TournamentResultSubmissionMatch(props){
             </Col>
             <Col className="col-2 col-lg-1">
                 {!props.round.finalized?
-                <a className="btn btn-outline-primary" onClick={() => editMatch()}><i className="bi bi-pen"></i></a>:
+                <button className="btn btn-outline-primary" onClick={() => editMatch()}><i className="bi bi-pen"></i></button>:
                 <></>}
             </Col>
             

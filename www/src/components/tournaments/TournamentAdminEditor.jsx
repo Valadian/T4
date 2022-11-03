@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import Query from "../../data/T4GraphContext";
 import { Form, Button, Col, FloatingLabel, Row } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
@@ -19,46 +19,35 @@ mutation updateTournamentPlayerByName($tournament_id: uuid = "", $player_name: S
 }`;
 
 export default function TournamentAdminEditor(props){
-    const [newTournamentDate, setNewTournamentDate] = useState("");
     const [newPlayerName, setNewPlayerName] = useState("");
     const { getAccessTokenSilently } = useAuth0();
     const {tournament} = useContext(TournamentHomeContext);
 
-    const updateTournamentDate = async (start_date) => {
-        const accessToken = await getAccessTokenSilently()
-        Query("updateTournamentDate", updateTournamentDateDoc, {
-        start_date: start_date,
-        tournament_id: tournament.id,
-        }, accessToken).then((data) => setNewTournamentDate(data.start));
-    }
-
-    const updateTournamentPlayerByName = () => {
-        if (!newTournamentDate) {
-        return;
+    const updateTournamentPlayerByName = async () => {
+        if (!newPlayerName) {
+          return;
         }
 
-        const id = tournament.id;
-
-        console.log(`New start date: ${newTournamentDate}`);
-        console.log(`Tournament id: ${id}`);
-
-        Query("updateTournamentDate", updateTournamentDateDoc, {
-        start_date: newTournamentDate,
-        tournament_id: id,
-        }).then((data) =>
-        // TODO: insert a "success" toast
-        setNewTournamentDate(data.start)
-        );
+        const accessToken = await getAccessTokenSilently()
+        
+        //TODO: Not implemented
+        // Query("updateTournamentPlayerByName", updateTournamentDateDoc, {
+        //   start_date: newTournamentDate,
+        //   tournament_id: tournament.id,
+        //   }, accessToken).then((data) =>
+        // // TODO: insert a "success" toast
+        // setNewTournamentDate(data.start)
+        // );
     };
 
-    const handleDateUpdate = (event) => {
-        console.log(event.target.value);
-        setNewTournamentDate(event.target.value);
-    };
+    // const handleDateUpdate = (event) => {
+    //     console.log(event.target.value);
+    //     setNewTournamentDate(event.target.value);
+    // };
 
-    const handleClose = () => {
-        props.show = false;
-    };
+    // const handleClose = () => {
+    //     props.show = false;
+    // };
 
 
     if (props) {

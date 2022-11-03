@@ -1,6 +1,5 @@
 import React from 'react';
-import TournamentList from '../components/tournaments/TournamentList';
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {Col, Row} from 'react-bootstrap'
 import { useAuth0 } from "@auth0/auth0-react";
 

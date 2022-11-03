@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Form, Button, Col, FloatingLabel, Row } from "react-bootstrap";
+import React, { useContext } from "react";
+import { Col, Row } from "react-bootstrap";
 import { useAuth0 } from "@auth0/auth0-react";
 import Query from "../../data/T4GraphContext";
 import TournamentPlayerName from "./TournamentPlayerName"
@@ -13,7 +13,7 @@ mutation DeleteTournamentPlayer($id: uuid = "") {
 }`
 export default function TournamentPlayerSummary(props) {
     const {updateTournament, isOwner} = useContext(TournamentHomeContext);
-    const { user, getAccessTokenSilently } = useAuth0();
+    const { getAccessTokenSilently } = useAuth0();
 
     const deletePlayer = async (id) =>{
       let accessToken = await getAccessTokenSilently()
@@ -60,7 +60,7 @@ export default function TournamentPlayerSummary(props) {
         <Col className="col-3 col-md-2">{props.player.mov}<span className="d-none d-md-inline"> / {props.player.sos.toFixed(2)}</span></Col>
         <Col className="col-3 d-none d-md-flex"><span className="me-auto">{props.player.club}</span>
         
-        {isOwner && props.player.Matches.length===0?<a className="btn btn-sm btn-outline-danger" onClick={() => deletePlayer(props.player.id)}><i className="bi bi-x"></i></a>:<></>}
+        {isOwner && props.player.Matches.length===0?<button className="btn btn-sm btn-outline-danger" onClick={() => deletePlayer(props.player.id)}><i className="bi bi-x"></i></button>:<></>}
         </Col>
       </Row>
       <Row id={"TP"+props.player.id.replaceAll("-","")} data-bs-parent="#ladder" className="roundRow accordion-collapse collapse">

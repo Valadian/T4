@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
-import Query from "../../data/T4GraphContext";
-import { Form, Button, Col, FloatingLabel, Row } from "react-bootstrap";
+import React, { useState, useContext } from "react";
+import { Col, Row } from "react-bootstrap";
 import TournamentPlayerSummary from "./TournamentPlayerSummary";
 import TournamentPlayerEditor from "./TournamentPlayerEditor";
 import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
@@ -24,12 +23,12 @@ export default function Ladder(props) {
       return (
         <div id="ladder">
           <div className="d-flex mb-3">
-            {isOwner?<a className="btn btn-outline-success" onClick={() => {
+            {isOwner?<button className="btn btn-outline-success" onClick={() => {
                     setShowTournamentPlayerEditor(true);
-                  }} title="Add Player"><i className="bi bi-plus"></i></a>:<></>}
+                  }} title="Add Player"><i className="bi bi-plus"></i></button>:<></>}
             <span className="me-auto"></span>
-            {finalizedOnly?<span className="form-group"><a className="btn btn-outline-secondary" onClick={toggleFinalizedOnly}>Finalized</a></span>:<></>}
-            {!finalizedOnly?<span className="form-group"><a className="btn btn-outline-danger" onClick={toggleFinalizedOnly}>LIVE</a></span>:<></>}
+            {finalizedOnly?<span className="form-group"><button className="btn btn-outline-secondary" onClick={toggleFinalizedOnly}>Finalized</button></span>:<></>}
+            {!finalizedOnly?<span className="form-group"><button className="btn btn-outline-danger" onClick={toggleFinalizedOnly}>LIVE</button></span>:<></>}
 
           </div>
           <Row className="pb-1 header mb-3">

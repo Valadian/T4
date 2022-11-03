@@ -133,10 +133,10 @@ export default function TournamentRoundsTab(props) {
                 }
                 return <Tab key={r.id} eventKey={"round_"+r.round_num} title={<span><i className="bi bi-bullseye"></i> <span className="d-none d-md-inline">Round </span>{r.round_num}</span>}>
                     <div className="d-flex flex-row-reverse">
-                        {isOwner&&r.Matches.length===0?<span className="form-group"><a className="btn btn-outline-danger" onClick={() => deleteRound(r.id)}><i className="bi bi-x"></i> Delete Round</a></span>:<></>}
-                        {isOwner&&r.Matches.length===0?<span className="form-group"><a className="btn btn-outline-success" onClick={() => generateRound(r.id)}><i className="bi bi-trophy-fill"></i> Generate Matches</a></span>:<></>}
-                        {isOwner&&r.Matches.length>0&&!r.finalized?<span className="form-group"><a className="btn btn-outline-warning" onClick={() => setRoundLocked(r.id, true)}><i className="bi bi-trophy-fill"></i> Finalize Round</a></span>:<></>}
-                        {isOwner&&r.Matches.length>0&&r.finalized?<span className="form-group"><a className="btn btn-outline-secondary" onClick={() => setRoundLocked(r.id, false)}><i className="bi bi-trophy-fill"></i> Reopen Round</a></span>:<></>}
+                        {isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-danger" onClick={() => deleteRound(r.id)}><i className="bi bi-x"></i> Delete Round</button></span>:<></>}
+                        {isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-success" onClick={() => generateRound(r.id)}><i className="bi bi-trophy-fill"></i> Generate Matches</button></span>:<></>}
+                        {isOwner&&r.Matches.length>0&&!r.finalized?<span className="form-group"><button className="btn btn-outline-warning" onClick={() => setRoundLocked(r.id, true)}><i className="bi bi-trophy-fill"></i> Finalize Round</button></span>:<></>}
+                        {isOwner&&r.Matches.length>0&&r.finalized?<span className="form-group"><button className="btn btn-outline-secondary" onClick={() => setRoundLocked(r.id, false)}><i className="bi bi-trophy-fill"></i> Reopen Round</button></span>:<></>}
                     </div>
                     <Row className="pb-1 header mb-3">
                         <Col className="col-1"><span className="d-none d-lg-inline">Table #</span><span className="d-inline d-lg-none">Tbl</span></Col>
@@ -154,7 +154,7 @@ export default function TournamentRoundsTab(props) {
                     {isOwner&&r.Matches.length>0&&!r.finalized?<Row>
                         <Col className="col-10 col-md-11"></Col>
                         <Col className="col-2 col-md-1">
-                        <span className="form-group"><a className="btn btn-outline-success" onClick={() => addMatch(r)} title="Add Match"><i className="bi bi-plus"></i></a></span>
+                        <span className="form-group"><button className="btn btn-outline-success" onClick={() => addMatch(r)} title="Add Match"><i className="bi bi-plus"></i></button></span>
                         </Col>
                     </Row>
                     :<></>}
@@ -176,7 +176,7 @@ export default function TournamentRoundsTab(props) {
                         <label htmlFor="roundDesc">Round Description</label>
                         <input className="form-control" placeholder="Enter Round Description (optional)"  value={roundDesc} onChange={(e) => setRoundDesc(e.target.value)}/>
                     </div>
-                    <div className="form-group"><a className="btn btn-outline-success" onClick={addRound}><i className="bi bi-plus"></i> Add Round</a></div>
+                    <div className="form-group"><button className="btn btn-outline-success" onClick={addRound}><i className="bi bi-plus"></i> Add Round</button></div>
                 </Tab>:<></>}
             </Tabs>
         </>

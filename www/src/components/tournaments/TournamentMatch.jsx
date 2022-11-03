@@ -1,5 +1,5 @@
 import React, {useContext, useState, useEffect} from "react"
-import { Col, NavItem, Row } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import { useAuth0 } from "@auth0/auth0-react";
 import Query from "../../data/T4GraphContext";
 import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
@@ -47,7 +47,7 @@ mutation AssignPlayer($ladder_name: String = null, $ladder_user_id: String = nul
     }
 }`
 export default function TournamentMatch(props){
-    const { user, getAccessTokenSilently } = useAuth0();
+    const { getAccessTokenSilently } = useAuth0();
     const {updateTournament, isOwner} = useContext(TournamentHomeContext);
     const [editing, setEditing] = useState(false)
     const [player1Pts, setPlayer1Pts] = useState(0)
@@ -133,7 +133,7 @@ export default function TournamentMatch(props){
         else if(mp.win) {return " roundWin"}
         else {return " roundLoss"}
     }
-    const notNullAndEqual = (v1,v2) => v1!=null && v2!=null && v1===v2
+    // const notNullAndEqual = (v1,v2) => v1!=null && v2!=null && v1===v2
     const notNullAndNotEqual = (v1,v2) => v1!=null && v2!=null && v1!==v2
     
     const save = async () => {
@@ -256,13 +256,13 @@ export default function TournamentMatch(props){
             <Col className="col-2 col-md-1">
                 {editing?
                 <>
-                    <a className="btn btn-outline-primary" onClick={cancel} title="Cancel Edit"><i className="bi bi-pen"></i></a>
-                    <a className="btn btn-outline-success" onClick={save} title="Save Scores"><i className="bi bi-check-square"></i></a>
-                    <a className="btn btn-outline-danger" onClick={wipe} title="Wipe Scores"><i className="bi bi-recycle"></i></a>
-                    <a className="btn btn-danger" onClick={deleteMatch} title="Delete Match"><i className="bi bi-trash-fill"></i></a>
+                    <button className="btn btn-outline-primary" onClick={cancel} title="Cancel Edit"><i className="bi bi-pen"></i></button>
+                    <button className="btn btn-outline-success" onClick={save} title="Save Scores"><i className="bi bi-check-square"></i></button>
+                    <button className="btn btn-outline-danger" onClick={wipe} title="Wipe Scores"><i className="bi bi-recycle"></i></button>
+                    <button className="btn btn-danger" onClick={deleteMatch} title="Delete Match"><i className="bi bi-trash-fill"></i></button>
                 </>:
                 !props.round.finalized?
-                    <a className="btn btn-outline-primary" onClick={edit} title="Edit Scores"><i className="bi bi-pen"></i></a>:
+                    <button className="btn btn-outline-primary" onClick={edit} title="Edit Scores"><i className="bi bi-pen"></i></button>:
                     <></>
                 }
                 

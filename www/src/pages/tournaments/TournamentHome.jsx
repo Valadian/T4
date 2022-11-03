@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, createContext, useReducer, useCallback } from "react";
 import { Link, useParams } from "react-router-dom";
 import Query from "../../data/T4GraphContext";
-import { Tournament } from "../../data/Models";
 import "react-datepicker/dist/react-datepicker.css";
 import Ladder from "../../components/tournaments/TournamentLadder";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -145,7 +144,7 @@ function TournamentHome() {
     const [showSignUpTab, setShowSignUpTab] = useState(true);
     const sum = (arr) => arr.reduce((a, b) => a + b,0)
     const avg = (arr) => arr.length===0?0:sum(arr)/arr.length
-    const max = (arr) => arr.reduce((a, b) => Math.max(a, b),0)
+    // const max = (arr) => arr.reduce((a, b) => Math.max(a, b),0)
     const bakeLadder = (tournament, finalOnly) => {
         if(tournament){
             for(let l of tournament.Ladder){

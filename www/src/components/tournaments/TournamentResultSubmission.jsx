@@ -1,19 +1,8 @@
-import React, {useState,useEffect,useContext} from "react"
-import {Tab, Col, Row} from 'react-bootstrap'
-import Query from "../../data/T4GraphContext";
+import React, {useContext} from "react"
+import {Col, Row} from 'react-bootstrap'
 import { useAuth0 } from "@auth0/auth0-react";
 import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
-import TournamentPlayerName from "./TournamentPlayerName";
-import ptsToTp from "../../util/armada";
 import TournamentResultSubmissionMatch from "./TournamentResultSubmissionMatch";
-
-const updateDoc = `
-mutation updateMatchPlayer($id: uuid!, $points: Int!, $opp_points: Int!, $tournament_points: Int!, $win: Boolean!, $mov: Int!) {
-    update_MatchPlayer_by_pk(pk_columns: {id: $id}, _set: {points: $points, opp_points: $opp_points, tournament_points: $tournament_points, win: $win, mov: $mov}) {
-      id
-    }
-  }
-  ` 
 
 export default function TournamentResultSubmission(props) {
     const {tournament} = useContext(TournamentHomeContext);

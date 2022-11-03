@@ -1,10 +1,8 @@
 import React from 'react';
 import { Link } from "react-router-dom";
 import AuthenticationButton from '../auth/AuthenticationButton';
-import { withAuth0 } from '@auth0/auth0-react';
 
-function Navbar(props){
-    const { user } = props.auth0;
+export default function Navbar(props){
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
             <div className="container">
@@ -38,5 +36,3 @@ function Navbar(props){
         </nav>
     )
 }
-
-export default withAuth0(Navbar)

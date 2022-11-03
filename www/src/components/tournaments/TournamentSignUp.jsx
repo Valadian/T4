@@ -1,5 +1,4 @@
-import React, {useState,useEffect,useContext} from "react"
-import {Tab} from 'react-bootstrap'
+import React, {useState,useContext} from "react"
 import Query from "../../data/T4GraphContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
@@ -28,6 +27,6 @@ export default function TournamentSignUp (props) {
     }
 
     return (
-    <a className="btn btn-outline-success" onClick={addUserToLadder}>Register for Tournament </a>
+    <button className="btn btn-outline-success" onClick={addUserToLadder}>Register for Tournament </button>
     )
 }
