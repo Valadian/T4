@@ -76,7 +76,7 @@ export default function TournamentHeader(props) {
           </Row>
         </Col>
       </Row>
-      <Row className="pt-3 pb-s small text-light">
+      <Row className="pt-3 pb-s small">
         <Col>
           <i className="bi bi-person-fill text-primary"></i>{" "}
           {tournament.Creator.name}
