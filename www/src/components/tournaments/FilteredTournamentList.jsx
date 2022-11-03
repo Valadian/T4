@@ -35,10 +35,10 @@ export default function FilteredTournamentList(props) {
               showPopperArrow={false}
             />
           </div>
-          <div className="col-3 col-md-2 p-0">
+          <div className="col-4 col-sm-3 col-md-2 p-0">
             <LocationDropdown setLocation={setLocation} />
           </div>
-          <div className="col-1 col-md-2 p-0">
+          <div className="d-none d-sm-block col-sm-1 col-md-2 p-0">
             {user?<Link className="btn btn-outline-success" to="/events/add"><i className="bi bi-plus"></i><span className="d-none d-md-inline"> Create</span></Link>:<></>}
           </div>
         </div>

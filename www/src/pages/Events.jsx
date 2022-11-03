@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import FilteredTournamentList from '../components/tournaments/FilteredTournamentList';
+import { useAuth0 } from "@auth0/auth0-react";
 
 function Events() {
-
+    const { user } = useAuth0();
+    
     return (
         <>
         
@@ -15,12 +17,12 @@ function Events() {
         </nav>
         
         <div className="row">
-            <div className="col-8">
+            <div className="col-8 col-sm-12">
                 <h1>All Events</h1>
             </div>
-            {/* <div className="col-4 p-1 d-flex flex-row-reverse">
+            <div className="d-sm-none col-4 p-1 d-flex flex-row-reverse">
                 {user?<Link className="btn btn-outline-success" to="/events/add"><i className="bi bi-plus"></i> Create</Link>:<></>}
-            </div> */}
+            </div>
         </div>
         <FilteredTournamentList />
         </>
