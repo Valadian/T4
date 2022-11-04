@@ -27,6 +27,7 @@ insert_permissions:
               creator_id:
                 _eq: X-Hasura-User-Id
       columns:
+        - disqualified
         - match_id
         - mov
         - opp_points
@@ -43,6 +44,7 @@ select_permissions:
     permission:
       columns:
         - confirmed
+        - disqualified
         - id
         - match_id
         - mov
@@ -50,6 +52,8 @@ select_permissions:
         - participant_list_id
         - player_name
         - points
+        - tournament_opponent_id
+        - tournament_player_id
         - tournament_points
         - user_id
         - win
@@ -58,6 +62,7 @@ select_permissions:
     permission:
       columns:
         - confirmed
+        - disqualified
         - id
         - match_id
         - mov
@@ -65,6 +70,8 @@ select_permissions:
         - participant_list_id
         - player_name
         - points
+        - tournament_opponent_id
+        - tournament_player_id
         - tournament_points
         - user_id
         - win
@@ -73,6 +80,7 @@ update_permissions:
   - role: user
     permission:
       columns:
+        - disqualified
         - match_id
         - mov
         - opp_points
