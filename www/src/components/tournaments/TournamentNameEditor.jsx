@@ -6,46 +6,47 @@ import Modal from "react-bootstrap/Modal";
 import { useAuth0 } from "@auth0/auth0-react";
 import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 
-const updateTournamentDescriptionDoc = `
-  mutation updateTournamentDescription($description: String = "", $tournament_id: uuid = "") {
-    update_Tournament(where: {id: {_eq: $tournament_id}}, _set: {description: $description}) {
+const updateTournamentNameDoc = `
+  mutation updateTournamentName($name: String = "", $tournament_id: uuid = "") {
+    update_Tournament(where: {id: {_eq: $tournament_id}}, _set: {name: $name}) {
       returning {
+        id
         name
-        description
       }
     }
   }
 `;
 
-export default function TournamenDescriptionEditor(props) {
-  const [newTournamentDescription, setNewTournamentDescription] = useState("");
+export default function TournamenNameEditor(props) {
+  const [newTournamentName, setNewTournamentName] = useState("");
     const { getAccessTokenSilently } = useAuth0();
     const {tournament, updateTournament} = useContext(TournamentHomeContext);
     useEffect(() => {
-      setNewTournamentDescription(tournament.description);
-    },[tournament.description, setNewTournamentDescription]);
+      setNewTournamentName(tournament.name);
+    },[tournament.name, setNewTournamentName]);
+
     const save = async () => {
-        if (!newTournamentDescription) {
+        if (!newTournamentName) {
             return;
         }
 
         const accessToken = await getAccessTokenSilently()
-        Query("updateTournamentDescription", updateTournamentDescriptionDoc, {
-        description: newTournamentDescription,
-        tournament_id: tournament.id,
+        Query("updateTournamentName", updateTournamentNameDoc, {
+          name: newTournamentName,
+          tournament_id: tournament.id,
         },accessToken)
         .then(() => {
             updateTournament();
         })
         .then(() => {
-          setNewTournamentDescription("");
+          setNewTournamentName("");
         });
         props.onHide();
         // TODO: insert a "success" toast
     };
 
     const handleUpdate = (event) => {
-      setNewTournamentDescription(event.target.value);
+      setNewTournamentName(event.target.value);
     };
 
     // const handleClose = () => {
@@ -63,7 +64,7 @@ export default function TournamenDescriptionEditor(props) {
         >
           <Modal.Header closeButton>
             <Modal.Title id="contained-modal-title-vcenter">
-              Change Event Description
+              Change Event Name
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -76,7 +77,7 @@ export default function TournamenDescriptionEditor(props) {
                 >
                   <FloatingLabel
                     controlId="eventLocation"
-                    label="Event Description"
+                    label="Event Name"
                     className="mb-3"
                   >
                     <Form.Control
@@ -84,7 +85,7 @@ export default function TournamenDescriptionEditor(props) {
                       placeholder="f"
                       required
                       onChange={handleUpdate}
-                      value={newTournamentDescription}
+                      value={newTournamentName}
                       autoFocus
                     />
                   </FloatingLabel>

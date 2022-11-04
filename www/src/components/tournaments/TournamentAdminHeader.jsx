@@ -10,6 +10,7 @@ import TournamentPublicToggle from "./TournamentPublicToggle";
 import TournamentListProtectionEditor from "./TournamentListProtectionEditor";
 import TournamentLocationEditor from "./TournamentLocationEditor";
 import TournamentDescriptionEditor from "./TournamentDescriptionEditor";
+import TournamentNameEditor from "./TournamentNameEditor";
 import TournamentPlayerEditor from "./TournamentPlayerEditor";
 import TournamentRegistrationToggle from "./TournamentRegistrationToggle";
 import { TournamentHomeContext } from "../../pages/tournaments/TournamentHome";
@@ -36,6 +37,8 @@ function TournamentAdminHeader(props) {
 
   const [showTournamentDescriptionEditor, setShowTournamentDescriptionEditor] =
     useState(false);
+    const [showTournamentNameEditor, setShowTournamentNameEditor] =
+      useState(false);
 
   var list_visibility = tournament.lists_visible ? "visible" : "hidden";
   var list_availability = tournament.lists_locked
@@ -53,7 +56,21 @@ function TournamentAdminHeader(props) {
 
   return (
     <div>
-      <h2 className="">{tournament.name || "Fetching Event..."}</h2>
+      <Row>
+        <Col xs={10} md={11} >
+          <h2 className="">{tournament.name || "Fetching Event..."}</h2>
+        </Col>
+        <Col xs={2} md={1}>
+          <button className="btn btn-outline-primary" onClick={() => {
+                      setShowTournamentNameEditor(true);
+                    }} title="Edit Title"><i className="bi bi-pen"></i></button>
+                  
+          <TournamentNameEditor
+            show={showTournamentNameEditor}
+            onHide={() => setShowTournamentNameEditor(false)}/>
+          
+        </Col>
+      </Row>
       <h4 className="text-secondary" style={{ fontVariant: ["small-caps"] }}>
         {tournament.Game.value || "Fetching Game..."}
       </h4>
@@ -62,9 +79,9 @@ function TournamentAdminHeader(props) {
           <p>{tournament.description}</p>
         </Col>
         <Col xs={2} md={1}>
-          <a className="btn btn-outline-primary" onClick={() => {
+          <button className="btn btn-outline-primary" onClick={() => {
                     setShowTournamentDescriptionEditor(true);
-                  }} title="Edit Description"><i className="bi bi-pen"></i></a>
+                  }} title="Edit Description"><i className="bi bi-pen"></i></button>
                   
           <TournamentDescriptionEditor
             show={showTournamentDescriptionEditor}
