@@ -29,6 +29,9 @@ const operationsDoc = `
         id
         name
       }
+      Rounds {
+        finalized
+      }
     }
   }
 `;

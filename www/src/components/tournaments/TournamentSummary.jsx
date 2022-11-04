@@ -15,6 +15,7 @@ export default function TournamentSummary(props) {
                     {isOwner ? <span className="badge bg-info">Owner</span>:<></>}&nbsp;
                     {isParticipant ? <span className="badge bg-success">Participant</span>:<></>}&nbsp;
                     {!(props.data.public) ? <span className="badge bg-warning">Private</span>:<></>}
+                    {(props.data.Rounds.length!==props.data.Rounds.filter(r => r.finalized).length) ? <span className="badge bg-danger">Live</span>:<></>}
                 </Link>
             </div>
             <div className="row text-muted small">
