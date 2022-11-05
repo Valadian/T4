@@ -63,7 +63,7 @@ export default function TournamentPlayerSummary(props) {
     const TournamentPlayerMatchSummaryRows = (props)=>{
       let m = props.match
       let state = m.TournamentOpponent?(m.win===null?"PENDING":(m.win?"WIN":"LOSS")):(m.win===false?"D/Q":"BYE")
-      let oppname = m.TournamentOpponent?(m.TournamentOpponent.User?.name??m.TournamentOpponent.player_name):""
+      let oppname = m.TournamentOpponent?(m.TournamentOpponent.player_name??m.TournamentOpponent.User?.name):""
 
       return (<>
         <Col xs={1}></Col>
