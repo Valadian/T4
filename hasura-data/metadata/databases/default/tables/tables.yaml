@@ -10,3 +10,4 @@
 - "!include public_TournamentPlayer.yaml"
 - "!include public_TournamentRound.yaml"
 - "!include public_User.yaml"
+- "!include public_UserPreferences.yaml"

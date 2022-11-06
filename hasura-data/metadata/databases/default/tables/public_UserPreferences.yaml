@@ -1,0 +1,44 @@
+table:
+  name: UserPreferences
+  schema: public
+object_relationships:
+  - name: User
+    using:
+      foreign_key_constraint_on: user_id
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        User:
+          id:
+            _eq: X-Hasura-User-Id
+      set:
+        user_id: x-hasura-User-Id
+      columns:
+        - club
+        - location
+        - player_name
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - club
+        - location
+        - player_name
+        - user_id
+      filter:
+        User:
+          id:
+            _eq: X-Hasura-User-Id
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - club
+        - location
+        - player_name
+      filter:
+        User:
+          id:
+            _eq: X-Hasura-User-Id
+      check: null

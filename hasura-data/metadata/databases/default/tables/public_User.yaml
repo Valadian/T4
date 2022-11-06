@@ -9,6 +9,13 @@ array_relationships:
         table:
           name: MatchPlayer
           schema: public
+  - name: Preferences
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: UserPreferences
+          schema: public
   - name: TournamentsAsOwner
     using:
       foreign_key_constraint_on:
