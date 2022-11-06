@@ -40,7 +40,7 @@ export default function TournamentRegistrationToggle(props) {
     if (props) {
         return (
             <Button
-                variant={tournament.signups_open?"outline-success":"outline-secondary"}
+                variant={tournament.signups_open?(tournament.signups_open && tournament.Rounds.length>0 && tournament.Rounds[0].Matches.length>0?"outline-warning":"outline-success"):"outline-secondary"}
                 onClick={() => {
                     updateTournamentRegistration();
                 }}

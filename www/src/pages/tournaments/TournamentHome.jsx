@@ -272,6 +272,7 @@ function TournamentHome() {
                 </>:<></>}
                 <Toaster ref={toaster} />
                 {isOwner?<TournamentAdminHeader/>:<TournamentHeader/>}
+                {(isOwner && tournament.signups_open && tournament.Rounds.length>0 && tournament.Rounds[0].Matches.length>0) ?<h2 className="text-warning">Round 1 matchups generated but sign ups remain open (Disable above)</h2>:<></>}
                 <Tabs
                     activeKey={activeTab}
                     onSelect={setActiveTab}
