@@ -95,7 +95,7 @@ const tournamentByIdDoc = `
         Matches(order_by: {table_num: asc}) {
             id
             table_num
-            Players {
+            Players(order_by: {id: asc}) {
                 id
                 match_id
                 win
