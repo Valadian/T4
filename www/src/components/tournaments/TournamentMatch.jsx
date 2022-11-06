@@ -46,6 +46,13 @@ mutation AssignPlayer($ladder_name: String = null, $ladder_user_id: String = nul
         id
     }
 }`
+const withdrawDoc = `
+mutation WithdrawPlayer($id: uuid!, $disqualified: Boolean = true) {
+    update_MatchPlayer_by_pk(pk_columns: {id: $id}, _set: {disqualified: $disqualified, tournament_points: 0, mov: 0, win: false}) {
+        id
+        disqualified
+    }
+}`
 export default function TournamentMatch(props){
     const { getAccessTokenSilently } = useAuth0();
     const {updateTournament, isOwner} = useContext(TournamentHomeContext);
@@ -85,6 +92,15 @@ export default function TournamentMatch(props){
             match_id2: p2.match_id,
             tournament_opponent_id2: p2.TournamentOpponent?.id,
             tournament_player_id2: p2.TournamentPlayer?.id },accessToken)
+        .then((response) => {
+            updateTournament();
+        })
+    }
+    const disqualify = async (id, dq) => {
+        const accessToken = await getAccessTokenSilently()
+        Query("WithdrawPlayer", withdrawDoc, { 
+            id: id, 
+            disqualified: dq},accessToken)
         .then((response) => {
             updateTournament();
         })
@@ -137,16 +153,16 @@ export default function TournamentMatch(props){
     const notNullAndNotEqual = (v1,v2) => v1!=null && v2!=null && v1!==v2
     
     const save = async () => {
-        player1.points = player1Pts
-        player1.opp_points = player2Pts
+        player1.points = player1.disqualified?0:(player2.disqualified?Math.max(140,player1Pts):player1Pts)
+        player1.opp_points = player2.disqualified?0:(player1.disqualified?Math.max(140,player2Pts):player2Pts)
         player1.mov = Math.min(400,Math.max(0,player1.points-player1.opp_points))
-        player1.win = player1Win
-        player1.tp = ptsToTp(player1.points,player1.opp_points,player1.win)
-        player2.points = player2Pts
-        player2.opp_points = player1Pts
+        player1.win = player1.disqualified?false:player1Win
+        player1.tp = player1.disqualified?0:ptsToTp(player1.points,player1.opp_points,player1.win)
+        player2.points = player2.disqualified?0:(player1.disqualified?Math.max(140,player2Pts):player2Pts)
+        player2.opp_points = player1.disqualified?0:(player2.disqualified?Math.max(140,player1Pts):player1Pts)
         player2.mov = Math.min(400,Math.max(0,player2.points-player2.opp_points))
-        player2.win = !player1Win
-        player2.tp = ptsToTp(player2.points,player2.opp_points,player2.win)
+        player2.win = player2.disqualified?false:!player1Win
+        player2.tp = player2.disqualified?0:ptsToTp(player2.points,player2.opp_points,player2.win)
 
         
         const accessToken = await getAccessTokenSilently()
@@ -220,14 +236,15 @@ export default function TournamentMatch(props){
             <Col className="col-1">{props.match.table_num}</Col>
             <Col className="col-9 col-md-10">
                 <Row className="h-100">
-                    <Col className={"draggablePlayer col-7 col-sm-8 col-lg-4 pb-3 paddedLikeInput"+MatchPlayerBg(player1)} draggable="true"  onDragStart={dragPlayer1} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer1(e)}>
+                    <Col className={"draggablePlayer col-6 col-sm-7 col-lg-3 pb-3 paddedLikeInput"+MatchPlayerBg(player1)+(player1.disqualified?" withdrawn":"")} draggable="true"  onDragStart={dragPlayer1} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer1(e)}>
                         <TournamentPlayerName player={player1} />
                     </Col>
-                    <Col className={"col-5 col-sm-4 col-lg-2 col-r-border pb-3 paddedLikeInput"+MatchPlayerBg(player1)}>
+                    <Col className={"col-6 col-sm-5 col-lg-3 col-r-border pb-3 paddedLikeInput"+MatchPlayerBg(player1)+(player1.disqualified?" withdrawn":"")}>
                         {editing?
                         <div className="input-group">
-                            <input className="form-control" value={player1Pts} onChange={(evt) => setPlayer1Pts(evt.target.value)}></input>
+                            <input className="form-control" value={player1Pts} onFocus={(event) => event.target.select()} onChange={(evt) => setPlayer1Pts(evt.target.value)}></input>
                             <button className={"btn "+(player1Win?"btn-warning":"btn-outline-secondary")} type="button" onClick={() => setPlayer1Win(true)}><i className="bi bi-trophy-fill" title="win"></i></button>
+                            <button className={"btn "+(player1.disqualified?"btn-danger":"btn-outline-danger")} type="button" onClick={() => disqualify(player1.id, !player1.disqualified)}><i className="bi bi-slash-circle" title="disqualify"></i></button>
                         </div>:
                         <>
                         {player1?.points}
@@ -235,14 +252,15 @@ export default function TournamentMatch(props){
                         {notNullAndNotEqual(player1?.points,player2?.opp_points)?<span className="text-danger" title="Opponent Reported Value">({player2?.opp_points})</span>:<></>}
                         </>}
                     </Col>
-                    <Col className={"draggablePlayer col-7 col-sm-8 col-lg-4 pb-3 paddedLikeInput"+MatchPlayerBg(player2)} draggable="true"  onDragStart={dragPlayer2} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer2(e)}>
+                    <Col className={"draggablePlayer col-6 col-sm-7 col-lg-3 pb-3 paddedLikeInput"+MatchPlayerBg(player2)+(player2.disqualified?" withdrawn":"")} draggable="true"  onDragStart={dragPlayer2} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer2(e)}>
                         <TournamentPlayerName player={player2} />
                     </Col>
-                    <Col className={"col-5 col-sm-4 col-lg-2 pb-3 paddedLikeInput"+MatchPlayerBg(player2)}>
+                    <Col className={"col-6 col-sm-5 col-lg-3 pb-3 paddedLikeInput"+MatchPlayerBg(player2)+(player2.disqualified?" withdrawn":"")}>
                         {editing?
                         <div className="input-group">
-                            <input className="form-control" value={player2Pts} onChange={(evt) => setPlayer2Pts(evt.target.value)}></input>
+                            <input className="form-control" value={player2Pts} onFocus={(event) => event.target.select()} onChange={(evt) => setPlayer2Pts(evt.target.value)}></input>
                             <button className={"btn "+(player1Win?"btn-outline-secondary":"btn-warning")} type="button" onClick={() => setPlayer1Win(false)}><i className="bi bi-trophy-fill" title="win"></i></button>
+                            <button className={"btn "+(player2.disqualified?"btn-danger":"btn-outline-danger")} type="button" onClick={() => disqualify(player2.id, !player2.disqualified)}><i className="bi bi-slash-circle" title="disqualify"></i></button>
                         </div>:
                         <>
                         {player2?.points}

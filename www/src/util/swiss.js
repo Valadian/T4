@@ -3,7 +3,7 @@ import Query from "../data/T4GraphContext";
 
 const playersDoc = `
 query AllTournamentPlayers($tournament_id: uuid!) {
-    TournamentPlayer(where: {Tournament: {id: {_eq: $tournament_id}}}) {
+    TournamentPlayer(where: {Tournament: {id: {_eq: $tournament_id}}, disqualified: {_eq: false}}) {
         id
         tournament_points
         club

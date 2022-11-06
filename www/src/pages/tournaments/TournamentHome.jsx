@@ -51,6 +51,7 @@ const tournamentByIdDoc = `
         group
         id
         tournament_id
+        disqualified
         user_id
         User {
           id
@@ -64,6 +65,7 @@ const tournamentByIdDoc = `
           mov
           win
           tournament_points
+          disqualified
           TournamentOpponent {
             player_name
             User {
@@ -103,6 +105,7 @@ const tournamentByIdDoc = `
                 confirmed
                 player_name
                 mov
+                disqualified
                 User {
                     id
                     name

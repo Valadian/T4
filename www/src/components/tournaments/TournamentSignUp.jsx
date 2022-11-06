@@ -24,19 +24,21 @@ export default function TournamentSignUp (props) {
     const [club, setClub] = useState("");
     
     useEffect(() => {
-        let fetchData = async () => {
-            let accessToken = await getAccessTokenSilently()
-            Query("GetPreferences", getDoc, { 
-                user_id: user.sub
-            },accessToken)
-            .then((response) => {
-                let {player_name, club} = response.UserPreferences_by_pk
-                setPlayerName(player_name??user.name)
-                setClub(club??"")
-            })
+        if(user){
+            let fetchData = async () => {
+                let accessToken = await getAccessTokenSilently()
+                Query("GetPreferences", getDoc, { 
+                    user_id: user.sub
+                },accessToken)
+                .then((response) => {
+                    let {player_name, club} = response.UserPreferences_by_pk
+                    setPlayerName(player_name??user.name)
+                    setClub(club??"")
+                })
+            }
+            fetchData();
         }
-        fetchData();
-    },[user.sub, user.name, getAccessTokenSilently])
+    },[user, getAccessTokenSilently])
 
     const addUserToLadder = async () => {
         var accessToken = await getAccessTokenSilently()

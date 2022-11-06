@@ -11,6 +11,14 @@ mutation DeleteTournamentPlayer($id: uuid = "") {
         id
     }
 }`
+
+const withdrawDoc = `
+mutation WithdrawTournamentPlayer($id: uuid!, $disqualified: Boolean = true) {
+  update_TournamentPlayer_by_pk(pk_columns: {id: $id}, _set: {disqualified: $disqualified}) {
+    id
+    disqualified
+  }
+}`
 const updateNameDoc = `
 mutation UpdateNameTournamentPlayer($id: uuid = "", $player_name: String = null) {
   update_TournamentPlayer_by_pk(pk_columns: {id: $id}, _set: {player_name: $player_name}) {
@@ -32,6 +40,14 @@ export default function TournamentPlayerSummary(props) {
     const deletePlayer = async (id) =>{
       let accessToken = await getAccessTokenSilently()
       Query("DeleteTournamentPlayer", deleteDoc, { id: id },accessToken)
+        .then((response) => {
+          updateTournament()
+        })
+    }
+    
+    const withdrawPlayer = async (id, dq) =>{
+      let accessToken = await getAccessTokenSilently()
+      Query("WithdrawTournamentPlayer", withdrawDoc, { id: id, disqualified: dq },accessToken)
         .then((response) => {
           updateTournament()
         })
@@ -62,7 +78,7 @@ export default function TournamentPlayerSummary(props) {
     }
     const TournamentPlayerMatchSummaryRows = (props)=>{
       let m = props.match
-      let state = m.TournamentOpponent?(m.win===null?"PENDING":(m.win?"WIN":"LOSS")):(m.win===false?"D/Q":"BYE")
+      let state = m.TournamentOpponent?(m.win===null?"PENDING":(m.win?"WIN":(m.disqualified?"DQ":"LOSS"))):(m.win===false?"D/Q":"BYE")
       let oppname = m.TournamentOpponent?(m.TournamentOpponent.player_name??m.TournamentOpponent.User?.name):""
 
       return (<>
@@ -76,7 +92,7 @@ export default function TournamentPlayerSummary(props) {
     }
     return (
       <>
-      <Row className="accordion-row" data-bs-toggle="collapse" data-bs-target={"#TP"+props.player.id.replaceAll("-","")}>
+      <Row className={"accordion-row"+(props.player.disqualified?" withdrawn":"")} data-bs-toggle="collapse" data-bs-target={"#TP"+props.player.id.replaceAll("-","")}>
         <Col className="col-1">{props.player.rank}</Col>
         <Col className="col-5 col-md-4" title={TournamentPlayerMatchSummary(props.player)}>
           {props.editPlayerNames?
@@ -100,7 +116,8 @@ export default function TournamentPlayerSummary(props) {
         <Col className="col-3 d-none d-md-flex"><span className="me-auto">{props.player.club}</span>
         
         {props.editPlayerNames?<button className="btn btn-sm btn-outline-success" onClick={() => {updatePlayerName(props.player.id);props.setEditPlayerNames(false);}}><i className="bi bi-save"></i></button>:
-        (props.disqualifyMode?<button className="btn btn-sm btn-outline-danger" onClick={() => {}}><i className="bi bi-slash-circle"></i></button>:
+
+        (props.disqualifyMode?(!props.player.disqualified?<button className="btn btn-sm btn-outline-danger" onClick={() => withdrawPlayer(props.player.id,true)} title="Disqualify player"><i className="bi bi-slash-circle"></i></button>:<button className="btn btn-sm btn-outline-success" onClick={() => withdrawPlayer(props.player.id,false)} title="Re-enter player"><i className="bi bi-plus"></i></button>):
         (isOwner && props.player.Matches.length===0?<button className="btn btn-sm btn-outline-danger" onClick={() => deletePlayer(props.player.id)}><i className="bi bi-x"></i></button>:<></>))
         }
         </Col>
