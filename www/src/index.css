@@ -11,7 +11,6 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
 .tournament-link {
   font-weight: bold;
   text-decoration: none;
@@ -37,6 +36,9 @@ code {
   .roundLoss {
     background-color: #402030
   }
+  .text-info2 {
+    color: rgb(23, 162,184)
+  }
 }
 @media (prefers-color-scheme: light) {
   .roundVerified {
@@ -50,6 +52,9 @@ code {
   }
   .roundLoss {
     background-color: #FFDFEF
+  }
+  .text-info2 {
+    color: rgb(0, 60,137)
   }
 }
 

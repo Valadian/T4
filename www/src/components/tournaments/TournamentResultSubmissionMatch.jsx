@@ -43,7 +43,7 @@ export default function TournamentResultSubmissionMatch(props){
     const editMatch = () => {
         setPoints(props.mp_self.points??0);
         setOppPts(props.mp_self.opp_points??0);
-        setWin(props.mp_self.win);
+        setWin(props.mp_self.win??false);
         setEditing(true);
     }
     const cancelMatch = () => setEditing(false)
@@ -100,22 +100,22 @@ export default function TournamentResultSubmissionMatch(props){
             <Col className="col-2 paddedLikeInput">
                 <span>{props.mp_self.points}&nbsp;
                     {notNullAndNotEqual(props.mp_opp.opp_points,props.mp_self.points)?<span className="text-danger" title="Opponent Reported Value">({props.mp_opp.opp_points})</span>:<></>}
-                    {notNullAndEqual(props.mp_opp.opp_points,props.mp_self.points)?<i className="bi bi-check-circle-fill d-none d-md-inline text-info" title="Verified"></i>:<></>}
+                    {notNullAndEqual(props.mp_opp.opp_points,props.mp_self.points)?<i className="bi bi-check-circle-fill d-none d-md-inline text-success" title="Verified"></i>:<></>}
                 </span>
             </Col>
             <Col className="col-2 paddedLikeInput">
                 <span>{props.mp_self.opp_points}&nbsp;
                     {notNullAndNotEqual(props.mp_opp.points,props.mp_self.opp_points)?<span className="text-danger" title="Opponent Reported Value">({props.mp_opp.points})</span>:<></>}
-                    {notNullAndEqual(props.mp_opp.points,props.mp_self.opp_points)?<i className="bi bi-check-circle-fill d-none d-md-inline text-info" title="Verified"></i>:<></>}
+                    {notNullAndEqual(props.mp_opp.points,props.mp_self.opp_points)?<i className="bi bi-check-circle-fill d-none d-md-inline text-success" title="Verified"></i>:<></>}
                 </span>
             </Col>
             <Col className="col-2 col-lg-1 paddedLikeInput">{props.mp_self.mov}</Col>
             <Col className="col-2 col-lg-1 paddedLikeInput">{props.mp_self.tournament_points}&nbsp;
-                    {notNullAndAddsTo11(props.mp_self.tournament_points,props.mp_opp.tournament_points)?<i className="bi bi-check-circle-fill d-none d-md-inline text-info" title="Verified"></i>:<></>}
+                    {notNullAndAddsTo11(props.mp_self.tournament_points,props.mp_opp.tournament_points)?<i className="bi bi-check-circle-fill d-none d-md-inline text-success" title="Verified"></i>:<></>}
             </Col>
             <Col className="col-2 paddedLikeInput">
                 <span>{props.mp_self.win?<span className="text-success">Win</span>:<span className="text-danger">Loss</span>}&nbsp;
-                    {notNullAndNotEqual(props.mp_opp.win,props.mp_self.win)?<i className="bi bi-check-circle-fill d-none d-md-inline text-info" title="Verified"></i>:<></>}
+                    {notNullAndNotEqual(props.mp_opp.win,props.mp_self.win)?<i className="bi bi-check-circle-fill d-none d-md-inline text-success" title="Verified"></i>:<></>}
                 </span>
             </Col>
             <Col className="col-2 col-lg-1">

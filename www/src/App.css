@@ -186,8 +186,18 @@ a.selfUserLink {
   border-bottom: #375a7f solid 3px;
   font-weight: bold;
 }
-.draggablePlayer:hover {
-  outline: #61dafb solid 1px;
-  cursor: move;
-  color: #61dafb
+
+@media (prefers-color-scheme: dark) {
+  .draggablePlayer:hover {
+    outline: #61dafb solid 1px;
+    cursor: move;
+    color: #61dafb
+  }
+}
+@media (prefers-color-scheme: light) {
+  .draggablePlayer:hover {
+    outline: rgb(0, 60,137) solid 1px;
+    cursor: move;
+    color: rgb(0, 60,137)
+  }
 }
