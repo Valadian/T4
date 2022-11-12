@@ -144,7 +144,7 @@ function TournamentHome() {
     const [finalizedOnly, setFinalizedOnly] = useState(true);
     const [activeTab, setActiveTab] = useState("ladder")
     const toaster = useRef(null);
-    const [showSignUpTab, setShowSignUpTab] = useState(true);
+    const [showSignUpTab, setShowSignUpTab] = useState(false);
     const sum = (arr) => arr.reduce((a, b) => a + b,0)
     const avg = (arr) => arr.length===0?0:sum(arr)/arr.length
     // const max = (arr) => arr.reduce((a, b) => Math.max(a, b),0)
