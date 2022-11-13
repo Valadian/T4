@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { Col, Row, Form, FloatingLabel } from "react-bootstrap";
 import { useAuth0 } from "@auth0/auth0-react";
 import Query from "../../data/T4GraphContext";
@@ -37,7 +37,12 @@ export default function TournamentPlayerSummary(props) {
     const {updateTournament, isOwner, tournament} = useContext(TournamentHomeContext);
     const { getAccessTokenSilently } = useAuth0();
     const [nameUpdate, setNameUpdate] = useState(props.player.player_name);
+    const [expanded, setExpanded] = useState(false);
 
+    const stopPropagation = (event) =>{
+      event.stopPropagation();
+      event.nativeEvent.stopImmediatePropagation();
+    } 
     const deletePlayer = async (id) =>{
       let accessToken = await getAccessTokenSilently()
       Query("DeleteTournamentPlayer", deleteDoc, { id: id },accessToken)
@@ -99,38 +104,41 @@ export default function TournamentPlayerSummary(props) {
     let min_sos = tournament?.Ladder?.map(l => l.sos).reduce((a,b)=>Math.min(a,b),10)
     return (
       <>
-      <Row className={"accordion-row"+(props.player.disqualified?" withdrawn":"")} data-bs-toggle="collapse" data-bs-target={"#TP"+props.player.id.replaceAll("-","")}>
+      <Row onClick={() => setExpanded(v => !v)} className={"collapsible"+(expanded?" active":"")+(props.player.disqualified?" withdrawn":"")} >{/* "accordion-row"+  data-bs-toggle="collapse" data-bs-target={"#TP"+props.player.id.replaceAll("-","")} */}
         <Col className="col-1">{props.player.rank}</Col>
         <Col className="col-5 col-md-4" title={TournamentPlayerMatchSummary(props.player)}>
           {props.editPlayerNames?
-                  <FloatingLabel
-                    controlId="nameOverride"
-                    label={props.player.player_name??props.player.User?.name}
-                  >
-                    <Form.Control
-                      type="text"
-                      placeholder="f"
-                      required
-                      onChange={(event) => setNameUpdate(event.target.value)}
-                      value={nameUpdate}
-                      autoFocus
-                    />
-                  </FloatingLabel>:<TournamentPlayerName player={props.player} />}
+          <FloatingLabel
+            controlId="nameOverride"
+            label={props.player.player_name??props.player.User?.name}
+          >
+            <Form.Control
+              type="text"
+              placeholder="f"
+              required
+              onChange={(event) => setNameUpdate(event.target.value)}
+              onClick={stopPropagation}
+              value={nameUpdate}
+              autoFocus
+            />
+          </FloatingLabel>:<TournamentPlayerName player={props.player} />}
         </Col>
         <Col className="col-2 col-md-1"><span className={props.player.win>0?"text-info2":""}>{props.player.win}</span><span className="d-none d-md-inline"> </span>/<span className="d-none d-md-inline"> </span><span className={props.player.loss>0?"text-danger":""}>{props.player.loss}</span></Col>
         <Col className="col-1"><TournamentColoredText value={props.player.tournament_points} min={min_tp} max={max_tp}/></Col>
-        <Col className="col-3 col-md-2"><TournamentColoredText value={props.player.mov} min={min_mov} max={max_mov}/><span className="d-none d-md-inline"> / <TournamentColoredText value={props.player.sos.toFixed(2)} min={min_sos} max={max_sos}/></span></Col>
-        <Col className="col-3 d-none d-md-flex"><span className="me-auto">{props.player.club}</span>
+        <Col className="col-1 col-md-2"><TournamentColoredText value={props.player.mov} min={min_mov} max={max_mov}/><span className="d-none d-md-inline"> / <TournamentColoredText value={props.player.sos.toFixed(2)} min={min_sos} max={max_sos}/></span></Col>
+        <Col className="col-2 col-md-3 d-flex"><span className="me-auto"><span className="d-none d-md-block">{props.player.club}</span></span>
         
-        {props.editPlayerNames?<button className="btn btn-sm btn-outline-success" onClick={() => {updatePlayerName(props.player.id);props.setEditPlayerNames(false);}}><i className="bi bi-save"></i></button>:
+        {props.editPlayerNames?<button className="btn btn-sm btn-outline-success" onClick={(event) => {stopPropagation(event);updatePlayerName(props.player.id);props.setEditPlayerNames(false);}}><i className="bi bi-save"></i></button>:
 
-        (props.disqualifyMode?(!props.player.disqualified?<button className="btn btn-sm btn-outline-danger" onClick={() => withdrawPlayer(props.player.id,true)} title="Disqualify player"><i className="bi bi-slash-circle"></i></button>:<button className="btn btn-sm btn-outline-success" onClick={() => withdrawPlayer(props.player.id,false)} title="Re-enter player"><i className="bi bi-plus"></i></button>):
-        (isOwner && props.player.Matches.length===0?<button className="btn btn-sm btn-outline-danger" onClick={() => deletePlayer(props.player.id)}><i className="bi bi-x"></i></button>:<></>))
+        (props.disqualifyMode?(!props.player.disqualified?<button className="btn btn-sm btn-outline-danger" onClick={(event) => {stopPropagation(event);withdrawPlayer(props.player.id,true);}} title="Disqualify player"><i className="bi bi-slash-circle"></i></button>:
+        <button className="btn btn-sm btn-outline-success" onClick={(event) => {stopPropagation(event);withdrawPlayer(props.player.id,false)}} title="Re-enter player"><i className="bi bi-plus"></i></button>):
+        (isOwner && props.player.Matches.length===0?<button className="btn btn-sm btn-outline-danger" onClick={(event) => {stopPropagation(event);deletePlayer(props.player.id)}}><i className="bi bi-x"></i></button>:<></>))
         }
         </Col>
       </Row>
-      <Row id={"TP"+props.player.id.replaceAll("-","")} data-bs-parent="#ladder" className="roundRow accordion-collapse collapse">
+      <Row style={{maxHeight:(expanded?"500px":null)}}className={"collapsible-content"} >{/*accordion-collapse  id={"TP"+props.player.id.replaceAll("-","")} data-bs-parent="#ladder" accordion-collapse collapse */}
         {props.player.Matches.map(m=> <TournamentPlayerMatchSummaryRows key={m.id} match={m}/>)}
+        <div className="roundRow"></div>
       </Row>
       </>
     );
