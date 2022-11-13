@@ -109,3 +109,7 @@ div.paddedLikeInput {
   overflow: hidden;
   transition: max-height 0.5s ease-out;
 }
+.ps-0 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}

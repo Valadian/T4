@@ -201,3 +201,35 @@ a.selfUserLink {
     color: rgb(0, 60,137)
   }
 }
+
+.editing {
+  position: relative;
+}
+@media (prefers-color-scheme: dark) {
+  /* .editing {
+    outline: #61dafb solid 2px;
+  } */
+  .editing:before {
+    content: '';
+    width: .5em;
+    background: #61dafb;
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    transform: translateX(-200%);
+    outline: #61dafb solid 2px;
+  }
+}
+@media (prefers-color-scheme: light) {
+  /* .editing {
+    outline: rgb(0, 60,137) solid 2px;
+  } */
+  .editing:before {
+    content: '';
+    width: .5em;
+    background: rgb(0, 60,137);
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    transform: translateX(-200%);
+    outline: rgb(0, 60,137) solid 2px;
+  }
+}

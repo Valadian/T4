@@ -140,17 +140,17 @@ export default function TournamentRoundsTab(props) {
                     </div>
                     <Row className="pb-1 header mb-3">
                         <Col className="col-1"><span className="d-none d-lg-inline">Table #</span><span className="d-inline d-lg-none">Tbl</span></Col>
-                        <Col xs={isOwner?9:11} md={isOwner?10:11}>
+                        <Col xs={isOwner?10:11} md={isOwner?10:11}>
                             <Row>
-                                <Col xs={6} sm={7} md={6} lg={4}></Col>
-                                <Col xs={3} sm={3} md={3} lg={1}><span className="d-none d-md-inline">Points</span><span className="d-inline d-md-none">pts</span></Col>
-                                <Col xs={3} sm={2} md={3} lg={1}>TPs</Col>
-                                <Col xs={6} sm={7} md={6} lg={4} className="d-none d-lg-block"></Col>
-                                <Col xs={3} sm={3} md={3} lg={1} className="d-none d-lg-block"><span className="d-none d-md-inline">Points</span><span className="d-inline d-md-none">pts</span></Col>
-                                <Col xs={3} sm={2} md={3} lg={1} className="d-none d-lg-block">TPs</Col>
+                                <Col xs={5} sm={7} md={6} lg={4}></Col>
+                                <Col xs={5} sm={3} md={3} lg={1}><span className="d-none d-md-inline">Points</span><span className="d-inline d-md-none">pts</span></Col>
+                                <Col xs={2} sm={2} md={3} lg={1}>TPs</Col>
+                                <Col xs={5} sm={7} md={6} lg={4} className="d-none d-lg-block"></Col>
+                                <Col xs={5} sm={3} md={3} lg={1} className="d-none d-lg-block"><span className="d-none d-md-inline">Points</span><span className="d-inline d-md-none">pts</span></Col>
+                                <Col xs={2} sm={2} md={3} lg={1} className="d-none d-lg-block">TPs</Col>
                             </Row>
                         </Col>
-                        <Col xs={isOwner?2:0} md={isOwner?1:0}></Col>
+                        <Col xs={isOwner?1:0} md={isOwner?1:0}></Col>
                     </Row>
                     {r.Matches.map(m => <TournamentMatch key={m.id} match={m} round={r}/>)}
                     {isOwner&&r.Matches.length>0&&!r.finalized?<Row>

@@ -233,19 +233,19 @@ export default function TournamentMatch(props){
     //TODO: Handle null player 2 (Buy)
     if(isOwner){
         return (
-        <Row className="roundRow">
+        <Row className={"roundRow"+(editing?" editing":"")}>
             <Col className="col-1">{props.match.table_num}</Col>
-            <Col className="col-9 col-md-10">
+            <Col className="col-10">
                 <Row className="h-100">
-                    <Col xs={6} sm={7} md={6} lg={4} className={"draggablePlayer pb-3 paddedLikeInput"+MatchPlayerBg(player1)+(player1.disqualified?" withdrawn":"")} draggable="true"  onDragStart={dragPlayer1} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer1(e)}>
+                    <Col xs={5} sm={7} md={6} lg={3} className={"draggablePlayer pb-3 paddedLikeInput"+MatchPlayerBg(player1)+(player1.disqualified?" withdrawn":"")} draggable="true"  onDragStart={dragPlayer1} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer1(e)}>
                         <TournamentPlayerName player={player1} />
                     </Col>
-                    <Col xs={3} sm={3} md={3} lg={1} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player1)+(player1.disqualified?" withdrawn":"")}>
+                    <Col xs={5} sm={3} md={3} lg={2} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player1)+(player1.disqualified?" withdrawn":"")+(editing?" ps-0":"")}>
                         {editing?
                         <div className="input-group">
                             <input className="form-control" value={player1Pts} onFocus={(event) => event.target.select()} onChange={(evt) => setPlayer1Pts(evt.target.value)}></input>
-                            <button className={"btn "+(player1Win?"btn-warning":"btn-outline-secondary")} type="button" onClick={() => setPlayer1Win(true)}><i className="bi bi-trophy-fill" title="win"></i></button>
-                            <button className={"btn "+(player1.disqualified?"btn-danger":"btn-outline-danger")} type="button" onClick={() => disqualify(player1.id, !player1.disqualified)}><i className="bi bi-slash-circle" title="disqualify"></i></button>
+                            <button className={"btn btn-sm "+(player1Win?"btn-warning":"btn-outline-secondary")} type="button" onClick={() => setPlayer1Win(true)}><i className="bi bi-trophy-fill" title="win"></i></button>
+                            <button className={"btn btn-sm "+(player1.disqualified?"btn-danger":"btn-outline-danger")} type="button" onClick={() => disqualify(player1.id, !player1.disqualified)}><i className="bi bi-slash-circle" title="disqualify"></i></button>
                         </div>:
                         <>
                         <TournamentColoredText value={player1?.points} min={0} max={400} />
@@ -253,18 +253,18 @@ export default function TournamentMatch(props){
                         {notNullAndNotEqual(player1?.points,player2?.opp_points)?<span className="text-danger" title="Opponent Reported Value">({player2?.opp_points})</span>:<></>}
                         </>}
                     </Col>
-                    <Col xs={3} sm={2} md={3} lg={1} className={"col-r-border pb-3 paddedLikeInput"+MatchPlayerBg(player1)+(player1.disqualified?" withdrawn":"")}>
+                    <Col xs={2} sm={2} md={3} lg={1} className={"col-r-border pb-3 paddedLikeInput"+MatchPlayerBg(player1)+(player1.disqualified?" withdrawn":"")}>
                     <TournamentColoredText value={player1?.tournament_points} min={1} max={10}/>
                     </Col>
-                    <Col xs={6} sm={7} md={6} lg={4} className={"draggablePlayer pb-3 paddedLikeInput"+MatchPlayerBg(player2)+(player2.disqualified?" withdrawn":"")} draggable="true"  onDragStart={dragPlayer2} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer2(e)}>
+                    <Col xs={5} sm={7} md={6} lg={3} className={"draggablePlayer pb-3 paddedLikeInput"+MatchPlayerBg(player2)+(player2.disqualified?" withdrawn":"")} draggable="true"  onDragStart={dragPlayer2} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer2(e)}>
                         <TournamentPlayerName player={player2} />
                     </Col>
-                    <Col xs={3} sm={3} md={3} lg={1} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player2)+(player2.disqualified?" withdrawn":"")}>
+                    <Col xs={5} sm={3} md={3} lg={2} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player2)+(player2.disqualified?" withdrawn":"")+(editing?" ps-0":"")}>
                         {editing?
                         <div className="input-group">
                             <input className="form-control" value={player2Pts} onFocus={(event) => event.target.select()} onChange={(evt) => setPlayer2Pts(evt.target.value)}></input>
-                            <button className={"btn "+(player1Win?"btn-outline-secondary":"btn-warning")} type="button" onClick={() => setPlayer1Win(false)}><i className="bi bi-trophy-fill" title="win"></i></button>
-                            <button className={"btn "+(player2.disqualified?"btn-danger":"btn-outline-danger")} type="button" onClick={() => disqualify(player2.id, !player2.disqualified)}><i className="bi bi-slash-circle" title="disqualify"></i></button>
+                            <button className={"btn btn-sm "+(player1Win?"btn-outline-secondary":"btn-warning")} type="button" onClick={() => setPlayer1Win(false)}><i className="bi bi-trophy-fill" title="win"></i></button>
+                            <button className={"btn btn-sm "+(player2.disqualified?"btn-danger":"btn-outline-danger")} type="button" onClick={() => disqualify(player2.id, !player2.disqualified)}><i className="bi bi-slash-circle" title="disqualify"></i></button>
                         </div>:
                         <>
                         <TournamentColoredText value={player2?.points} min={0} max={400} />
@@ -273,12 +273,12 @@ export default function TournamentMatch(props){
                         
                         </>}
                     </Col>
-                    <Col xs={3} sm={2} md={3} lg={1} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player2)+(player2.disqualified?" withdrawn":"")}>
+                    <Col xs={2} sm={2} md={3} lg={1} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player2)+(player2.disqualified?" withdrawn":"")}>
                         <TournamentColoredText value={player2?.tournament_points} min={1} max={10}/>
                     </Col>
                 </Row>
             </Col>
-            <Col className="col-2 col-md-1">
+            <Col className="col-1 p-0">
                 {editing?
                 <>
                     <button className="btn btn-outline-primary" onClick={cancel} title="Cancel Edit"><i className="bi bi-pen"></i></button>
@@ -301,12 +301,12 @@ export default function TournamentMatch(props){
                 <Col xs={1}>{props.match.table_num}</Col>
                 <Col xs={11}>
                     <Row>
-                        <Col xs={6} sm={7} md={6} lg={4} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player1)}><TournamentPlayerName player={player1} /></Col>
-                        <Col xs={3} sm={3} md={3} lg={1} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player1)}><TournamentColoredText value={player1?.points} min={0} max={400}/></Col>
-                        <Col xs={3} sm={2} md={3} lg={1} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player1)}><TournamentColoredText value={player1?.tournament_points} min={1} max={10}/></Col>
-                        <Col xs={6} sm={7} md={6} lg={4} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player2)}><TournamentPlayerName player={player2} /></Col>
-                        <Col xs={3} sm={3} md={3} lg={1} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player2)}><TournamentColoredText value={player2?.points} min={0} max={400}/></Col>
-                        <Col xs={3} sm={2} md={3} lg={1} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player2)}><TournamentColoredText value={player2?.tournament_points} min={1} max={10}/></Col>
+                        <Col xs={5} sm={7} md={6} lg={4} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player1)}><TournamentPlayerName player={player1} /></Col>
+                        <Col xs={5} sm={3} md={3} lg={1} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player1)}><TournamentColoredText value={player1?.points} min={0} max={400}/></Col>
+                        <Col xs={2} sm={2} md={3} lg={1} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player1)}><TournamentColoredText value={player1?.tournament_points} min={1} max={10}/></Col>
+                        <Col xs={5} sm={7} md={6} lg={4} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player2)}><TournamentPlayerName player={player2} /></Col>
+                        <Col xs={5} sm={3} md={3} lg={1} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player2)}><TournamentColoredText value={player2?.points} min={0} max={400}/></Col>
+                        <Col xs={2} sm={2} md={3} lg={1} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player2)}><TournamentColoredText value={player2?.tournament_points} min={1} max={10}/></Col>
                     </Row>
                 </Col>
                 {/* <Col xs={2} md={1}></Col> */}
