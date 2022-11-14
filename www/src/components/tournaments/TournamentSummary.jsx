@@ -12,11 +12,11 @@ export default function TournamentSummary(props) {
         <div className="card mb-3">
             <div className="card-header">
                 <Link to={"/events/"+props.data.id} className="tournament-link">{props.data.name}&nbsp;
-                    {isOwner ? <span className="badge bg-info">Owner</span>:<></>}&nbsp;
-                    {isParticipant ? <span className="badge bg-success">Participant</span>:<></>}&nbsp;
-                    {!(props.data.public) ? <span className="badge bg-warning">Private</span>:<></>}
-                    {(props.data.Rounds.length!==props.data.Rounds.filter(r => r.finalized).length) ? <span className="badge bg-danger">Live</span>:<></>}
-                    {(props.data.Rounds.length>0 && props.data.Rounds.length===props.data.Rounds.filter(r => r.finalized).length) ? <span className="badge bg-secondary">Complete</span>:<></>}
+                    {isOwner ? <><span className="badge bg-info">Owner</span>&nbsp;</>:<></>}
+                    {isParticipant ? <><span className="badge bg-success">Participant</span>&nbsp;</>:<></>}
+                    {!(props.data.public) ? <><span className="badge bg-warning">Private</span>&nbsp;</>:<></>}
+                    {(props.data.Rounds.length!==props.data.Rounds.filter(r => r.finalized).length) ? <><span className="badge bg-danger">Live</span>&nbsp;</>:<></>}
+                    {(props.data.Rounds.length>0 && props.data.Rounds.length===props.data.Rounds.filter(r => r.finalized).length) ? <><span className="badge bg-secondary">Complete</span>&nbsp;</>:<></>}
                 </Link>
             </div>
             <div className="text-muted small card-body">

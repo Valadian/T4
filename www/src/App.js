@@ -10,6 +10,8 @@ import {TournamentHome} from "./pages/tournaments/TournamentHome";
 import Search from "./pages/Search";
 import Profile from "./pages/Profile";
 import NoPage from "./pages/NoPage";
+import Features from "./pages/Features";
+import About from "./pages/About";
 import ProtectedRoute from "./auth/ProtectedRoute";
 
 function App() {
@@ -24,6 +26,8 @@ function App() {
         <Route path="players" element={<Players />} />
         <Route path="players/:id" element={<PlayerEditor />} />
         <Route path="players/add" element={<PlayerEditor />} />
+        <Route path="features" element={<Features />} />
+        <Route path="about" element={<About />} />
         <Route path="search" element={<Search />} />
         <Route
           path="/profile"
