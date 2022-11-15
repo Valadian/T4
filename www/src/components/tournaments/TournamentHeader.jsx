@@ -11,7 +11,7 @@ export default function TournamentHeader(props) {
   var list_availability = tournament.lists_locked
     ? `Lists ${list_visibility} & locked`
     : `Lists ${list_visibility} & unlocked`;
-  var ladder_visibility = tournament.ladder_visibility
+  var ladder_visibility = tournament.ladder_visible
     ? "Ladder visible"
     : "Ladder hidden";
   var signup_availability = tournament.signups_open

@@ -39,7 +39,6 @@ const operationsDoc = `
 export default function TournamentList(props) {
   const [tournaments, setTournaments] = useState([]);
   const { user, getAccessTokenSilently } = useAuth0();
-  console.log("redraw")
   useEffect(() => {
     let where_expression = {};
     if (props.filter) {
