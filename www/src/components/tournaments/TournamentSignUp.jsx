@@ -31,9 +31,14 @@ export default function TournamentSignUp (props) {
                     user_id: user.sub
                 },accessToken)
                 .then((response) => {
+                  if (response.UserPreferences_by_pk){
                     let {player_name, club} = response.UserPreferences_by_pk
-                    setPlayerName(player_name??user.name)
+                    setPlayerName((player_name===null)?user.name:player_name)
                     setClub(club??"")
+                  } else {
+                    setPlayerName(user.name)
+                    setClub("")
+                  }
                 })
             }
             fetchData();
@@ -44,7 +49,7 @@ export default function TournamentSignUp (props) {
         var accessToken = await getAccessTokenSilently()
         Query("TournamentSignUp", signup_doc, {
             user_id: user.sub,
-            player_name: playerName,
+            player_name: (playerName==="")?null:playerName,
             tournament_id: tournament.id,
             club: club
         },accessToken)
