@@ -136,7 +136,7 @@ export default function TournamentPlayerSummary(props) {
         }
         </Col>
       </Row>
-      <Row style={{maxHeight:(expanded?"500px":null)}}className={"collapsible-content"} >{/*accordion-collapse  id={"TP"+props.player.id.replaceAll("-","")} data-bs-parent="#ladder" accordion-collapse collapse */}
+      <Row style={{maxHeight:(expanded?"500px":null)}} className={"match-summary-rows collapsible-content"} >{/*accordion-collapse  id={"TP"+props.player.id.replaceAll("-","")} data-bs-parent="#ladder" accordion-collapse collapse */}
         {props.player.Matches.map(m=> <TournamentPlayerMatchSummaryRows key={m.id} match={m}/>)}
         <div className="roundRow"></div>
       </Row>
