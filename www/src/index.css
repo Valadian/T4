@@ -98,7 +98,7 @@ div.paddedLikeInput {
   /* float: right;
   margin-left: 5px; */
   position:absolute;
-  right: 50px;
+  left: -15px;
 }
 
 .collapsible.active:after {
