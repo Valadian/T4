@@ -231,13 +231,15 @@ export default function TournamentMatch(props){
         });
     }
     //TODO: Handle null player 2 (Buy)
+    var player1draggable = player1?.points===null
+    var player2draggable = player2?.points===null
     if(isOwner){
         return (
         <Row className={"roundRow"+(editing?" editing":"")}>
             <Col className="col-1">{props.match.table_num}</Col>
             <Col className="col-10">
                 <Row className="h-100">
-                    <Col xs={5} sm={7} md={6} lg={3} className={"draggablePlayer pb-3 paddedLikeInput"+MatchPlayerBg(player1)+(player1.disqualified?" withdrawn":"")} draggable="true"  onDragStart={dragPlayer1} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer1(e)}>
+                    <Col xs={5} sm={7} md={6} lg={3} className={"pb-3 paddedLikeInput"+(player1draggable?" draggablePlayer":"")+MatchPlayerBg(player1)+(player1.disqualified?" withdrawn":"")} draggable={player1draggable?"true":"false"}  onDragStart={player1draggable?dragPlayer1:()=>{}} onDragOver={player1draggable?e => allowDrop(e):()=>{}} onDrop={player1draggable?e => handleDropPlayer1(e):()=>{}}>
                         <TournamentPlayerName player={player1} />
                     </Col>
                     <Col xs={5} sm={3} md={3} lg={2} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player1)+(player1.disqualified?" withdrawn":"")+(editing?" ps-0":"")}>
@@ -256,7 +258,7 @@ export default function TournamentMatch(props){
                     <Col xs={2} sm={2} md={3} lg={1} className={"col-r-border pb-3 paddedLikeInput"+MatchPlayerBg(player1)+(player1.disqualified?" withdrawn":"")}>
                     <TournamentColoredText value={player1?.tournament_points} min={1} max={10}/>
                     </Col>
-                    <Col xs={5} sm={7} md={6} lg={3} className={"draggablePlayer pb-3 paddedLikeInput"+MatchPlayerBg(player2)+(player2.disqualified?" withdrawn":"")} draggable="true"  onDragStart={dragPlayer2} onDragOver={e => allowDrop(e)} onDrop={e => handleDropPlayer2(e)}>
+                    <Col xs={5} sm={7} md={6} lg={3} className={"pb-3 paddedLikeInput"+(player2draggable?" draggablePlayer":"")+MatchPlayerBg(player2)+(player2.disqualified?" withdrawn":"")} draggable={player2draggable?"true":"false"}  onDragStart={player2draggable?dragPlayer2:()=>{}} onDragOver={player2draggable?e => allowDrop(e):()=>{}} onDrop={player2draggable?e => handleDropPlayer2(e):()=>{}}>
                         <TournamentPlayerName player={player2} />
                     </Col>
                     <Col xs={5} sm={3} md={3} lg={2} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player2)+(player2.disqualified?" withdrawn":"")+(editing?" ps-0":"")}>
