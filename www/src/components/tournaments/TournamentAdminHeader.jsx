@@ -13,6 +13,7 @@ import TournamentDescriptionEditor from "./TournamentDescriptionEditor";
 import TournamentNameEditor from "./TournamentNameEditor";
 import TournamentPlayerEditor from "./TournamentPlayerEditor";
 import TournamentRegistrationToggle from "./TournamentRegistrationToggle";
+import TournamentDeleteModal from "./TournamentDeleteModal";
 import { TournamentHomeContext } from "../../pages/tournaments/TournamentHome";
 
 function TournamentAdminHeader(props) {
@@ -37,8 +38,10 @@ function TournamentAdminHeader(props) {
 
   const [showTournamentDescriptionEditor, setShowTournamentDescriptionEditor] =
     useState(false);
-    const [showTournamentNameEditor, setShowTournamentNameEditor] =
-      useState(false);
+  const [showTournamentNameEditor, setShowTournamentNameEditor] =
+    useState(false);
+  const [showDeleteModal, setShowDeleteModal] =
+    useState(false);
 
   var list_visibility = tournament.lists_visible ? "visible" : "hidden";
   var list_availability = tournament.lists_locked
@@ -235,6 +238,25 @@ function TournamentAdminHeader(props) {
               </div>
             </Col>
           </Row>
+          {tournament?.Rounds.length===0?<Row>
+            <Col>
+              <div className="d-grid">
+                <Button
+                    variant="outline-danger"
+                    onClick={() => {
+                      setShowDeleteModal(true);
+                    }}
+                    size="sm"
+                  >
+                  <i className="bi bi-trash text-danger"></i>{" "}
+                  <span>DELETE</span>
+                </Button>
+              </div>
+              <TournamentDeleteModal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}/>
+            </Col>
+          </Row>:<></>}
         </Col>
       </Row>
       <hr />

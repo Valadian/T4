@@ -103,6 +103,7 @@ update_permissions:
   - role: user
     permission:
       columns:
+        - deleted
         - description
         - end
         - game
