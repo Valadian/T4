@@ -55,6 +55,7 @@ export default function FilteredTournamentList(props) {
         setFilterFuture(true)
         setFilterPast(false)
         setFilterByDate(false)
+        setFilterLive(false)
       }
     }
     const toggleFilterLastMonth = () => {
@@ -64,6 +65,7 @@ export default function FilteredTournamentList(props) {
         setFilterPast(true)
         setFilterFuture(false)
         setFilterByDate(false)
+        setFilterLive(false)
       }
     }
     const toggleFilterByDate = () => {
@@ -77,6 +79,19 @@ export default function FilteredTournamentList(props) {
         setFilterByDate(true)
         setFilterFuture(false)
         setFilterPast(false)
+        setFilterLive(false)
+      }
+    }
+    const toggleFilterLive = () => {
+      if(filterLive){
+        // setFilterFuture(filterFutureCached)
+        setFilterLive(false)
+      } else {
+        // setFilterFutureCached(filterFuture)
+        setFilterLive(true)
+        setFilterFuture(false)
+        setFilterPast(false)
+        setFilterByDate(false)
       }
     }
     return (
@@ -93,7 +108,7 @@ export default function FilteredTournamentList(props) {
               <Button size="sm" variant={filterFuture?"success":"outline-secondary"} onClick={toggleFilterFuture}>Future</Button>
               <Button size="sm" variant={filterPast?"warning":"outline-secondary"} onClick={toggleFilterLastMonth}>Past</Button>
               <Button size="sm" variant={filterByDate?"primary":"outline-secondary"} onClick={toggleFilterByDate}><span className="d-none d-sm-inline">By</span> Date</Button>
-              <Button size="sm" variant={filterLive?"danger":"outline-secondary"} onClick={() => setFilterLive(v => !v)}>Live</Button>
+              <Button size="sm" variant={filterLive?"danger":"outline-secondary"} onClick={toggleFilterLive}>Live</Button>
               {user?<Button size="sm" variant={filterMine?"info":"outline-secondary"} onClick={() => setFilterMine(v => !v)}>Mine</Button>:<></>}
             </div>
           </Col>
