@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {Col, Row} from 'react-bootstrap'
 import { useAuth0 } from "@auth0/auth0-react";
 import TournamentList from "../components/tournaments/TournamentList";
@@ -10,9 +10,9 @@ function Home() {
     const [ showPast, setShowPast] = useState(false);
     return (
         <>
-        {/* {user?<></>:<div className="d-flex flex-row-reverse">
-            <h4 className="text-success">Log in to create Event <i className="bi bi-arrow-up-circle-fill"></i></h4>
-        </div>} */}
+        {user?<></>:<div className="d-flex flex-row-reverse">
+            <h4 className="text-success" onClick={() => loginWithRedirect()}>Log in to create Event <i className="bi bi-arrow-up-circle-fill"></i></h4>
+        </div>}
         {/* <nav className="" aria-label="breadcrumb">
             <ol className="breadcrumb">
                 <li className="breadcrumb-item">Home</li>
@@ -34,22 +34,17 @@ function Home() {
                 <div className="progress-bar progress-bar-striped bg-warning progress-bar-animated" role="progressbar" style={{width: '100%'}}></div>
             </div>
         </div>
-        <div className=" homeIcon btn btn-outline-secondary" onClick={() => navigate("/events")}>
-            <span>
-                <h3 className="mb-0"><i className="bi bi-trophy-fill"></i></h3>
-                <span>Events</span>
-            </span>
-        </div>
-        {user?<></>:<div className="homeIcon btn btn-outline-primary" onClick={() => loginWithRedirect()}>
+        {/* {user?<></>:<div className="homeIcon btn btn-outline-primary" onClick={() => loginWithRedirect()}>
             <span>
                 <h3 className="mb-0"><i className="bi bi-box-arrow-in-right"></i></h3>
                 <span>Login</span>
             </span>
-        </div>}
+        </div>} */}
         
         {user?<>
-            <div className="d-flex">
-                <h1 className="me-auto">My Events</h1>
+            <div className="d-flex gap-3">
+                <h2>My Events</h2>
+                <h2 className="me-auto text-muted">(<Link to="/events" title="All Events">All</Link>)</h2>
                 <div>
                     {showPast?<button className="btn btn-sm btn-danger" onClick={() => setShowPast(p => !p)}>Hide Past</button>:
                     <button className="btn btn-sm btn-success" onClick={() => setShowPast(p => !p)}>Show Past</button>}
@@ -63,7 +58,13 @@ function Home() {
                 earliest: showPast?null:new Date()
             }}
             />
-        </>:<></>}
+        </>:
+        <div className=" homeIcon btn btn-outline-secondary" onClick={() => navigate("/events")}>
+            <span>
+                <h3 className="mb-0"><i className="bi bi-trophy-fill"></i></h3>
+                <span>Events</span>
+            </span>
+        </div>}
         </>
     );
 }

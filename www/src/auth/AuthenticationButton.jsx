@@ -13,9 +13,9 @@ const AuthenticationButton = () => {
     <img
         src={user.picture}
         alt="Profile"
-        className="profile-pic rounded-circle img-fluid profile-picture mb-3 mb-md-0"
-        width="50px"
-        height="50px"
+        className="profile-pic rounded-circle img-fluid profile-picture mb-md-0"
+        width="40px"
+        height="40px"
         />
     </Link>
     </> : <LoginButton />;
