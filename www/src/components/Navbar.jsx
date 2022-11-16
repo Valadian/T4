@@ -14,7 +14,7 @@ export default function Navbar(props){
                 </button>
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                        <Nav.Link as={NavLink} to='/' exact>Home</Nav.Link>
+                        <Nav.Link as={NavLink} to='/' exact="true">Home</Nav.Link>
                         <Nav.Link as={NavLink} to="/events">Events</Nav.Link >
                         <Nav.Link as={NavLink} to="/features">Features</Nav.Link >
                         <Nav.Link as={NavLink} to="/about">About Us</Nav.Link >

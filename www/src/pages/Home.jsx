@@ -19,9 +19,7 @@ function Home() {
             </ol>
         </nav> */}
         
-        <h2>
-            Welcome to TableTop Tournament Tools (T4)!
-        </h2>
+        <h2>TableTop Tournament Tools (T4)</h2>
 
         <div className="mt-0 mb-3" style={{'border':'#FF8000 solid 1px', 'borderRadius': '.25rem', 'fontSize': 'smaller'}}>
             <div className="progress" style={{'borderRadius': '0rem'}}>
@@ -51,7 +49,7 @@ function Home() {
                 </div>
             </div>
             
-            <TournamentList
+            <TournamentList pageSize={5}
             filter={{
                 creator_id: user?.sub ?? "NOMATCHES",
                 player_id: user?.sub ?? "NOMATCHES",

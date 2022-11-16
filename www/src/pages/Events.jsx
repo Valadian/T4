@@ -20,9 +20,9 @@ function Events() {
             <div className="col-8 col-sm-12">
                 <h1>All Events</h1>
             </div>
-            <div className="d-sm-none col-4 p-1 d-flex flex-row-reverse">
+            {/* <div className="d-sm-none col-4 p-1 d-flex flex-row-reverse">
                 {user?<Link className="btn btn-outline-success" to="/events/add"><i className="bi bi-plus"></i> Create</Link>:<></>}
-            </div>
+            </div> */}
         </div>
         <FilteredTournamentList />
         </>

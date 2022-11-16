@@ -15,6 +15,10 @@ code {
   font-weight: bold;
   text-decoration: none;
 }
+
+a {
+  text-decoration: none;
+}
 @media (prefers-color-scheme: dark) {
   input:disabled {
     color: #333;
@@ -127,4 +131,10 @@ html {
 }
 body {
   margin-bottom: 100px;
+}
+.overflow-ellipsis{
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

@@ -29,17 +29,24 @@ export default function LocationDropdown(props) {
 
     if (locations && props.setLocation) {
       return (
-        <DropdownButton
-          title="Location"
+        <Dropdown
+          // title="Location"
           onSelect={props.setLocation}
         >
-          <Dropdown.Item eventKey={null}>Any Location</Dropdown.Item>
-          {locations.map((tourn) => (
-            <Dropdown.Item eventKey={tourn.location} key={tourn.location}>
-              {tourn.location}
-            </Dropdown.Item>
-          ))}
-        </DropdownButton>
+          <Dropdown.Toggle className="btn-sm w-100" >  {/* style={{maxWidth:320}} */}
+            <span className="overflow-ellipsis" style={{width:"90%"}}>
+              {props.location?props.location:"Location"}
+            </span>
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            <Dropdown.Item eventKey={null}>Any Location</Dropdown.Item>
+            {locations.map((tourn) => (
+              <Dropdown.Item eventKey={tourn.location} key={tourn.location}>
+                {tourn.location}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Menu>
+        </Dropdown>
       );
     } else {
       return <div>Loading...</div>;

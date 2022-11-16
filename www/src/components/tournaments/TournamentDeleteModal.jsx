@@ -75,7 +75,7 @@ export default function TournamentDeleteModal(props){
             </Form>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={deleteTournament} className="btn-danger">DELETE</Button>
+            <Button onClick={deleteTournament} variant="danger">DELETE</Button>
             <Button onClick={props.onHide}>Close</Button>
           </Modal.Footer>
         </Modal>
