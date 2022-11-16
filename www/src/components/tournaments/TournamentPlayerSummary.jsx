@@ -92,7 +92,7 @@ export default function TournamentPlayerSummary(props) {
         <Col xs={5} md={4}>&nbsp;- R{m.Match.Round.round_num} vs {oppname}</Col>
         <Col xs={2} md={1} className={state==="PENDING"?"text-warning":(m.win?"text-info2":"text-danger")}>{state}</Col>
         <Col xs={1}><TournamentColoredText value={m.tournament_points} min={1} max={10}/></Col>
-        <Col xs={3} md={2}>{m.points&&m.opp_points?<span>(<TournamentColoredText value={m.points} min={0} max={400}/>:<TournamentColoredText value={m.opp_points} min={0} max={400}/>)</span>:<></>}</Col>
+        <Col xs={3} md={2}>{m.points!==null&&m.opp_points!==null?<span>(<TournamentColoredText value={m.points} min={0} max={400}/>:<TournamentColoredText value={m.opp_points} min={0} max={400}/>)</span>:<></>}</Col>
         <Col xs={3} className="d-none d-md-flex"></Col>
       </>)
     }
