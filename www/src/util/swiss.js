@@ -101,8 +101,8 @@ async function generatePairings(tournament_id, round_id, accessToken, updateTour
             let playerMap;
             let success;
             let RETRIES = 6;
-            for(var i = 1; !success && i<RETRIES; i++ ){
-                ({ matches, playerMap, success } = buildMatches(players, first_round));
+            for(var i = 1; !success && i<=RETRIES; i++ ){
+                ({ matches, playerMap, success } = buildMatches(players, (i<RETRIES && first_round)));
             }
             let table_num = 1
             for(let m of matches){
