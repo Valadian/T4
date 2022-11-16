@@ -6,6 +6,8 @@ export default function Features(){
         <li>Secure user authentication with Google OAuth support through Auth0</li>
         <li>Swiss Tournaments</li>
         <li>Swiss matchmaking</li>
+        <li>Supports Avoiding matchups for Travel Groups/Clubs</li>
+        <li>Supports avoiding duplicate byes</li>
         <li>Registered and unregistered users</li>
         <li>TO and user submitted scores</li>
         <li>Mobile friendly</li>
