@@ -132,11 +132,13 @@ export default function TournamentRoundsTab(props) {
                     unmatched = all_players.filter(p => match_players.filter(mp => mp.player_name===p.player_name && mp.User?.id===p.User?.id).length===0);
                 }
                 return <Tab key={r.id} eventKey={"round_"+r.round_num} title={<span><i className="bi bi-bullseye"></i> <span className="d-none d-md-inline">Round </span>{r.round_num}</span>}>
-                    <div className="d-flex flex-row-reverse">
-                        {isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-danger" onClick={() => deleteRound(r.id)}><i className="bi bi-x"></i> Delete Round</button></span>:<></>}
-                        {isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-success" onClick={() => generateRound(r.id,r.round_num===1)}><i className="bi bi-trophy-fill"></i> Generate Matches</button></span>:<></>}
-                        {isOwner&&r.Matches.length>0&&!r.finalized?<span className="form-group"><button className="btn btn-outline-warning" onClick={() => setRoundLocked(r.id, true)}><i className="bi bi-trophy-fill"></i> Finalize Round</button></span>:<></>}
+                    <div className="d-flex">
+                        {unmatched.length>0?<h2 className="text-warning me-auto">Unmatched Players!</h2>:<span className="me-auto"></span>}
                         {isOwner&&r.Matches.length>0&&r.finalized?<span className="form-group"><button className="btn btn-outline-secondary" onClick={() => setRoundLocked(r.id, false)}><i className="bi bi-trophy-fill"></i> Reopen Round</button></span>:<></>}
+                        {isOwner&&r.Matches.length>0&&!r.finalized?<span className="form-group"><button className="btn btn-outline-warning" onClick={() => setRoundLocked(r.id, true)}><i className="bi bi-trophy-fill"></i> Finalize Round</button></span>:<></>}
+                        {isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-success" onClick={() => generateRound(r.id,r.round_num===1)}><i className="bi bi-trophy-fill"></i> Generate Matches</button></span>:<></>}
+                        {isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-danger" onClick={() => deleteRound(r.id)}><i className="bi bi-x"></i> Delete Round</button></span>:<></>}
+                        
                     </div>
                     <Row className="pb-1 header mb-3">
                         <Col className="col-1"><span className="d-none d-lg-inline">Table #</span><span className="d-inline d-lg-none">Tbl</span></Col>

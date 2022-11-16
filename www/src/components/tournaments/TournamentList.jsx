@@ -78,8 +78,8 @@ export default function TournamentList(props) {
       }
       if(props.filter["earliest"] || props.filter["latest"]){
         where_expression['start'] = {
-          _gt: props.filter["earliest"],
-          _lt: props.filter["latest"],
+          _gte: props.filter["earliest"],
+          _lte: props.filter["latest"],
         }
       }
       // {_or: [
