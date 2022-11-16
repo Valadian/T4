@@ -91,7 +91,7 @@ export default function FilteredTournamentList(props) {
           <Col xs={12} lg={6} className="pt-3">
             <div className="d-flex justify-content-start align-items-star gap-1">
               <Button size="sm" variant={filterFuture?"success":"outline-secondary"} onClick={toggleFilterFuture}>Future</Button>
-              <Button size="sm" variant={filterPast?"warning":"outline-secondary"} onClick={toggleFilterLastMonth}>Past <span className="d-none d-md-inline">Month</span></Button>
+              <Button size="sm" variant={filterPast?"warning":"outline-secondary"} onClick={toggleFilterLastMonth}>Past</Button>
               <Button size="sm" variant={filterByDate?"primary":"outline-secondary"} onClick={toggleFilterByDate}><span className="d-none d-sm-inline">By</span> Date</Button>
               <Button size="sm" variant={filterLive?"danger":"outline-secondary"} onClick={() => setFilterLive(v => !v)}>Live</Button>
               {user?<Button size="sm" variant={filterMine?"info":"outline-secondary"} onClick={() => setFilterMine(v => !v)}>Mine</Button>:<></>}
