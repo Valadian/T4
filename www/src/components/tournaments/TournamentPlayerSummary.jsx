@@ -21,9 +21,10 @@ mutation WithdrawTournamentPlayer($id: uuid!, $disqualified: Boolean = true) {
   }
 }`
 const updateNameDoc = `
-mutation UpdateNameTournamentPlayer($id: uuid = "", $player_name: String = null) {
-  update_TournamentPlayer_by_pk(pk_columns: {id: $id}, _set: {player_name: $player_name}) {
+mutation UpdateNameTournamentPlayer($id: uuid = "", $player_name: String = null, $club: String = null) {
+  update_TournamentPlayer_by_pk(pk_columns: {id: $id}, _set: {player_name: $player_name, club: $club}) {
     player_name
+    club
     id
   }
   update_MatchPlayer(where: {tournament_player_id: {_eq: $id}}, _set: {player_name: $player_name}) {
@@ -37,6 +38,7 @@ export default function TournamentPlayerSummary(props) {
     const {updateTournament, isOwner, tournament} = useContext(TournamentHomeContext);
     const { getAccessTokenSilently } = useAuth0();
     const [nameUpdate, setNameUpdate] = useState(props.player.player_name);
+    const [clubUpdate, setClubUpdate] = useState(props.player.club);
     const [expanded, setExpanded] = useState(false);
 
     const stopPropagation = (event) =>{
@@ -62,7 +64,8 @@ export default function TournamentPlayerSummary(props) {
       let accessToken = await getAccessTokenSilently()
       Query("UpdateNameTournamentPlayer", updateNameDoc, { 
         id: id,
-        player_name: nameUpdate===""?null:nameUpdate
+        player_name: nameUpdate===""?null:nameUpdate,
+        club: clubUpdate===""?null:clubUpdate
       },accessToken)
         .then((response) => {
           updateTournament()
@@ -126,7 +129,23 @@ export default function TournamentPlayerSummary(props) {
         <Col className="col-2 col-md-1"><span className={props.player.win>0?"text-info2":""}>{props.player.win}</span><span className="d-none d-md-inline"> </span>/<span className="d-none d-md-inline"> </span><span className={props.player.loss>0?"text-danger":""}>{props.player.loss}</span></Col>
         <Col className="col-1"><TournamentColoredText value={props.player.tournament_points} min={min_tp} max={max_tp}/></Col>
         <Col className="col-1 col-md-2"><TournamentColoredText value={props.player.mov} min={min_mov} max={max_mov}/><span className="d-none d-md-inline"> / <TournamentColoredText value={props.player.sos.toFixed(2)} min={min_sos} max={max_sos}/></span></Col>
-        <Col className="col-2 col-md-3 d-flex"><span className="me-auto"><span className="d-none d-md-block">{props.player.club}</span></span>
+        <Col className="col-2 col-md-3 d-flex"><span className="me-auto"><span className="d-none d-md-block">
+          {props.editPlayerNames?
+          <FloatingLabel
+            controlId="nameOverride"
+            label={props.player.club}
+          >
+            <Form.Control
+              type="text"
+              placeholder="f"
+              required
+              onChange={(event) => setClubUpdate(event.target.value)}
+              onClick={stopPropagation}
+              value={clubUpdate}
+              autoFocus
+            />
+          </FloatingLabel>:props.player.club}
+        </span></span>
         
         {props.editPlayerNames?<button className="btn btn-sm btn-outline-success" onClick={(event) => {stopPropagation(event);updatePlayerName(props.player.id);props.setEditPlayerNames(false);}}><i className="bi bi-save"></i></button>:
 

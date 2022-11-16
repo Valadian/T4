@@ -82,63 +82,27 @@ function sortByTournamentPoints(players){
     players.sort((a,b)=>b.tournament_points-a.tournament_points)
     return players
 }
-function filterValidOpponents(p, players){
-    let opponents = players.filter(tp => tp.id!==p.id && !p.Matches.map(mp => mp.TournamentOpponent?.id).includes(tp.id))
+function filterValidOpponents(p, players, first_round){
+    if(first_round){
+        console.log("First Round, considering travel groups")
+    }
+    let opponents = players.filter(tp => tp.id!==p.id && !p.Matches.map(mp => mp.TournamentOpponent?.id).includes(tp.id) && (!first_round || !p.club || p.club!==tp.club))
     opponents.sort((a,b) =>  Math.abs(a.tournament_points-p.tournament_points) - Math.abs(b.tournament_points-p.tournament_points))
     return opponents.map(tp => tp.id)
 }
-async function generatePairings(tournament_id, round_id, accessToken, updateTournament){
+async function generatePairings(tournament_id, round_id, accessToken, updateTournament, first_round){
     Query("AllTournamentPlayers", playersDoc, {
         tournament_id: tournament_id
     } ,accessToken)
     .then((response) => {
         if (response && response.TournamentPlayer){
             let players = response.TournamentPlayer
-            let playerMap = tournamentPlayersToMap(players)
-            bakeTournamentPoints(players)
-            players = sortByTournamentPoints(players)
-            let byes = []
-            let edges = {}
-            let vertices = players.map(tp => tp.id)
-            let valid_paths = {}
-            let matches = []
-            let bye_match = null
-            for(let p of players){
-                let bye = p.Matches.filter(mp => mp.TournamentOpponent==null).length>0
-                if (bye) {
-                    byes.push(p.id)
-                }
-                valid_paths[p.id] = filterValidOpponents(p, players)
-            }
-            //TODO: IF ODD, handle bye
-            if(players.length%2===1){
-                let nobye_players = vertices.filter(v => !byes.includes(v))
-                let next_bye = nobye_players[nobye_players.length-1]
-                edges[next_bye]=null
-                bye_match = [next_bye,null]
-                console.log(next_bye,"BYE")
-            }
-            for(let v of vertices){
-                if(v in edges){
-                    continue
-                }
-                let found = false
-                for(let valid of valid_paths[v]){
-                    if(!(valid in edges)){
-                        edges[v] = valid
-                        edges[valid] = v
-                        matches.push([v,valid])
-                        console.log(v,valid)
-                        found = true
-                        break
-                    }
-                }
-                if(!found){
-                    console.log("No pairing found for: ",v)
-                }
-            }
-            if(bye_match){
-                matches.push(bye_match)
+            let matches;
+            let playerMap;
+            let success;
+            let RETRIES = 3;
+            for(var i = 1; !success && i<RETRIES; i++ ){
+                ({ matches, playerMap, success } = buildMatches(players, first_round));
             }
             let table_num = 1
             for(let m of matches){
@@ -176,3 +140,56 @@ async function generatePairings(tournament_id, round_id, accessToken, updateTour
 }
 
 export default generatePairings
+
+function buildMatches(players, first_round) {
+    console.log("Attempt building ladder")
+    let success = true;
+    let matches = [];
+    let playerMap = tournamentPlayersToMap(players);
+    bakeTournamentPoints(players);
+    players = sortByTournamentPoints(players);
+    let byes = [];
+    let edges = {};
+    let vertices = players.map(tp => tp.id);
+    let valid_paths = {};
+    let bye_match = null;
+    for (let p of players) {
+        let bye = p.Matches.filter(mp => mp.TournamentOpponent == null).length > 0;
+        if (bye) {
+            byes.push(p.id);
+        }
+        valid_paths[p.id] = filterValidOpponents(p, players, first_round);
+    }
+    //TODO: IF ODD, handle bye
+    if (players.length % 2 === 1) {
+        let nobye_players = vertices.filter(v => !byes.includes(v));
+        let next_bye = nobye_players[nobye_players.length - 1];
+        edges[next_bye] = null;
+        bye_match = [next_bye, null];
+        console.log(next_bye, "BYE");
+    }
+    for (let v of vertices) {
+        if (v in edges) {
+            continue;
+        }
+        let found = false;
+        for (let valid of valid_paths[v]) {
+            if (!(valid in edges)) {
+                edges[v] = valid;
+                edges[valid] = v;
+                matches.push([v, valid]);
+                console.log(v, valid);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            console.log("No pairing found for: ", v);
+            success = false;
+        }
+    }
+    if (bye_match) {
+        matches.push(bye_match);
+    }
+    return { matches, playerMap, success };
+}
