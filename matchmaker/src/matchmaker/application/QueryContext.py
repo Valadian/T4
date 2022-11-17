@@ -27,22 +27,48 @@ def getMatchHistory(tourney_id):
 
     operation_name = "getMatchHistory"
     vars = {"tournament_id": str(tourney_id)}
+    
+    # get_match_history_doc = """
+    #     query getMatchHistory($tournament_id: uuid = "") {
+    #         Match(where: {Round: {tournament_id: {_eq: $tournament_id}}}) {
+    #             Players {
+    #                 id
+    #             }
+    #             Round {
+    #                 round_num
+    #             }
+    #         }
+    #         Tournament(where: {id: {_eq: $tournament_id}}) {
+    #             Ladder {
+    #                 id
+    #                 tournament_points
+    #                 mov
+    #                 sos
+    #             }
+    #         }
+    #     }
+    # """
+
     get_match_history_doc = """
         query getMatchHistory($tournament_id: uuid = "") {
-            Match(where: {Round: {tournament_id: {_eq: $tournament_id}}}) {
-                Players {
-                    user_id
-                }
-                Round {
-                    round_num
-                }
-            }
             Tournament(where: {id: {_eq: $tournament_id}}) {
                 Ladder {
-                    user_id
+                    id
                     tournament_points
                     mov
                     sos
+                    Matches(where: {Match: {Round: {finalized: {_eq: true}}}}) {
+                        TournamentOpponent {
+                            id
+                        }
+                    }
+                }
+                Rounds_aggregate {
+                    aggregate {
+                        max {
+                            round_num
+                        }
+                    }
                 }
             }
         }
