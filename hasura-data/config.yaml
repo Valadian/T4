@@ -2,7 +2,7 @@ version: 3
 endpoint: 
   from_env: HASURA_EXT_ENDPOINT
 admin_secret: 
-  from_env: 
+  from_env: HASURA_GRAPHQL_ADMIN_SECRET
 metadata_directory: metadata
 actions:
   kind: synchronous
