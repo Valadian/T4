@@ -2,7 +2,8 @@ actions:
   - name: NextRoundMatches
     definition:
       kind: synchronous
-      handler: https://matchmaker.dev.advancedtransponder.net/NextRoundMatches
+      handler: 
+        from_env: HASURA_MATCHMAKER_URL
     permissions:
       - role: user
 custom_types:

@@ -1,7 +1,10 @@
 version: 3
-endpoint: http://localhost:8080/
-admin_secret: SuperSekritHasura
+endpoint: 
+  from_env: HASURA_EXT_ENDPOINT
+admin_secret: 
+  from_env: 
 metadata_directory: metadata
 actions:
   kind: synchronous
-  handler_webhook_baseurl: http://localhost:3000
+  handler_webhook_baseurl: 
+    from_env: HASURA_MATCHMAKER_URI
