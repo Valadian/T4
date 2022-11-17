@@ -1,5 +1,5 @@
 from operator import itemgetter
-from .QueryContext import createMatches, createMatchPlayer, getMatchHistory
+from .QueryContext import createMatches, createMatchPlayers, getMatchHistory
 import random
 
 from flask import current_app as app
@@ -9,18 +9,22 @@ class Matchmaker:
     def __init__(self, tournament_id):
 
         self.tournament_id = tournament_id
-        self.match_history = getMatchHistory(self.tournament_id)["data"]["Tournament"][0]
+        self.match_history = getMatchHistory(self.tournament_id)["data"]["Tournament"][
+            0
+        ]
 
         # rounds_completed = [
         #     match["Round"]["round_num"] for match in self.match_history["data"]["Match"]
         # ]
-        rounds_completed = self.match_history["Rounds_aggregate"]["aggregate"]["max"]["round_num"]
+        rounds_completed = self.match_history["Rounds_aggregate"]["aggregate"]["max"][
+            "round_num"
+        ]
         self.round = int(rounds_completed) + 1 if rounds_completed else 1
 
         try:
-            app.logger.debug("="*30)
+            app.logger.debug("=" * 30)
             app.logger.debug("Generating Round {}...".format(self.round))
-            app.logger.debug("="*30)
+            app.logger.debug("=" * 30)
             self.players = self.match_history["Ladder"]
             app.logger.debug("  Player list:")
             [app.logger.debug(p) for p in self.players]
@@ -61,7 +65,9 @@ class Matchmaker:
         # Shuffle then sort on TP only to randomize within TP tiers
         [self.addPreviousOpponents(player) for player in self.unpaired_players]
         random.shuffle(self.players)
-        self.players_in_pairing_order = sorted(self.players, key=itemgetter("tournament_points"),reverse=True)
+        self.players_in_pairing_order = sorted(
+            self.players, key=itemgetter("tournament_points"), reverse=True
+        )
 
         # iterate through the shuffled player list and generate pairings
         for p_idx, player in enumerate(self.players_in_pairing_order):
@@ -71,10 +77,8 @@ class Matchmaker:
             ):
                 self.pairings.append(player_pair)
 
-        app.logger.debug("="*30)
+        app.logger.debug("=" * 30)
         app.logger.debug("[+] Pairings")
-        [app.logger.debug(pair) for pair in self.pairings]
-        exit()
 
         if self.bye:
             app.logger.debug("{} has the bye".format(self.bye["id"]))
@@ -84,13 +88,18 @@ class Matchmaker:
     def addPreviousOpponents(self, player):
 
         player["previous_opponents"] = []
-        
+
         app.logger.debug("[+] Opponents of {}".format(player["id"]))
 
         for previous_opponent in player["Matches"]:
-            player["previous_opponents"].append(previous_opponent["TournamentOpponent"]["id"])
+            player["previous_opponents"].append(
+                previous_opponent["TournamentOpponent"]["id"]
+            )
 
-        [app.logger.debug("  - {}".format(opponent)) for opponent in player["previous_opponents"]]
+        [
+            app.logger.debug("  - {}".format(opponent))
+            for opponent in player["previous_opponents"]
+        ]
 
         return player
 
@@ -118,7 +127,7 @@ class Matchmaker:
             return self.matchmakePlayer(player, player_index + 1)
 
     def postPairings(self):
-        """Create the next round's matches, then post the players to them."""
+        """Create the next round, its matches, then post the players to them."""
 
         match_count = len(self.pairings)
 
@@ -136,20 +145,19 @@ class Matchmaker:
 
         for pair in self.pairings:
             match_id = self.new_match_ids.pop()
-            for player in pair:
-                success = createMatchPlayer(player["id"], match_id)
-                if success:
-                    self.populated_match_ids.append(match_id)
-                else:
-                    app.logger.info(
-                        "Failed to assign player {} to match {}.".format(
-                            player, match_id
-                        )
+            success = createMatchPlayers(pair, match_id)
+            if success:
+                self.populated_match_ids.append(match_id)
+            else:
+                app.logger.info(
+                    "Failed to assign players {} to match {}.".format(
+                        (pair[0]["id"], pair[1]["id"]), match_id
                     )
+                )
 
         if self.bye:
             bye_match_id = self.new_match_ids.pop()
-            success = createMatchPlayer(self.bye["id"], bye_match_id)
+            success = createMatchPlayers((self.bye, "bye"), bye_match_id)
             if success:
                 self.populated_match_ids.append(bye_match_id)
             else:
