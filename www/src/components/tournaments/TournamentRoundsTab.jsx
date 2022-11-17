@@ -1,42 +1,54 @@
-import React, {useState,useEffect,useContext} from "react"
-import {Tabs, Tab, Col, Row} from 'react-bootstrap'
+import React, { useState, useEffect, useContext } from "react";
+import { Tabs, Tab, Col, Row } from "react-bootstrap";
 import Query from "../../data/T4GraphContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import TournamentMatch from "./TournamentMatch";
-import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
+import { TournamentHomeContext } from "../../pages/tournaments/TournamentHome";
 import TournamentPlayerName from "./TournamentPlayerName";
 import generatePairings from "../../util/swiss";
 
 const insertDoc = `
-mutation addNewRound($tournament_id: uuid!, $round_num: numeric!, $description: String!) {
+  mutation addNewRound($tournament_id: uuid!, $round_num: numeric!, $description: String!) {
     insert_TournamentRound(objects: {round_num: $round_num, description: $description, tournament_id: $tournament_id}) {
       affected_rows
       returning {
         id
       }
     }
-  }`
+  }`;
+
 const deleteDoc = `
   mutation deleteRound($id: uuid!) {
-      delete_TournamentRound_by_pk(id: $id) {
-          id
-      }
-  }`
+    delete_TournamentRound_by_pk(id: $id) {
+      id
+    }
+  }
+  `;
+
 const finalizeDoc = `
   mutation finalizeRound($id: uuid!, $finalized: Boolean!) {
-      update_TournamentRound_by_pk(pk_columns: {id: $id}, _set: {finalized: $finalized}) {
-        id
-      }
+    update_TournamentRound_by_pk(pk_columns: {id: $id}, _set: {finalized: $finalized}) {
+      id
     }
-    ` 
+  }
+  `;
+
 const addMatchDoc = `
-mutation addMatch($round_id: uuid!, $table_num: Int!) {
+  mutation addMatch($round_id: uuid!, $table_num: Int!) {
     insert_Match_one(object: {table_num: $table_num, round_id: $round_id, Players: {data: [{}, {}]}}) {
-        id
+      id
     }
-}
-  
-`
+  }
+  `;
+
+const generateMatchesDoc = `
+  mutation generateMatches($tournament_id: uuid!) {
+    NextRoundMatches(tournament_id: $tournament_id) {
+      match_ids
+    }
+  }
+  `;
+
 export default function TournamentRoundsTab(props) {
     const { getAccessTokenSilently } = useAuth0();
     const [roundNum, setRoundNum] = useState(0);
@@ -78,9 +90,12 @@ export default function TournamentRoundsTab(props) {
         });
     }
     const generateRound = async (id, firstRound) => {
-        const accessToken = await getAccessTokenSilently()
-        generatePairings(tournament.id, id, accessToken, updateTournament, firstRound)
-    }
+      const accessToken = await getAccessTokenSilently();
+      let vars = { tournament_id: tournament.id };
+      Query("generateMatches", generateMatchesDoc, vars, accessToken).then(() => {
+        updateTournament();
+      });
+    };
     const setRoundLocked = async (round_id, finalized) => {
         const accessToken = await getAccessTokenSilently()
         Query("finalizeRound", finalizeDoc, {
