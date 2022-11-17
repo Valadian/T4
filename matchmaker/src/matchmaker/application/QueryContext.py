@@ -1,6 +1,8 @@
 import os
 import requests
 
+from flask import current_app as app
+
 
 def Query(operation_name, operation_doc, variables):
 
@@ -27,7 +29,7 @@ def getMatchHistory(tourney_id):
 
     operation_name = "getMatchHistory"
     vars = {"tournament_id": str(tourney_id)}
-    
+
     # get_match_history_doc = """
     #     query getMatchHistory($tournament_id: uuid = "") {
     #         Match(where: {Round: {tournament_id: {_eq: $tournament_id}}}) {
@@ -93,7 +95,9 @@ def createRound(tourney_id, round_num):
         }
     """
 
-    round_id = Query(operation_name, create_round_doc, vars)["data"]["insert_TournamentRound"]["returning"][0]["id"]
+    round_id = Query(operation_name, create_round_doc, vars)["data"][
+        "insert_TournamentRound"
+    ]["returning"][0]["id"]
 
     return round_id
 
@@ -102,7 +106,9 @@ def createMatches(tourney_id, round_num, count):
 
     round_id = createRound(tourney_id, round_num)
     operation_name = "CreateMatches"
-    matches_list = [{"round_id": round_id, "table_num": table_num+1} for table_num in range(count)]
+    matches_list = [
+        {"round_id": round_id, "table_num": table_num + 1} for table_num in range(count)
+    ]
     vars = {"matches": matches_list}
     create_matches_doc = """
         mutation CreateMatches($matches: [Match_insert_input!] !) {
@@ -120,28 +126,56 @@ def createMatches(tourney_id, round_num, count):
     return new_matches
 
 
-def createMatchPlayer(player, match_id):
+def createMatchPlayers(pair, match_id):
 
     operation_name = "CreateMatchPlayer"
-    vars = {"user_id": player, "match_id": match_id}
-    create_matches_doc = """
-        mutation CreateMatchPlayer($user_id: String = "", $match_id: uuid = "") {
+    create_match_player_doc = """
+        mutation CreateMatchPlayer(
+            $tournament_player_id: uuid!, 
+            $tournament_opponent_id: uuid, 
+            $match_id: uuid!
+            ) {
         insert_MatchPlayer(
             objects: {
-                user_id: $user_id,
+                tournament_player_id: $tournament_player_id,
+                tournament_opponent_id: $tournament_opponent_id,
                 match_id: $match_id,
-                points: 0,
-                tournament_points: 0
+                confirmed: false,
+                disqualified: false
             }) {
                 affected_rows
             }
         }
     """
 
-    response = Query(operation_name, create_matches_doc, vars)
-    
-    success = not bool("errors" in response.keys())
+    # Pair bye with null
+    if pair[1] == "bye":
+        vars = {
+            "tournament_player_id": pair[0]["id"],
+            "match_id": match_id,
+        }
+        response = Query(operation_name, create_match_player_doc, vars)
+        success = not bool("errors" in response.keys())
 
-    print(response)
+        return success
 
+    vars = {
+        "tournament_player_id": pair[0]["id"],
+        "tournament_opponent_id": pair[1]["id"],
+        "match_id": match_id,
+    }
+    response = Query(operation_name, create_match_player_doc, vars)
+    success_a = not bool("errors" in response.keys())
+
+    vars = {
+        "tournament_player_id": pair[1]["id"],
+        "tournament_opponent_id": pair[0]["id"],
+        "match_id": match_id,
+    }
+    response = Query(operation_name, create_match_player_doc, vars)
+    success_b = not bool("errors" in response.keys())
+
+    success = success_a and success_b
+    if not success:
+        app.logger.debug(response)
     return success
