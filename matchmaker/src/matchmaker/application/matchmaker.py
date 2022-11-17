@@ -9,16 +9,20 @@ class Matchmaker:
     def __init__(self, tournament_id):
 
         self.tournament_id = tournament_id
-        self.match_history = getMatchHistory(self.tournament_id)
+        self.match_history = getMatchHistory(self.tournament_id)["data"]["Tournament"][0]
 
-        rounds_completed = [
-            match["Round"]["round_num"] for match in self.match_history["data"]["Match"]
-        ]
-        self.round = int(max(rounds_completed)) + 1 if rounds_completed else 1
+        # rounds_completed = [
+        #     match["Round"]["round_num"] for match in self.match_history["data"]["Match"]
+        # ]
+        rounds_completed = self.match_history["Rounds_aggregate"]["aggregate"]["max"]["round_num"]
+        self.round = int(rounds_completed) + 1 if rounds_completed else 1
 
         try:
-            self.players = self.match_history["data"]["Tournament"][0]["Ladder"]
-            app.logger.debug("  Player list: ")
+            app.logger.debug("="*30)
+            app.logger.debug("Generating Round {}...".format(self.round))
+            app.logger.debug("="*30)
+            self.players = self.match_history["Ladder"]
+            app.logger.debug("  Player list:")
             [app.logger.debug(p) for p in self.players]
         except KeyError:
             app.logger.debug(
@@ -30,7 +34,6 @@ class Matchmaker:
             self.players = False
             self.pairings = False
             return
-
         random.shuffle(self.players)
         self.unpaired_players = self.players
 
@@ -43,32 +46,24 @@ class Matchmaker:
         if not self.players:
             return False
 
-        # Rank players to find last place for the bye
-        players_ranked = sorted(
-            self.players,
-            key=itemgetter("tournament_points", "mov", "sos"),
-            reverse=True,
-        )
+        # Bye bye bye
+        if len(self.players) % 2:
+            # Rank players to find last place for the bye
+            players_ranked = sorted(
+                self.players,
+                key=itemgetter("tournament_points", "mov", "sos"),
+                reverse=True,
+            )
 
-        self.bye = players_ranked[-1] if len(players_ranked) % 2 else None
-        not self.bye or self.unpaired_players.remove(self.bye)
+            self.bye = players_ranked[-1]
+            self.unpaired_players.remove(self.bye)
 
-        # Break the equal-tp players out into lists to shuffle then re-concat them
-        players_by_tp = {}
+        # Shuffle then sort on TP only to randomize within TP tiers
+        [self.addPreviousOpponents(player) for player in self.unpaired_players]
+        random.shuffle(self.players)
+        self.players_in_pairing_order = sorted(self.players, key=itemgetter("tournament_points"),reverse=True)
 
-        for player in self.unpaired_players:
-            player = self.addPreviousOpponents(player)
-            players_by_tp.setdefault(player["tournament_points"], []).append(player)
-
-        players_by_tp = dict(sorted(players_by_tp.items(), reverse=True))
-        self.players_in_pairing_order = []
-
-        # Shuffle and concat
-        for tp_tier in players_by_tp:
-            random.shuffle(players_by_tp[tp_tier])
-            self.players_in_pairing_order.extend(players_by_tp[tp_tier])
-
-        # iterate through the micro-shuffled list and generate pairings
+        # iterate through the shuffled player list and generate pairings
         for p_idx, player in enumerate(self.players_in_pairing_order):
 
             if (player in self.unpaired_players) and (
@@ -76,25 +71,26 @@ class Matchmaker:
             ):
                 self.pairings.append(player_pair)
 
+        app.logger.debug("="*30)
+        app.logger.debug("[+] Pairings")
+        [app.logger.debug(pair) for pair in self.pairings]
+        exit()
+
         if self.bye:
-            app.logger.debug("{} has the bye".format(self.bye["user_id"]))
+            app.logger.debug("{} has the bye".format(self.bye["id"]))
         else:
             app.logger.debug("No bye.")
 
     def addPreviousOpponents(self, player):
 
         player["previous_opponents"] = []
+        
+        app.logger.debug("[+] Opponents of {}".format(player["id"]))
 
-        matches = self.match_history["data"]["Match"]
+        for previous_opponent in player["Matches"]:
+            player["previous_opponents"].append(previous_opponent["TournamentOpponent"]["id"])
 
-        for match in matches:
-            if player["user_id"] in [
-                match_player["user_id"] for match_player in match["Players"]
-            ]:
-                for match_player in match["Players"]:
-                    match_player["user_id"] == player["user_id"] or player[
-                        "previous_opponents"
-                    ].append(match_player["user_id"])
+        [app.logger.debug("  - {}".format(opponent)) for opponent in player["previous_opponents"]]
 
         return player
 
@@ -112,7 +108,7 @@ class Matchmaker:
             )
             app.logger.debug(
                 "{} playing {}".format(
-                    player["user_id"], self.players_in_pairing_order[player_index + 1]
+                    player["id"], self.players_in_pairing_order[player_index + 1]
                 )
             )
             return [player, self.players_in_pairing_order[player_index + 1]]
@@ -141,7 +137,7 @@ class Matchmaker:
         for pair in self.pairings:
             match_id = self.new_match_ids.pop()
             for player in pair:
-                success = createMatchPlayer(player["user_id"], match_id)
+                success = createMatchPlayer(player["id"], match_id)
                 if success:
                     self.populated_match_ids.append(match_id)
                 else:
@@ -153,7 +149,7 @@ class Matchmaker:
 
         if self.bye:
             bye_match_id = self.new_match_ids.pop()
-            success = createMatchPlayer(self.bye["user_id"], bye_match_id)
+            success = createMatchPlayer(self.bye["id"], bye_match_id)
             if success:
                 self.populated_match_ids.append(bye_match_id)
             else:
