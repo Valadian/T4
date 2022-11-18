@@ -2,8 +2,7 @@ actions:
   - name: NextRoundMatches
     definition:
       kind: synchronous
-      handler: 
-        from_env: HASURA_MATCHMAKER_URL
+      handler: {{HASURA_MATCHMAKER_URL}}
     permissions:
       - role: user
 custom_types:
