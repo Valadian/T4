@@ -5,6 +5,7 @@ import Query from "../../data/T4GraphContext";
 import { TournamentHomeContext } from "../../pages/tournaments/TournamentHome";
 import TournamentPlayerName from "./TournamentPlayerName";
 import TournamentColoredText from "./TournamentColoredText";
+import ptsToTp from "../../util/armada";
 
 const swapDoc = `
 mutation SwapPlayers($id1: uuid!, $match_id1: uuid!, $id2: uuid!, $match_id2: uuid!, $tournament_opponent_id1: uuid = null, $tournament_opponent_id2: uuid = null, $tournament_player_id1: uuid = null, $tournament_player_id2: uuid = null) {
