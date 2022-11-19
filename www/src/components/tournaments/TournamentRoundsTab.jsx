@@ -19,8 +19,8 @@ const insertDoc = `
 
 const deleteDoc = `
   mutation deleteRound($id: uuid!) {
-    delete_TournamentRound_by_pk(id: $id) {
-      id
+    update_TournamentRound(where: {id: {_eq: $id}}, _set: {deleted: true}) {
+      affected_rows
     }
   }
   `;
@@ -89,7 +89,7 @@ export default function TournamentRoundsTab(props) {
             updateTournament()
         });
     }
-    const generateRound = async (round_number) => {
+    const generateRound = async (round_number, no_delete) => {
       const accessToken = await getAccessTokenSilently();
       if (round_number === null) {
         round_number = roundNum;
@@ -99,6 +99,7 @@ export default function TournamentRoundsTab(props) {
       let vars = {
         tournament_id: tournament.id,
         round_num: round_number,
+        no_delete: no_delete,
       };
   
       Query("generateMatches", generateMatchesDoc, vars, accessToken)
@@ -176,7 +177,7 @@ export default function TournamentRoundsTab(props) {
                 let ReopenRoundButton = () => isOwner&&r.Matches.length>0&&r.finalized?<span className="form-group"><button className="btn btn-outline-secondary" onClick={() => setRoundLocked(r.id, false)}><i className="bi bi-trophy-fill"></i> Reopen Round</button></span>:<></>
                 let FinalizeRoundButton = () => isOwner&&r.Matches.length>0&&!r.finalized?<span className="form-group"><button className="btn btn-outline-warning" onClick={() => setRoundLocked(r.id, true)}><i className="bi bi-trophy-fill"></i> Finalize Round</button></span>:<></>
                 let FinalizePreviousWarningLabel = () =>(isOwner&&r.Matches.length===0&&tournament.Rounds.filter(or=>!or.finalized && or.round_num<r.round_num).length>0)?<h2 className="text-warning">Finalize Previous Rounds!</h2>:<></>
-                let GenerateMatchesButton = () => isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-success" onClick={() => generateRound(r.id,r.round_num===1)}><i className="bi bi-trophy-fill"></i> Generate Matches</button></span>:<></>
+                let GenerateMatchesButton = () => isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-success" onClick={() => generateRound(r.round_num,false)}><i className="bi bi-trophy-fill"></i> Generate Matches</button></span>:<></>
                 let DeleteRoundButton = () => isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-danger" onClick={() => deleteRound(r.id)}><i className="bi bi-x"></i> Delete Round</button></span>:<></>
                 
                 let SwapPlayersButton = () => isOwner&&r.Matches.length>0&&!r.finalized?<span className="form-group"><button className={"btn"+(swapping?" btn-warning text-dark swapping":" btn-outline-warning")} onClick={() => setSwapping(v => !v)} title="Swap Players"><i className="bi bi-arrow-left-right"></i></button></span>:<></>
@@ -241,7 +242,7 @@ export default function TournamentRoundsTab(props) {
                     <div className="form-group">
                       <button
                         className="btn btn-outline-success"
-                        onClick={() => generateRound(null)}
+                        onClick={() => generateRound(null, true)}
                       >
                     <i className="bi bi-plus"></i> Add Round</button></div>
                 </Tab>:<></>}

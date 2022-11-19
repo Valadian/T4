@@ -1,11 +1,18 @@
-import React, { useState, useEffect, useRef, createContext, useReducer, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  createContext,
+  useReducer,
+  useCallback,
+} from "react";
 import { Link, useParams } from "react-router-dom";
 import Query from "../../data/T4GraphContext";
 import "react-datepicker/dist/react-datepicker.css";
 import Ladder from "../../components/tournaments/TournamentLadder";
 import { useAuth0 } from "@auth0/auth0-react";
-import Toaster from "../../components/Toaster"
-import {Tabs, Tab} from 'react-bootstrap'
+import Toaster from "../../components/Toaster";
+import { Tabs, Tab } from "react-bootstrap";
 import TournamentAdminHeader from "../../components/tournaments/TournamentAdminHeader";
 import TournamentHeader from "../../components/tournaments/TournamentHeader";
 import TournamentRoundsTab from "../../components/tournaments/TournamentRoundsTab";
@@ -13,142 +20,9 @@ import TournamentResultSubmission from "../../components/tournaments/TournamentR
 import TournamentSignUp from "../../components/tournaments/TournamentSignUp"
 import getScoringConfig from "../../util/rulesets"
 
-// const tournamentByIdDoc = `
-//   query TournamentById($id: uuid) {
-//     Tournament(order_by: {start: desc}, where: {id: {_eq: $id}}) {
-//       id
-//       name
-//       description
-//       location
-//       start
-//       lists_visible
-//       lists_locked
-//       ladder_visible
-//       signups_open
-//       public
-//       Ladder_aggregate {
-//         aggregate {
-//           count
-//         }
-//       }
-//       Game {
-//         key
-//         value
-//       }
-//       ScoringRuleset {
-//         name
-//       }
-//       Creator {
-//         name
-//         id
-//       }
-//       Ladder {
-//         player_list_id
-//         rank
-//         player_name
-//         mov
-//         loss
-//         win
-//         tournament_points
-//         sos
-//         club
-//         group
-//         id
-//         tournament_id
-//         disqualified
-//         user_id
-//         User {
-//           id
-//           name
-//         }
-//         Matches(order_by: {Match: {Round: {round_num: asc}}}) {
-//           id
-//           confirmed
-//           points
-//           opp_points
-//           mov
-//           win
-//           draw
-//           tournament_points
-//           disqualified
-//           tournament_opponent_id
-//           TournamentOpponent {
-//             id
-//             player_name
-//             User {
-//               id
-//               name
-//             }
-//             Matches {
-//               tournament_points
-//               confirmed
-//               Match {
-//                 Round {
-//                   finalized
-//                 }
-//               }
-//             }
-//           }
-//           Match {
-//             table_num
-//             Round {
-//               round_num
-//               finalized
-//             }
-//           }
-//         }
-//       }
-//       Rounds(order_by: {round_num: asc}) {
-//         Matches(order_by: {table_num: asc}) {
-//             id
-//             table_num
-//             Players(order_by: {id: asc}) {
-//                 id
-//                 match_id
-//                 win
-//                 draw
-//                 tournament_points
-//                 points
-//                 opp_points
-//                 confirmed
-//                 player_name
-//                 mov
-//                 disqualified
-//                 User {
-//                     id
-//                     name
-//                 }
-//                 tournament_opponent_id
-//                 TournamentOpponent {
-//                     id
-//                     player_name
-//                     User {
-//                         id
-//                         name
-//                     }
-//                 }
-//                 tournament_player_id
-//                 TournamentPlayer {
-//                     id
-//                     player_name
-//                     User {
-//                         id
-//                         name
-//                     }
-//                 }
-//             }
-//         }
-//         id
-//         round_num
-//         description
-//         finalized
-//       }
-//     }
-//   }
-// `;
 const tournamentByIdDoc = `
   query TournamentById($id: uuid) {
-    Tournament(order_by: {start: desc}, where: {id: {_eq: $id}}) {
+    Tournament(order_by: { start: desc }, where: { id: { _eq: $id } }) {
       id
       name
       description
@@ -194,7 +68,10 @@ const tournamentByIdDoc = `
           id
           name
         }
-        Matches(order_by: {Match: {Round: {round_num: asc}}}) {
+        Matches(
+          order_by: { Match: { Round: { round_num: asc } } },
+          where: { deleted: { _eq: false } }
+        ) {
           id
           confirmed
           points
@@ -215,33 +92,32 @@ const tournamentByIdDoc = `
           }
         }
       }
-      Rounds(order_by: {round_num: asc}) {
-        Matches(order_by: {table_num: asc}) {
+      Rounds(order_by: { round_num: asc }, where: { deleted: { _eq: false } }) {
+        Matches(
+          order_by: { table_num: asc }
+          where: { deleted: { _eq: false } }
+        ) {
+          id
+          table_num
+          Players(order_by: { id: asc }, where: { deleted: { _eq: false } }) {
             id
-            table_num
-            round_id
-            Players(order_by: {id: asc}) {
-                id
-                match_id
-                win
-                draw
-                tournament_points
-                points
-                opp_points
-                confirmed
-                player_name
-                mov
-                disqualified
-                User {
-                    id
-                    name
-                }
-                Match {
-                    round_id
-                }
-                tournament_opponent_id
-                tournament_player_id
+            match_id
+            win
+            draw
+            tournament_points
+            points
+            opp_points
+            confirmed
+            player_name
+            mov
+            disqualified
+            User {
+              id
+              name
             }
+            tournament_opponent_id
+            tournament_player_id
+          }
         }
         id
         round_num
@@ -250,8 +126,8 @@ const tournamentByIdDoc = `
       }
     }
   }
-`;
-const TournamentHomeContext = createContext()
+  `;
+const TournamentHomeContext = createContext();
 
 function TournamentHome() {
     const { id } = useParams();
@@ -345,18 +221,19 @@ function TournamentHome() {
         }
         return tournament
     }
-    const ladderReducer = (state, action) => {
-        switch(action.type){
-            case 'live':
-                return bakeLadder(state, false)
-            case 'finalized':
-                return bakeLadder(state, true)
-            case 'reset':
-                bakeLadder(action.payload, finalizedOnly)
-                return action.payload
-            default:
-                throw new Error();
-        }
+    return tournament;
+  };
+  const ladderReducer = (state, action) => {
+    switch (action.type) {
+      case "live":
+        return bakeLadder(state, false);
+      case "finalized":
+        return bakeLadder(state, true);
+      case "reset":
+        bakeLadder(action.payload, finalizedOnly);
+        return action.payload;
+      default:
+        throw new Error();
     }
     const [tournament, dispatchTournament] = useReducer(ladderReducer, null);
     
@@ -371,28 +248,28 @@ function TournamentHome() {
         }
     },[tournament, user])
 
-    const queryTournament = useCallback(async () => {
-        var accessToken = undefined
-        if (user) {
-            accessToken = await getAccessTokenSilently()
+  const queryTournament = useCallback(async () => {
+    var accessToken = undefined;
+    if (user) {
+      accessToken = await getAccessTokenSilently();
+    }
+    await Query("TournamentById", tournamentByIdDoc, { id: id }, accessToken)
+      .then((response) => {
+        var tournament = null;
+        if (response && response.Tournament && response.Tournament.length > 0) {
+          tournament = response.Tournament[0];
+          tournament.start = Date.parse(tournament.start);
+          dispatchTournament({ type: "reset", payload: tournament });
         }
-        await Query("TournamentById", tournamentByIdDoc, { id: id },accessToken)
-        .then((response) => {
-            var tournament = null;
-            if (response && response.Tournament && response.Tournament.length > 0) {
-                tournament = response.Tournament[0];
-                tournament.start = Date.parse(tournament.start);
-                dispatchTournament({type: 'reset', payload: tournament})
-            }
-        })
-        .catch((error) => {
-            toaster.current.ShowError(error);
-        });
-    },[id, getAccessTokenSilently, user])
+      })
+      .catch((error) => {
+        toaster.current.ShowError(error);
+      });
+  }, [id, getAccessTokenSilently, user]);
 
-    useEffect(() => {
-        queryTournament();
-    },[id, queryTournament])
+  useEffect(() => {
+    queryTournament();
+  }, [id, queryTournament]);
 
     const updateTournament = () => {
         queryTournament();
@@ -433,50 +310,107 @@ function TournamentHome() {
             // rebakeLadder
         }
 
-        //var round_count = matches.map(m => m.)
-        return (
-            <TournamentHomeContext.Provider value={context}>
-                {breadcrumbs()}
-                {isOwner && !tournament.public?<>
-                    <h2 className="text-warning">This event is a Draft and hidden</h2>
-                    <p className="text-muted">Click <b>Draft</b> toggle below to make public</p>
-                </>:<></>}
-                <Toaster ref={toaster} />
-                {isOwner?<TournamentAdminHeader/>:<TournamentHeader/>}
-                {(isOwner && tournament.signups_open && tournament.Rounds.length>0 && tournament.Rounds[0].Matches.length>0) ?<h2 className="text-warning">Round 1 matchups generated but sign ups remain open (Disable above)</h2>:<></>}
-                <Tabs
-                    activeKey={activeTab}
-                    onSelect={setActiveTab}
-                    defaultActiveKey="ladder"
-                    id="uncontrolled-tab-example"
-                    className="mb-3"
-                    // fill
-                >
-                    <Tab eventKey="ladder" title={<span><i className="bi bi-list-ol"></i> Ladder</span>}>
-                        {!tournament.ladder_visible?<h3 className="text-warning"><i className="bi bi-lock-fill"></i> Ladder is Hidden</h3>:<></>}
-                        {tournament.ladder_visible || isOwner?<Ladder />:<></>}
-                    </Tab>
-                    <Tab eventKey="rounds" title={<span><i className="bi bi-play-circle-fill"></i> Rounds</span>}>
-                        <TournamentRoundsTab />
-                    </Tab>
-                    {/* <Tab eventKey="log" title={<span><i className="bi bi-journals"></i> <span className="d-none d-md-inline">Event </span>Logs</span>}>
+    //var round_count = matches.map(m => m.)
+    return (
+      <TournamentHomeContext.Provider value={context}>
+        {breadcrumbs()}
+        {isOwner && !tournament.public ? (
+          <>
+            <h2 className="text-warning">This event is a Draft and hidden</h2>
+            <p className="text-muted">
+              Click <b>Draft</b> toggle below to make public
+            </p>
+          </>
+        ) : (
+          <></>
+        )}
+        <Toaster ref={toaster} />
+        {isOwner ? <TournamentAdminHeader /> : <TournamentHeader />}
+        {isOwner &&
+        tournament.signups_open &&
+        tournament.Rounds.length > 0 &&
+        tournament.Rounds[0].Matches.length > 0 ? (
+          <h2 className="text-warning">
+            Round 1 matchups generated but sign ups remain open (Disable above)
+          </h2>
+        ) : (
+          <></>
+        )}
+        <Tabs
+          activeKey={activeTab}
+          onSelect={setActiveTab}
+          defaultActiveKey="ladder"
+          id="uncontrolled-tab-example"
+          className="mb-3"
+          // fill
+        >
+          <Tab
+            eventKey="ladder"
+            title={
+              <span>
+                <i className="bi bi-list-ol"></i> Ladder
+              </span>
+            }
+          >
+            {!tournament.ladder_visible ? (
+              <h3 className="text-warning">
+                <i className="bi bi-lock-fill"></i> Ladder is Hidden
+              </h3>
+            ) : (
+              <></>
+            )}
+            {tournament.ladder_visible || isOwner ? <Ladder /> : <></>}
+          </Tab>
+          <Tab
+            eventKey="rounds"
+            title={
+              <span>
+                <i className="bi bi-play-circle-fill"></i> Rounds
+              </span>
+            }
+          >
+            <TournamentRoundsTab />
+          </Tab>
+          {/* <Tab eventKey="log" title={<span><i className="bi bi-journals"></i> <span className="d-none d-md-inline">Event </span>Logs</span>}>
                     </Tab> */}
-                    {isParticipant?<Tab eventKey="submit" title={<span><i className="bi bi-trophy-fill"></i> My Scores</span>}>
-                        <TournamentResultSubmission />
-                    </Tab>:<></>}
-                    {showSignUpTab?<Tab eventKey="signup" title={<span><i className="bi bi-person-plus-fill"></i> Sign Up</span>}>
-                        <TournamentSignUp />
-                    </Tab>:<></>}
-                </Tabs>
-            </TournamentHomeContext.Provider>
-        );
-    } else {
-        return (
-            <>
-            {breadcrumbs()}
-            <div>Loading...</div>
-            </>
-        );
-    }
+          {isParticipant ? (
+            <Tab
+              eventKey="submit"
+              title={
+                <span>
+                  <i className="bi bi-trophy-fill"></i> My Scores
+                </span>
+              }
+            >
+              <TournamentResultSubmission />
+            </Tab>
+          ) : (
+            <></>
+          )}
+          {showSignUpTab ? (
+            <Tab
+              eventKey="signup"
+              title={
+                <span>
+                  <i className="bi bi-person-plus-fill"></i> Sign Up
+                </span>
+              }
+            >
+              <TournamentSignUp />
+            </Tab>
+          ) : (
+            <></>
+          )}
+        </Tabs>
+      </TournamentHomeContext.Provider>
+    );
+  } else {
+    return (
+      <>
+        {breadcrumbs()}
+        <div>Loading...</div>
+      </>
+    );
+  }
 }
-export {TournamentHome, TournamentHomeContext}
+export { TournamentHome, TournamentHomeContext };

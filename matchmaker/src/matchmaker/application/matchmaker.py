@@ -79,9 +79,10 @@ class Matchmaker:
         self.to_delete = []
 
         for round in self.match_history["Rounds"]:
-            if round["round_num"] < this_round:
+            if int(round["round_num"]) < this_round:
                 pass
             else:
+                app.logger.debug("Deleting round {}".format(this_round))
                 self.to_delete.append(round)
 
         success = QueryContext.deleteRounds(self.to_delete)
