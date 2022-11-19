@@ -22,7 +22,7 @@ import getScoringConfig from "../../util/rulesets"
 
 const tournamentByIdDoc = `
   query TournamentById($id: uuid) {
-    Tournament(order_by: { start: desc }, where: { id: { _eq: $id } }) {
+    Tournament(order_by: {start: desc}, where: {id: {_eq: $id}}) {
       id
       name
       description
@@ -68,10 +68,7 @@ const tournamentByIdDoc = `
           id
           name
         }
-        Matches(
-          order_by: { Match: { Round: { round_num: asc } } },
-          where: { deleted: { _eq: false } }
-        ) {
+        Matches(order_by: {Match: {Round: {round_num: asc}}}) {
           id
           confirmed
           points
@@ -92,32 +89,33 @@ const tournamentByIdDoc = `
           }
         }
       }
-      Rounds(order_by: { round_num: asc }, where: { deleted: { _eq: false } }) {
-        Matches(
-          order_by: { table_num: asc }
-          where: { deleted: { _eq: false } }
-        ) {
-          id
-          table_num
-          Players(order_by: { id: asc }, where: { deleted: { _eq: false } }) {
+      Rounds(order_by: {round_num: asc}) {
+        Matches(order_by: {table_num: asc}) {
             id
-            match_id
-            win
-            draw
-            tournament_points
-            points
-            opp_points
-            confirmed
-            player_name
-            mov
-            disqualified
-            User {
-              id
-              name
+            table_num
+            round_id
+            Players(order_by: {id: asc}) {
+                id
+                match_id
+                win
+                draw
+                tournament_points
+                points
+                opp_points
+                confirmed
+                player_name
+                mov
+                disqualified
+                User {
+                    id
+                    name
+                }
+                Match {
+                    round_id
+                }
+                tournament_opponent_id
+                tournament_player_id
             }
-            tournament_opponent_id
-            tournament_player_id
-          }
         }
         id
         round_num
@@ -126,7 +124,7 @@ const tournamentByIdDoc = `
       }
     }
   }
-  `;
+`;
 const TournamentHomeContext = createContext();
 
 function TournamentHome() {
