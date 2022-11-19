@@ -153,6 +153,8 @@ import getScoringConfig from "../../util/rulesets"
 //     }
 //   }
 // `;
+
+//TODO: Fix this for deleted flag again
 const tournamentByIdDoc = `
   query TournamentById($id: uuid) {
     Tournament(order_by: { start: desc }, where: { id: { _eq: $id } }) {
