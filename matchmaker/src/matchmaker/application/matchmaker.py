@@ -1,25 +1,52 @@
 from operator import itemgetter
-from .QueryContext import createMatches, createMatchPlayers, getMatchHistory
+from application import QueryContext
 import random
 
 from flask import current_app as app
 
 
 class Matchmaker:
-    def __init__(self, tournament_id):
+    """
+    Makes player matchups for T4.
+
+    To generate pairings, query with:
+
+        mutation nextRoundMatches($tournament_id: uuid!, $round_num: numeric = 0, $no_delete: Boolean = false) {
+            NextRoundMatches(tournament_id: $tournament_id, round_num: $round_num, no_delete: $no_delete) {
+                match_ids
+            }
+        }
+
+    The simplest way to use it, and in most cases what you want, is to
+    generate the next round's pairings.  For this case, query with
+    just the $tournament_id.
+
+    To generate pairings for an arbitrary round AND DELETE ALL
+    SUBSEQUENT ONES, query with $tournament_id and $round_num of the
+    round you want to generate.  If round_num exists, it will be
+    deleted and regenerated.
+    """
+
+    def __init__(self, tournament_id, round_num=False, no_delete=False):
 
         self.tournament_id = tournament_id
-        self.match_history = getMatchHistory(self.tournament_id)["data"]["Tournament"][
-            0
-        ]
+        self.match_history = QueryContext.getMatchHistory(self.tournament_id)["data"][
+            "Tournament"
+        ][0]
 
-        # rounds_completed = [
-        #     match["Round"]["round_num"] for match in self.match_history["data"]["Match"]
-        # ]
-        rounds_completed = self.match_history["Rounds_aggregate"]["aggregate"]["max"][
-            "round_num"
-        ]
-        self.round = int(rounds_completed) + 1 if rounds_completed else 1
+        if round_num and not no_delete:
+            self.round = int(round_num)
+            success = self.deleteRoundsAtOrAfter(self.round)
+            self.match_history = QueryContext.getMatchHistory(self.tournament_id)[
+                "data"
+            ]["Tournament"][0]
+
+        elif rounds_completed := self.match_history["Rounds_aggregate"]["aggregate"][
+            "max"
+        ]["round_num"]:
+            self.round = int(rounds_completed) + 1
+        else:
+            self.round = 1
 
         try:
             app.logger.debug("=" * 30)
@@ -43,6 +70,22 @@ class Matchmaker:
 
         self.pairings = []
         self.bye = None
+
+    def deleteRoundsAtOrAfter(self, this_round):
+        """Delete any round with a higher round_num than this_round,
+        including all matches and match_players."""
+
+        app.logger.debug("deleting some shit here")
+        self.to_delete = []
+
+        for round in self.match_history["Rounds"]:
+            if round["round_num"] < this_round:
+                pass
+            else:
+                self.to_delete.append(round)
+
+        success = QueryContext.deleteRounds(self.to_delete)
+        return success
 
     def generatePairings(self):
 
@@ -104,8 +147,8 @@ class Matchmaker:
         return player
 
     def matchmakePlayer(self, player, player_index):
-        """Recurse through the pairings order until we find the first player
-        this player hasn't played against before, then pair them."""
+        """Recurse through the pairings order until we find the first
+        player this player hasn't played against before, then pair them."""
 
         if (
             self.players_in_pairing_order[player_index + 1]
@@ -134,7 +177,9 @@ class Matchmaker:
         if self.bye:
             match_count += 1
 
-        new_matches = createMatches(self.tournament_id, self.round, match_count)
+        new_matches = QueryContext.createMatches(
+            self.tournament_id, self.round, match_count
+        )
 
         self.new_match_ids = [
             match["id"] for match in new_matches["data"]["insert_Match"]["returning"]
@@ -145,7 +190,7 @@ class Matchmaker:
 
         for pair in self.pairings:
             match_id = self.new_match_ids.pop()
-            success = createMatchPlayers(pair, match_id)
+            success = QueryContext.createMatchPlayers(pair, match_id)
             if success:
                 self.populated_match_ids.append(match_id)
             else:
@@ -157,7 +202,7 @@ class Matchmaker:
 
         if self.bye:
             bye_match_id = self.new_match_ids.pop()
-            success = createMatchPlayers((self.bye, "bye"), bye_match_id)
+            success = QueryContext.createMatchPlayers((self.bye, "bye"), bye_match_id)
             if success:
                 self.populated_match_ids.append(bye_match_id)
             else:

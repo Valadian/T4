@@ -1,5 +1,5 @@
 from dataclasses import dataclass, asdict
-from typing import Optional
+from typing import Optional, List
 import json
 
 
@@ -16,7 +16,7 @@ class RequestMixin:
 
 @dataclass
 class NextRoundMatchesOutput(RequestMixin):
-    match_ids: list[str]
+    match_ids: List[str]
 
 
 @dataclass
@@ -27,3 +27,5 @@ class Mutation(RequestMixin):
 @dataclass
 class NextRoundMatchesArgs(RequestMixin):
     tournament_id: Optional[any]
+    round_num: Optional[any]
+    no_delete: Optional[bool]
