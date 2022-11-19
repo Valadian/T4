@@ -33,8 +33,8 @@ mutation updateMatchPlayer($id: uuid!, $points: Int!, $opp_points: Int!, $tourna
 }`;
 const deleteDoc = `
 mutation deleteMatch($id: uuid!) {
-    delete_Match_by_pk(id: $id) {
-        id
+    update_Match(where: {id: {_eq: $id}}, _set: {deleted: true}) {
+      affected_rows
     }
 }`;
 const assignDoc = `
