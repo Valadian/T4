@@ -185,12 +185,22 @@ def createMatchPlayers(pair, match_id):
         vars = {
             "tournament_player_id": pair[0]["id"],
             "player_name": pair[0]["player_name"],
+            "tournament_opponent_id": None,
             "match_id": match_id,
         }
         response = Query(operation_name, create_match_player_doc, vars)
-        success = not bool("errors" in response.keys())
+        success_a = not bool("errors" in response.keys())
 
-        return success
+        vars = {
+            "tournament_player_id": None,
+            "player_name": "BYE",
+            "tournament_opponent_id": pair[0]["id"],
+            "match_id": match_id,
+        }
+        response = Query(operation_name, create_match_player_doc, vars)
+        success_b = not bool("errors" in response.keys())
+
+        return success_a and success_b
 
     vars = {
         "tournament_player_id": pair[0]["id"],
