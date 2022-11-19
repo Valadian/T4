@@ -1,8 +1,8 @@
-import React, {useContext, useState, useEffect} from "react"
+import React, { useContext, useState, useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
 import { useAuth0 } from "@auth0/auth0-react";
 import Query from "../../data/T4GraphContext";
-import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
+import { TournamentHomeContext } from "../../pages/tournaments/TournamentHome";
 import TournamentPlayerName from "./TournamentPlayerName";
 import TournamentColoredText from "./TournamentColoredText";
 
@@ -23,19 +23,22 @@ mutation SwapPlayers($id1: uuid!, $match_id1: uuid!, $id2: uuid!, $match_id2: uu
         id
     }
 }
-`
+`;
+
 const updateDoc = `
 mutation updateMatchPlayer($id: uuid!, $points: Int!, $opp_points: Int!, $tournament_points: Int!, $win: Boolean = null, $draw: Boolean = null, $mov: numeric = 0) {
     update_MatchPlayer_by_pk(pk_columns: {id: $id}, _set: {points: $points, opp_points: $opp_points, tournament_points: $tournament_points, win: $win, draw: $draw, mov: $mov}) {
         id
     }
-}` 
+}`;
+
 const deleteDoc = `
 mutation deleteMatch($id: uuid!) {
     delete_Match_by_pk(id: $id) {
         id
     }
-}`
+}`;
+
 const assignDoc = `
 mutation AssignPlayer($ladder_name: String = null, $ladder_user_id: String = null, $id: uuid!, $match_id: uuid!, $tournament_player_id: uuid!) {
     update1: update_MatchPlayer(where: {match_id: {_eq: $match_id}, id: {_neq: $id}}, _set: {tournament_opponent_id: $tournament_player_id}) {
@@ -45,7 +48,8 @@ mutation AssignPlayer($ladder_name: String = null, $ladder_user_id: String = nul
     update2: update_MatchPlayer_by_pk(pk_columns: {id: $id}, _set: {player_name: $ladder_name, user_id: $ladder_user_id, tournament_player_id: $tournament_player_id}) {
         id
     }
-}`
+}`;
+
 const withdrawDoc = `
 mutation WithdrawPlayer($id: uuid!, $disqualified: Boolean = true) {
     update_MatchPlayer_by_pk(pk_columns: {id: $id}, _set: {disqualified: $disqualified, tournament_points: 0, mov: 0, win: false}) {
@@ -310,8 +314,52 @@ export default function TournamentMatch({ match, round, swapping, setSwapping, s
                     {PlayerColumns({player:player2,opponent:player1,playerPts:player2Pts,setPlayerPts:setPlayer2Pts, getPlayerWin:() => !player1Win,setPlayerWin:(v) => setPlayer1Win(!v),playersDraw:playersDraw,setPlayersDraw:(v) => {if(v){setPlayer1Win(false)};setPlayersDraw(v)}})}
                 </Row>
             </Col>
-            <Col className="col-1 p-0">
-                {editing?
+            <Col
+              xs={5}
+              sm={3}
+              md={3}
+              lg={2}
+              className={
+                "pb-3 paddedLikeInput" +
+                MatchPlayerBg(player2) +
+                (player2.disqualified ? " withdrawn" : "") +
+                (editing ? " ps-0" : "")
+              }
+            >
+              {editing ? (
+                <div className="input-group">
+                  <input
+                    className="form-control"
+                    value={player2Pts}
+                    onFocus={(event) => event.target.select()}
+                    onChange={(evt) => setPlayer2Pts(evt.target.value)}
+                  ></input>
+                  <button
+                    className={
+                      "btn btn-sm " +
+                      (player1Win ? "btn-outline-secondary" : "btn-warning")
+                    }
+                    type="button"
+                    onClick={() => setPlayer1Win(false)}
+                  >
+                    <i className="bi bi-trophy-fill" title="win"></i>
+                  </button>
+                  <button
+                    className={
+                      "btn btn-sm " +
+                      (player2.disqualified
+                        ? "btn-danger"
+                        : "btn-outline-danger")
+                    }
+                    type="button"
+                    onClick={() =>
+                      disqualify(player2.id, !player2.disqualified)
+                    }
+                  >
+                    <i className="bi bi-slash-circle" title="disqualify"></i>
+                  </button>
+                </div>
+              ) : (
                 <>
                     <button tabIndex="-1" className="btn btn-outline-primary" onClick={cancel} title="Cancel Edit"><i className="bi bi-pen"></i></button>
                     <button className="btn btn-outline-success" onClick={() => save(player1Pts,player2Pts,player1Win,playersDraw)} title="Save Scores"><i className="bi bi-check-square"></i></button>
@@ -321,8 +369,26 @@ export default function TournamentMatch({ match, round, swapping, setSwapping, s
                 !round.finalized?
                     <button className="btn btn-outline-primary" onClick={edit} title="Edit Scores"><i className="bi bi-pen"></i></button>:
                     <></>
-                }
-                
+                  )}
+                </>
+              )}
+            </Col>
+            <Col
+              xs={2}
+              sm={2}
+              md={3}
+              lg={1}
+              className={
+                "pb-3 paddedLikeInput" +
+                MatchPlayerBg(player2) +
+                (player2.disqualified ? " withdrawn" : "")
+              }
+            >
+              <TournamentColoredText
+                value={player2?.tournament_points}
+                min={1}
+                max={10}
+              />
             </Col>
 
         </Row>

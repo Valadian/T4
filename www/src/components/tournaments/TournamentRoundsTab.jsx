@@ -5,7 +5,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import TournamentMatch from "./TournamentMatch";
 import { TournamentHomeContext } from "../../pages/tournaments/TournamentHome";
 import TournamentPlayerName from "./TournamentPlayerName";
-import generatePairings from "../../util/swiss";
+// import generatePairings from "../../util/swiss";
 
 const insertDoc = `
   mutation addNewRound($tournament_id: uuid!, $round_num: numeric!, $description: String!) {
@@ -42,8 +42,8 @@ const addMatchDoc = `
   `;
 
 const generateMatchesDoc = `
-  mutation generateMatches($tournament_id: uuid!) {
-    NextRoundMatches(tournament_id: $tournament_id) {
+  mutation generateMatches($tournament_id: uuid!, $round_num: numeric = 0, $no_delete: Boolean = false) {
+    NextRoundMatches(tournament_id: $tournament_id, round_num: $round_num, no_delete: $no_delete) {
       match_ids
     }
   }
@@ -89,12 +89,23 @@ export default function TournamentRoundsTab(props) {
             updateTournament()
         });
     }
-    const generateRound = async (id, firstRound) => {
+    const generateRound = async (round_number) => {
       const accessToken = await getAccessTokenSilently();
-      let vars = { tournament_id: tournament.id };
-      Query("generateMatches", generateMatchesDoc, vars, accessToken).then(() => {
-        updateTournament();
-      });
+      if (round_number === null) {
+        round_number = roundNum;
+      } else {
+        round_number = 1;
+      }
+      let vars = {
+        tournament_id: tournament.id,
+        round_num: round_number,
+      };
+  
+      Query("generateMatches", generateMatchesDoc, vars, accessToken)
+        .then(() => {
+          updateTournament();
+        })
+        .then(() => setActiveTab("round_" + roundNum));
     };
     const setRoundLocked = async (round_id, finalized) => {
         const accessToken = await getAccessTokenSilently()
@@ -227,7 +238,12 @@ export default function TournamentRoundsTab(props) {
                         <label htmlFor="roundDesc">Round Description</label>
                         <input className="form-control" placeholder="Enter Round Description (optional)"  value={roundDesc} onChange={(e) => setRoundDesc(e.target.value)}/>
                     </div>
-                    <div className="form-group"><button className="btn btn-outline-success" onClick={addRound}><i className="bi bi-plus"></i> Add Round</button></div>
+                    <div className="form-group">
+                      <button
+                        className="btn btn-outline-success"
+                        onClick={() => generateRound(null)}
+                      >
+                    <i className="bi bi-plus"></i> Add Round</button></div>
                 </Tab>:<></>}
             </Tabs>
         </>
