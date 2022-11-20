@@ -100,6 +100,9 @@ const getScoringConfig = (game, scoringRulesetName) =>{
     if(game==="STAR_WARS_ARMADA" && scoringRulesetName==="400pt Standard"){
         return ArmadaStandardTournamentRuleset
     }
+    if(game==="STAR_WARS_ARMADA" && scoringRulesetName==="Star Wars Armdada - 400pt Standard"){
+        return ArmadaStandardTournamentRuleset
+    }
     if(game==="STAR_WARS_LEGION" && scoringRulesetName==="800pt Battle Points"){
         return LegionBattlePoints
     }
