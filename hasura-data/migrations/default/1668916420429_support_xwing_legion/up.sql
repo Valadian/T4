@@ -4,6 +4,7 @@ alter table "public"."MatchPlayer" add column "draw" boolean
  null;
 
 INSERT INTO "public"."Game"("value", "key") VALUES (E'Star Wars: X-Wing', E'STAR_WARS_XWING');
+INSERT INTO "public"."Game"("value", "key") VALUES (E'Star Wars: Legion', E'STAR_WARS_LEGION');
 
 INSERT INTO "public"."ScoringRuleset"("id", "name", "game") VALUES (E'22ca1085-2ac0-441a-a1eb-8d51effed2fd', E'800pt Battle Points', E'STAR_WARS_LEGION');
 
