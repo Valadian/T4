@@ -25,14 +25,16 @@ def Query(operation_name, operation_doc, variables):
     return r.json()
 
 
-def getMatchHistory(tourney_id):
+def getTournamentData(tourney_id):
 
-    operation_name = "getMatchHistory"
+    operation_name = "getTournamentData"
     vars = {"tournament_id": str(tourney_id)}
 
-    get_match_history_doc = """
-        query getMatchHistory($tournament_id: uuid = "") {
+    get_tournament_data_doc = """
+        query getTournamentData($tournament_id: uuid = "") {
             Tournament(where: {id: {_eq: $tournament_id}, deleted: {_eq: false}}) {
+                game
+                scoring_ruleset_id
                 Ladder {
                     id
                     player_name
@@ -66,7 +68,7 @@ def getMatchHistory(tourney_id):
         }
     """
 
-    match_history = Query(operation_name, get_match_history_doc, vars)
+    match_history = Query(operation_name, get_tournament_data_doc, vars)
 
     return match_history
 

@@ -30,18 +30,18 @@ class Matchmaker:
     def __init__(self, tournament_id, round_num=False, no_delete=False):
 
         self.tournament_id = tournament_id
-        self.match_history = QueryContext.getMatchHistory(self.tournament_id)["data"][
-            "Tournament"
-        ][0]
+        self.tournament_data = QueryContext.getTournamentData(self.tournament_id)[
+            "data"
+        ]["Tournament"][0]
 
         if round_num and not no_delete:
             self.round = int(round_num)
             success = self.deleteRoundsAtOrAfter(self.round)
-            self.match_history = QueryContext.getMatchHistory(self.tournament_id)[
+            self.tournament_data = QueryContext.getTournamentData(self.tournament_id)[
                 "data"
             ]["Tournament"][0]
 
-        elif rounds_completed := self.match_history["Rounds_aggregate"]["aggregate"][
+        elif rounds_completed := self.tournament_data["Rounds_aggregate"]["aggregate"][
             "max"
         ]["round_num"]:
             self.round = int(rounds_completed) + 1
@@ -52,7 +52,7 @@ class Matchmaker:
             app.logger.debug("=" * 30)
             app.logger.debug("Generating Round {}...".format(self.round))
             app.logger.debug("=" * 30)
-            self.players = self.match_history["Ladder"]
+            self.players = self.tournament_data["Ladder"]
             app.logger.debug("  Player list:")
             [app.logger.debug(p) for p in self.players]
         except KeyError:
@@ -65,6 +65,7 @@ class Matchmaker:
             self.players = False
             self.pairings = False
             return
+
         random.shuffle(self.players)
         self.unpaired_players = self.players
 
@@ -78,7 +79,7 @@ class Matchmaker:
         app.logger.debug("deleting some shit here")
         self.to_delete = []
 
-        for round in self.match_history["Rounds"]:
+        for round in self.tournament_data["Rounds"]:
             if int(round["round_num"]) < this_round:
                 pass
             else:

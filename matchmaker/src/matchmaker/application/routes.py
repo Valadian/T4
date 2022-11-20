@@ -1,5 +1,6 @@
 from .NextRoundMatchesTypes import NextRoundMatchesArgs, NextRoundMatchesOutput
 from .matchmaker import Matchmaker
+from application.QueryContext import getTournamentData
 from flask import request, current_app as app
 
 
@@ -7,6 +8,20 @@ from flask import request, current_app as app
 def NextRoundMatchesHandler():
     args = NextRoundMatchesArgs.from_request(request.get_json())
     app.logger.debug(args)
+    game = str(
+        getTournamentData(args.tournament_id)["data"]["Tournament"][0]["game"]
+    ).upper()
+    app.logger.debug(game)
+    exit()
+
+    match game:
+        case "STAR_WARS_ARMADA":
+            print(3)
+        case "XWING_MINIA":
+            print(4)
+        case "LEGION":
+            print(5)
+
     mm = Matchmaker(args.tournament_id, args.round_num, args.no_delete)
     mm.generatePairings()
     if not mm.pairings:
