@@ -134,13 +134,13 @@ async function generatePairings(tournament_id, round_id, accessToken, updateTour
                     params['user2_id'] = p2.user_id
                     params['tournament_user_id2'] = p2.id
                 } else {
-                    params['player1_points'] = 140
-                    params['player1_mov'] = 140
-                    params['player1_tp'] = 8
+                    params['player1_points'] = config.BUY_POINTS
+                    params['player1_mov'] = config.BUY_POINTS
+                    params['player1_tp'] = config.BUY_TPS
                     params['player1_win'] = true
                     params['player2_points'] = 0
                     params['player2_mov'] = 0
-                    params['player2_tp'] = 3
+                    params['player2_tp'] = config.BUY_OPP_TPS
                     params['player2_win'] = false
                 }
                 Query("InsertMatch", insertMatchDoc, params ,accessToken)
