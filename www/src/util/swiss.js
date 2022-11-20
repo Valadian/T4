@@ -109,7 +109,7 @@ async function generatePairings(tournament_id, round_id, accessToken, updateTour
     .then((response) => {
         if (response && response.TournamentPlayer){
             //Currently all implemented systems use tournament_points only for pairing
-            let config = getScoringConfig(response.Tournament?.Game?.key,response.Tournament?.ScoringRuleset?.name)
+            let config = getScoringConfig(response.Tournament[0]?.Game?.key,response.Tournament[0]?.ScoringRuleset?.name)
             let players = response.TournamentPlayer
             let matches;
             let playerMap;
