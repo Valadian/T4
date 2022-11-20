@@ -35,7 +35,7 @@ mutation UpdateNameTournamentPlayer($id: uuid = "", $player_name: String = null,
   }
 }`
 export default function TournamentPlayerSummary(props) {
-    const {updateTournament, isOwner, tournament} = useContext(TournamentHomeContext);
+    const {updateTournament, isOwner, tournament, config} = useContext(TournamentHomeContext);
     const { getAccessTokenSilently } = useAuth0();
     const [nameUpdate, setNameUpdate] = useState(props.player.player_name);
     const [clubUpdate, setClubUpdate] = useState(props.player.club);
@@ -87,15 +87,15 @@ export default function TournamentPlayerSummary(props) {
     }
     const TournamentPlayerMatchSummaryRows = (props)=>{
       let m = props.match
-      let state = m.TournamentOpponent?(m.win===null?"PENDING":(m.win?"WIN":(m.disqualified?"DQ":"LOSS"))):(m.win===false?"D/Q":"BYE")
+      let state = m.TournamentOpponent?(m.win===null?"PENDING":(m.win?"WIN":(m.disqualified?"DQ":(m.draw?"DRAW":"LOSS")))):(m.win===false?"D/Q":"BYE")
       let oppname = m.TournamentOpponent?(m.TournamentOpponent.player_name??m.TournamentOpponent.User?.name):""
 
       return (<>
         <Col xs={1}></Col>
         <Col xs={5} md={4}>&nbsp;- R{m.Match.Round.round_num} vs {oppname}</Col>
-        <Col xs={2} md={1} className={state==="PENDING"?"text-warning":(m.win?"text-info2":"text-danger")}>{state}</Col>
-        <Col xs={1}><TournamentColoredText value={m.tournament_points} min={1} max={10}/></Col>
-        <Col xs={3} md={2}>{m.points!==null&&m.opp_points!==null?<span>(<TournamentColoredText value={m.points} min={0} max={400}/>:<TournamentColoredText value={m.opp_points} min={0} max={400}/>)</span>:<></>}</Col>
+        <Col xs={2} md={1} className={state==="PENDING"?"text-warning":(m.win?"text-info2":(m.draw?"text-muted":"text-danger"))}>{state}</Col>
+        <Col xs={1}><TournamentColoredText value={m.tournament_points} min={config.MIN_TPS} max={config.MAX_TPS}/></Col>
+        <Col xs={3} md={2}>{m.points!==null&&m.opp_points!==null?<span>(<TournamentColoredText value={m.points} min={0} max={config.MAX_POINTS}/>:<TournamentColoredText value={m.opp_points} min={0} max={config.MAX_POINTS}/>)</span>:<></>}</Col>
         <Col xs={3} className="d-none d-md-flex"></Col>
       </>)
     }
@@ -106,10 +106,10 @@ export default function TournamentPlayerSummary(props) {
     let max_sos = tournament?.Ladder?.map(l => l.sos).reduce((a,b)=>Math.max(a,b),0)
     let min_sos = tournament?.Ladder?.map(l => l.sos).reduce((a,b)=>Math.min(a,b),10)
     return (
-      <>
+      <div>
       <Row onClick={() => setExpanded(v => !v)} className={"collapsible"+(expanded?" active":"")+(props.player.disqualified?" withdrawn":"")} >{/* "accordion-row"+  data-bs-toggle="collapse" data-bs-target={"#TP"+props.player.id.replaceAll("-","")} */}
-        <Col className="col-1">{props.player.rank}</Col>
-        <Col className="col-5 col-md-4" title={TournamentPlayerMatchSummary(props.player)}>
+        <Col xs={1}>{props.player.rank}</Col>
+        <Col xs={11} md={4} title={TournamentPlayerMatchSummary(props.player)}>
           {props.editPlayerNames?
           <FloatingLabel
             controlId="nameOverride"
@@ -126,39 +126,55 @@ export default function TournamentPlayerSummary(props) {
             />
           </FloatingLabel>:<TournamentPlayerName player={props.player} />}
         </Col>
-        <Col className="col-2 col-md-1"><span className={props.player.win>0?"text-info2":""}>{props.player.win}</span><span className="d-none d-md-inline"> </span>/<span className="d-none d-md-inline"> </span><span className={props.player.loss>0?"text-danger":""}>{props.player.loss}</span></Col>
-        <Col className="col-1"><TournamentColoredText value={props.player.tournament_points} min={min_tp} max={max_tp}/></Col>
-        <Col className="col-1 col-md-2"><TournamentColoredText value={props.player.mov} min={min_mov} max={max_mov}/><span className="d-none d-md-inline"> / <TournamentColoredText value={props.player.sos.toFixed(2)} min={min_sos} max={max_sos}/></span></Col>
-        <Col className="col-2 col-md-3 d-flex"><span className="me-auto"><span className="d-none d-md-block">
-          {props.editPlayerNames?
-          <FloatingLabel
-            controlId="nameOverride"
-            label={props.player.club}
-          >
-            <Form.Control
-              type="text"
-              placeholder="f"
-              required
-              onChange={(event) => setClubUpdate(event.target.value)}
-              onClick={stopPropagation}
-              value={clubUpdate}
-              autoFocus
-            />
-          </FloatingLabel>:props.player.club}
-        </span></span>
+        <Col xs={1} className="d-md-none"></Col>
+        <Col xs={2} md={1}>
+          <span className={props.player.win>0?"text-info2":""}>{props.player.win}</span><span className="d-none d-md-inline"> </span>/
+          {config.CAN_DRAW?<><span className="d-none d-md-inline"> </span><span className={props.player.draw>0?"text-muted":""}>{props.player.draw}</span><span className="d-none d-md-inline"> </span>/</>:<></>}
+          <span className="d-none d-md-inline"> </span><span className={props.player.loss>0?"text-danger":""}>{props.player.loss}</span></Col>
+        <Col xs={4} md={2}>
+          {(config.LADDER_COLS[0][1].includes("tournament_points"))?<TournamentColoredText value={props.player.tournament_points} min={min_tp} max={max_tp}/>:<></>}
+          {(config.LADDER_COLS[0][1].includes("mov"))?<TournamentColoredText value={props.player.mov.toFixed(2)} min={min_mov} max={max_mov}/>:<></>}
+          {(config.LADDER_COLS[0][1].includes("emov"))?<>/ <TournamentColoredText value={props.player.emov.toFixed(2)} min={min_mov} max={max_mov}/></>:<></>}
+        </Col>
+        <Col xs={3} md={2}>
+          {(config.LADDER_COLS[1][1].includes("mov"))?<TournamentColoredText value={config.MOV_DATATYPE==="numeric"?props.player.mov.toFixed(2):props.player.mov} min={min_mov} max={max_mov}/>:<></>}
+          {(config.LADDER_COLS[1][1].includes("sos"))?<> {config.LADDER_COLS[1][1].includes("mov")?"/":""} <TournamentColoredText value={props.player.sos.toFixed(2)} min={min_sos} max={max_sos}/></>:<></>}
+          {(config.LADDER_COLS[1][1].includes("esos"))?<> / <TournamentColoredText value={props.player.esos.toFixed(2)} min={min_sos} max={max_sos}/></>:<></>}
+        </Col>
+        <Col xs={2} md={2} className="d-flex" style={{position:'relative'}}>
+          <span className="w-100">
+            <span className="d-none d-md-block overflow-ellipsis">
+              {props.editPlayerNames?
+              <FloatingLabel
+                controlId="nameOverride"
+                label={props.player.club}
+              >
+                <Form.Control
+                  type="text"
+                  placeholder="f"
+                  required
+                  onChange={(event) => setClubUpdate(event.target.value)}
+                  onClick={stopPropagation}
+                  value={clubUpdate}
+                  autoFocus
+                />
+              </FloatingLabel>:props.player.club}
+            </span>
+          </span>
         
-        {props.editPlayerNames?<button className="btn btn-sm btn-outline-success" onClick={(event) => {stopPropagation(event);updatePlayerName(props.player.id);props.setEditPlayerNames(false);}}><i className="bi bi-save"></i></button>:
+          {props.editPlayerNames?<button className="btn btn-sm btn-outline-success" onClick={(event) => {stopPropagation(event);updatePlayerName(props.player.id);props.setEditPlayerNames(false);}}><i className="bi bi-save"></i></button>:
 
-        (props.disqualifyMode?(!props.player.disqualified?<button className="btn btn-sm btn-outline-danger" onClick={(event) => {stopPropagation(event);withdrawPlayer(props.player.id,true);}} title="Disqualify player"><i className="bi bi-slash-circle"></i></button>:
-        <button className="btn btn-sm btn-outline-success" onClick={(event) => {stopPropagation(event);withdrawPlayer(props.player.id,false)}} title="Re-enter player"><i className="bi bi-plus"></i></button>):
-        (isOwner && props.player.Matches.length===0?<button className="btn btn-sm btn-outline-danger" onClick={(event) => {stopPropagation(event);deletePlayer(props.player.id)}}><i className="bi bi-x"></i></button>:<></>))
-        }
+          (props.disqualifyMode?(!props.player.disqualified?<button className="btn btn-sm btn-outline-danger d-md-rightside" onClick={(event) => {stopPropagation(event);withdrawPlayer(props.player.id,true);}} title="Disqualify player"><i className="bi bi-slash-circle"></i></button>:
+          <button className="btn btn-sm btn-outline-success" onClick={(event) => {stopPropagation(event);withdrawPlayer(props.player.id,false)}} title="Re-enter player"><i className="bi bi-plus"></i></button>):
+          (isOwner && props.player.Matches.length===0?<button className="btn btn-sm btn-outline-danger d-md-rightside" onClick={(event) => {stopPropagation(event);deletePlayer(props.player.id)}}><i className="bi bi-x"></i></button>:<></>))
+          }
         </Col>
       </Row>
-      <Row style={{maxHeight:(expanded?"500px":null)}} className={"match-summary-rows collapsible-content"} >{/*accordion-collapse  id={"TP"+props.player.id.replaceAll("-","")} data-bs-parent="#ladder" accordion-collapse collapse */}
+      <Row style={{maxHeight:(expanded?"500px":null)}} className={"mb-1 match-summary-rows collapsible-content"} >{/*accordion-collapse  id={"TP"+props.player.id.replaceAll("-","")} data-bs-parent="#ladder" accordion-collapse collapse */}
         {props.player.Matches.map(m=> <TournamentPlayerMatchSummaryRows key={m.id} match={m}/>)}
-        <div className="roundRow"></div>
+        
       </Row>
-      </>
+      <div className="roundRow"></div>
+      </div>
     );
 }

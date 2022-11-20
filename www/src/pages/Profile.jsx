@@ -16,12 +16,33 @@ mutation UpdateUserPreferences($user_id: String!, $club: String = null, $locatio
   }
 }
 `
+const deleteGamePreference = `
+mutation DeleteGamePreference($user_id: String!, $game: Game_enum!) {
+  delete_UserGamePreferences(where: {user_id: {_eq: $user_id}, game: {_eq: $game}}) {
+    affected_rows
+  }
+}
+`
+const addGamePreference = `
+mutation AddGamePreference($user_id: String!, $game: Game_enum!) {
+  insert_UserGamePreferences_one(object: {game: $game, user_id: $user_id}) {
+    id
+  }
+}
+`
 const getDoc = `
 query GetPreferences($user_id: String!) {
   UserPreferences_by_pk(user_id: $user_id) {
     club
     location
     player_name
+  }
+  UserGamePreferences(where: {user_id: {_eq: $user_id}}) {
+    game
+  }
+  Game {
+    key
+    value
   }
 }`
 const Profile = () => {
@@ -30,6 +51,8 @@ const Profile = () => {
   const [ playerName, setPlayerName ] = useState("")
   const [ club, setClub ] = useState("")
   const [ location, setLocation ] = useState("")
+  const [ gamePreferences, setGamePreferences] = useState([])
+  const [ games, setGames] = useState([])
   useEffect(() => {
     let fetchData = async () => {
       let accessToken = await getAccessTokenSilently()
@@ -41,6 +64,8 @@ const Profile = () => {
         setPlayerName(player_name??"")
         setClub(club??"")
         setLocation(location??"")
+        setGamePreferences((response.UserGamePreferences?.map(ugp => ugp.game))??[])
+        setGames(response.Game)
       })
     }
     fetchData();
@@ -56,6 +81,26 @@ const Profile = () => {
       .then((response) => {
         console.log(response)
       })
+    for(var game of games){
+      if(gamePreferences.includes(game.key)){
+        Query("AddGamePreference", addGamePreference, { 
+          user_id: user.sub,
+          game: game.key,
+        },accessToken)
+      } else {
+        Query("DeleteGamePreference", deleteGamePreference, { 
+          user_id: user.sub,
+          game: game.key,
+        },accessToken)
+      }
+    }
+  }
+  const setGamePreference = (key, value) => {
+    if(value){
+      setGamePreferences(gamePreferences.filter(v => v!==key).concat([key]))
+    } else {
+      setGamePreferences(gamePreferences.filter(v => v!==key))
+    }
   }
   return (
     <div>
@@ -113,7 +158,7 @@ const Profile = () => {
               </FloatingLabel>
             </Col>
           </Row>
-          <Row>
+          {/* <Row>
             <Col className="mb-3">
               <FloatingLabel
                 controlId="nameOverride"
@@ -129,9 +174,23 @@ const Profile = () => {
                 />
               </FloatingLabel>
             </Col>
-            {/* <pre className="col-12 p-4">
-              {JSON.stringify(user, null, 2)}
-            </pre> */}
+          </Row> */}
+          <Row>
+            <Col className="mb-3">
+              <div className="card">
+                <div className="card-header">Preferred Games</div>
+                <div className="card-body">
+                  {games.map(g => <div key={g.key} className="input-group mb-3">
+                    {/* <button className="btn btn-sm btn-outline-success" onClick={() => setGamePreference(g.key, true)}><i class="bi bi-plus"></i></button>
+                    <button className="btn btn-sm btn-outline-danger" onClick={() => setGamePreference(g.key, false)}><i class="bi bi-dash"></i></button> */}
+                    <div className="input-group-text">
+                      <input className="form-check-input mt-0" onChange={(event) => setGamePreference(g.key,event.target.checked)} checked={gamePreferences.includes(g.key)} type="checkbox" aria-label="Checkbox for following text input"/>
+                    </div>
+                    <input type="text" className={"form-control "+(gamePreferences.includes(g.key)?"text-success":"text-muted")} readOnly={true} value={g.value} aria-label="Text input with checkbox"/>
+                  </div>)}
+                </div>
+              </div>
+            </Col>
           </Row>
           <Row>
             <div>

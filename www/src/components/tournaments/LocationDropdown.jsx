@@ -33,7 +33,7 @@ export default function LocationDropdown(props) {
           // title="Location"
           onSelect={props.setLocation}
         >
-          <Dropdown.Toggle className="btn-sm w-100" >  {/* style={{maxWidth:320}} */}
+          <Dropdown.Toggle variant={props.location?"primary":'outline-secondary'} className="w-100" style={{height:38}} >  {/* style={{maxWidth:320}} */}
             <span className="overflow-ellipsis" style={{width:"90%"}}>
               {props.location?props.location:"Location"}
             </span>

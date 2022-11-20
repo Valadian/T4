@@ -40,6 +40,9 @@ a {
   .roundLoss {
     background-color: #402030
   }
+  .roundDraw {
+    background-color: #303030
+  }
   .text-info2 {
     color: rgb(23, 162,184)
   }
@@ -56,6 +59,9 @@ a {
   }
   .roundLoss {
     background-color: #FFDFEF
+  }
+  .roundDraw {
+    background-color: #DDDDDD
   }
   .text-info2 {
     color: rgb(0, 60,137)
@@ -137,4 +143,10 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+@media (min-width: 768px){
+  .d-md-rightside {
+    position:absolute;
+    right:-20px;
+  }
 }

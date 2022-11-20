@@ -11,8 +11,141 @@ import TournamentHeader from "../../components/tournaments/TournamentHeader";
 import TournamentRoundsTab from "../../components/tournaments/TournamentRoundsTab";
 import TournamentResultSubmission from "../../components/tournaments/TournamentResultSubmission"
 import TournamentSignUp from "../../components/tournaments/TournamentSignUp"
+import getScoringConfig from "../../util/rulesets"
 
-
+// const tournamentByIdDoc = `
+//   query TournamentById($id: uuid) {
+//     Tournament(order_by: {start: desc}, where: {id: {_eq: $id}}) {
+//       id
+//       name
+//       description
+//       location
+//       start
+//       lists_visible
+//       lists_locked
+//       ladder_visible
+//       signups_open
+//       public
+//       Ladder_aggregate {
+//         aggregate {
+//           count
+//         }
+//       }
+//       Game {
+//         key
+//         value
+//       }
+//       ScoringRuleset {
+//         name
+//       }
+//       Creator {
+//         name
+//         id
+//       }
+//       Ladder {
+//         player_list_id
+//         rank
+//         player_name
+//         mov
+//         loss
+//         win
+//         tournament_points
+//         sos
+//         club
+//         group
+//         id
+//         tournament_id
+//         disqualified
+//         user_id
+//         User {
+//           id
+//           name
+//         }
+//         Matches(order_by: {Match: {Round: {round_num: asc}}}) {
+//           id
+//           confirmed
+//           points
+//           opp_points
+//           mov
+//           win
+//           draw
+//           tournament_points
+//           disqualified
+//           tournament_opponent_id
+//           TournamentOpponent {
+//             id
+//             player_name
+//             User {
+//               id
+//               name
+//             }
+//             Matches {
+//               tournament_points
+//               confirmed
+//               Match {
+//                 Round {
+//                   finalized
+//                 }
+//               }
+//             }
+//           }
+//           Match {
+//             table_num
+//             Round {
+//               round_num
+//               finalized
+//             }
+//           }
+//         }
+//       }
+//       Rounds(order_by: {round_num: asc}) {
+//         Matches(order_by: {table_num: asc}) {
+//             id
+//             table_num
+//             Players(order_by: {id: asc}) {
+//                 id
+//                 match_id
+//                 win
+//                 draw
+//                 tournament_points
+//                 points
+//                 opp_points
+//                 confirmed
+//                 player_name
+//                 mov
+//                 disqualified
+//                 User {
+//                     id
+//                     name
+//                 }
+//                 tournament_opponent_id
+//                 TournamentOpponent {
+//                     id
+//                     player_name
+//                     User {
+//                         id
+//                         name
+//                     }
+//                 }
+//                 tournament_player_id
+//                 TournamentPlayer {
+//                     id
+//                     player_name
+//                     User {
+//                         id
+//                         name
+//                     }
+//                 }
+//             }
+//         }
+//         id
+//         round_num
+//         description
+//         finalized
+//       }
+//     }
+//   }
+// `;
 const tournamentByIdDoc = `
   query TournamentById($id: uuid) {
     Tournament(order_by: {start: desc}, where: {id: {_eq: $id}}) {
@@ -32,7 +165,11 @@ const tournamentByIdDoc = `
         }
       }
       Game {
+        key
         value
+      }
+      ScoringRuleset {
+        name
       }
       Creator {
         name
@@ -64,24 +201,11 @@ const tournamentByIdDoc = `
           opp_points
           mov
           win
+          draw
           tournament_points
           disqualified
-          TournamentOpponent {
-            player_name
-            User {
-              id
-              name
-            }
-            Matches {
-              tournament_points
-              confirmed
-              Match {
-                  Round {
-                    finalized
-                  }
-                }
-            }
-          }
+          tournament_opponent_id
+          tournament_player_id
           Match {
             table_num
             Round {
@@ -99,6 +223,7 @@ const tournamentByIdDoc = `
                 id
                 match_id
                 win
+                draw
                 tournament_points
                 points
                 opp_points
@@ -110,22 +235,8 @@ const tournamentByIdDoc = `
                     id
                     name
                 }
-                TournamentOpponent {
-                    id
-                    player_name
-                    User {
-                        id
-                        name
-                    }
-                }
-                TournamentPlayer {
-                    id
-                    player_name
-                    User {
-                        id
-                        name
-                    }
-                }
+                tournament_opponent_id
+                tournament_player_id
             }
         }
         id
@@ -145,31 +256,82 @@ function TournamentHome() {
     const [activeTab, setActiveTab] = useState("ladder")
     const toaster = useRef(null);
     const [showSignUpTab, setShowSignUpTab] = useState(false);
+    const [config, setConfig] = useState(getScoringConfig())
     const sum = (arr) => arr.reduce((a, b) => a + b,0)
     const avg = (arr) => arr.length===0?0:sum(arr)/arr.length
     // const max = (arr) => arr.reduce((a, b) => Math.max(a, b),0)
     const bakeLadder = (tournament, finalOnly) => {
         if(tournament){
+            let config = getScoringConfig(tournament?.Game?.key,tournament?.ScoringRuleset?.name)
+            setConfig(config)
+            
+            //Make Tournament fully self referential
+            let tpcache = Object.fromEntries(tournament.Ladder.map(l => [l.id,l]));
+            for(let tp of tournament.Ladder){
+                for (let mp of tp.Matches){
+                    mp.TournamentOpponent = tpcache[mp.tournament_opponent_id]
+                    mp.TournamentPlayer = tpcache[mp.tournament_player_id]
+                }
+            }
+            for(let r of tournament.Rounds){
+                for(let m of r.Matches){
+                    for(let mp of m.Players){
+                        mp.TournamentPlayer = tpcache[mp.tournament_player_id]
+                        mp.TournamentOpponent = tpcache[mp.tournament_opponent_id]
+                    }
+                }
+            }
             for(let l of tournament.Ladder){
                 if(finalOnly){
                     l.tournament_points = sum(l.Matches.filter(mp => mp.Match.Round.finalized).map(m => m.tournament_points))
                     l.mov = sum(l.Matches.filter(mp => mp.Match.Round.finalized).map(m => m.mov))
                     l.win = sum(l.Matches.filter(mp => mp.Match.Round.finalized).map(m => m.win===true?1:0))
-                    l.loss = sum(l.Matches.filter(mp => mp.Match.Round.finalized).map(m => m.win===false?1:0))
+                    l.loss = sum(l.Matches.filter(mp => mp.Match.Round.finalized).map(m => (m.win===false && !m.draw)?1:0))
+                    l.draw = sum(l.Matches.filter(mp => mp.Match.Round.finalized).map(m => (m.draw===true)?1:0))
                     l.tournament_points_avg = l.tournament_points/(l.win+l.loss)
                     l.mov_avg = l.mov/(l.win+l.loss)
-                    l.sos = avg(l.Matches.filter(mp => mp.Match.Round.finalized).filter(m=>m.win!=null).map(m => avg(m.TournamentOpponent?.Matches.filter(mp => mp.Match.Round.finalized).filter(m=>m.tournament_points!=null).map(om => om.tournament_points)??[3])))
+                    l.sos = avg(l.Matches.filter(mp => mp.Match.Round.finalized).filter(m=>m.win!=null).map(
+                        m => avg(m.TournamentOpponent?.Matches.filter(mp => mp.Match.Round.finalized).filter(m=>m.tournament_points!=null).map(
+                            om => om.tournament_points)??[config.BUY_OPP_TPS])))
+                    
                 } else {
                     l.tournament_points = sum(l.Matches.map(m => m.tournament_points))
                     l.mov = sum(l.Matches.map(m => m.mov))
                     l.win = sum(l.Matches.map(m => m.win===true?1:0))
-                    l.loss = sum(l.Matches.map(m => m.win===false?1:0))
+                    l.loss = sum(l.Matches.map(m => (m.win===false && !m.draw)?1:0))
+                    l.draw = sum(l.Matches.map(m => (m.draw===true)?1:0))
                     l.tournament_points_avg = l.tournament_points/(l.win+l.loss)
                     l.mov_avg = l.mov/(l.win+l.loss)
-                    l.sos = avg(l.Matches.filter(m=>m.win!=null).map(m => avg(m.TournamentOpponent?.Matches.filter(m=>m.tournament_points!=null).map(om => om.tournament_points)??[3])))
+                    l.sos = avg(l.Matches.filter(m=>m.win!=null).map(
+                        m => avg(m.TournamentOpponent?.Matches.filter(m=>m.tournament_points!=null).map(
+                            om => om.tournament_points)??[config.BUY_OPP_TPS])))
+                    
                 }
             }
-            tournament.Ladder.sort((a,b) => (b.tournament_points - a.tournament_points) || (b.mov - a.mov) || (b.sos - a.sos))
+            //Need to calculate base metrics for everyone first!
+            for(let l of tournament.Ladder){
+                if(finalOnly){
+                    for(let key in config.CUSTOM_TOURNAMENT_METRICS){
+                        l[key] = config.CUSTOM_TOURNAMENT_METRICS[key](l,mp => mp.Match.Round.finalized)
+                    }
+                } else {
+                    for(let key in config.CUSTOM_TOURNAMENT_METRICS){
+                        l[key] = config.CUSTOM_TOURNAMENT_METRICS[key](l)
+                    }
+                }
+            }
+            tournament.Ladder.sort((a,b) => {
+                // (b.tournament_points - a.tournament_points) || (b.mov - a.mov) || (b.sos - a.sos)
+                let props = config.LADDER_SORT;
+                let result = 0
+                for(let prop of props){
+                    result = b[prop] - a[prop];
+                    if(result!==0){
+                        break;
+                    }
+                }
+                return result
+            })
             
             let rank = 1 
             for(let l of tournament.Ladder){
@@ -194,6 +356,10 @@ function TournamentHome() {
     }
     const [tournament, dispatchTournament] = useReducer(ladderReducer, null);
     
+    // useEffect(() => {
+    //     setConfig(getScoringConfig(tournament?.Game?.key,tournament?.ScoringRuleset?.name))
+    // },[tournament])
+
     useEffect(() => {
         if(tournament && user){
             var registered = tournament.Ladder.map(l => user && (l.User?.id===user.sub)).reduce((a,b) => a||b,false) 
@@ -258,7 +424,8 @@ function TournamentHome() {
             activeTab,
             setActiveTab,
             finalizedOnly,
-            setFinalizedOnly
+            setFinalizedOnly,
+            config
             // rebakeLadder
         }
 

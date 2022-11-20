@@ -45,6 +45,7 @@ select_permissions:
       columns:
         - confirmed
         - disqualified
+        - draw
         - id
         - match_id
         - mov
@@ -63,6 +64,7 @@ select_permissions:
       columns:
         - confirmed
         - disqualified
+        - draw
         - id
         - match_id
         - mov
@@ -81,6 +83,7 @@ update_permissions:
     permission:
       columns:
         - disqualified
+        - draw
         - match_id
         - mov
         - opp_points

@@ -1,20 +1,28 @@
 table:
   name: User
   schema: public
-array_relationships:
-  - name: MatchesAsPlayer
-    using:
-      foreign_key_constraint_on:
-        column: user_id
-        table:
-          name: MatchPlayer
-          schema: public
+object_relationships:
   - name: Preferences
     using:
       foreign_key_constraint_on:
         column: user_id
         table:
           name: UserPreferences
+          schema: public
+array_relationships:
+  - name: GamePreferences
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: UserGamePreferences
+          schema: public
+  - name: MatchesAsPlayer
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: MatchPlayer
           schema: public
   - name: TournamentsAsOwner
     using:

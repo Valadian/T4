@@ -39,7 +39,7 @@ export default function TournamentRoundsTab(props) {
     const [roundNum, setRoundNum] = useState(0);
     const [roundDesc, setRoundDesc] = useState("");
     const [activeTab, setActiveTab] = useState("round_1")
-    const {tournament, updateTournament, isOwner} = useContext(TournamentHomeContext);
+    const {tournament, updateTournament, isOwner, config} = useContext(TournamentHomeContext);
     
     useEffect(() => {
         setRoundNum(tournament?.Rounds.map(r => r.round_num).reduce((a,b) => Math.max(a,b),0)+1)
@@ -110,7 +110,14 @@ export default function TournamentRoundsTab(props) {
         });
     }
     const dragPlayer = (mp) => {
-        return (e) => e.dataTransfer.setData("player",JSON.stringify(mp));
+        return (e) => e.dataTransfer.setData("player",JSON.stringify({
+            'id':mp.id,
+            'match_id':null,
+            'tournament_opponent_id':null,
+            'tournament_player_id':null,
+            'player_name':mp.player_name,
+            'User':mp.User
+        }));
     }
     if (tournament) {
         return (
@@ -136,19 +143,20 @@ export default function TournamentRoundsTab(props) {
                         {unmatched.length>0?<h2 className="text-warning me-auto">Unmatched Players!</h2>:<span className="me-auto"></span>}
                         {isOwner&&r.Matches.length>0&&r.finalized?<span className="form-group"><button className="btn btn-outline-secondary" onClick={() => setRoundLocked(r.id, false)}><i className="bi bi-trophy-fill"></i> Reopen Round</button></span>:<></>}
                         {isOwner&&r.Matches.length>0&&!r.finalized?<span className="form-group"><button className="btn btn-outline-warning" onClick={() => setRoundLocked(r.id, true)}><i className="bi bi-trophy-fill"></i> Finalize Round</button></span>:<></>}
+                        {(isOwner&&r.Matches.length===0&&tournament.Rounds.filter(or=>!or.finalized && or.round_num<r.round_num).length>0)?<h2 className="text-warning">Finalize Previous Rounds!</h2>:<></>}
                         {isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-success" onClick={() => generateRound(r.id,r.round_num===1)}><i className="bi bi-trophy-fill"></i> Generate Matches</button></span>:<></>}
                         {isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-danger" onClick={() => deleteRound(r.id)}><i className="bi bi-x"></i> Delete Round</button></span>:<></>}
                         
                     </div>
                     <Row className="pb-1 header mb-3">
                         <Col className="col-1"><span className="d-none d-lg-inline">Table #</span><span className="d-inline d-lg-none">Tbl</span></Col>
-                        <Col xs={isOwner?10:11} md={isOwner?10:11}>
+                        <Col xs={isOwner?10:11}>
                             <Row>
                                 <Col xs={5} sm={7} md={6} lg={4}></Col>
-                                <Col xs={5} sm={3} md={3} lg={1}><span className="d-none d-md-inline">Points</span><span className="d-inline d-md-none">pts</span></Col>
+                                <Col xs={5} sm={3} md={3} lg={1}><span className="d-none d-md-inline">{config.POINTS_NAME}</span><span className="d-inline d-md-none">{config.POINTS_ACRONYM}s</span></Col>
                                 <Col xs={2} sm={2} md={3} lg={1}>TPs</Col>
                                 <Col xs={5} sm={7} md={6} lg={4} className="d-none d-lg-block"></Col>
-                                <Col xs={5} sm={3} md={3} lg={1} className="d-none d-lg-block"><span className="d-none d-md-inline">Points</span><span className="d-inline d-md-none">pts</span></Col>
+                                <Col xs={5} sm={3} md={3} lg={1} className="d-none d-lg-block"><span className="d-none d-md-inline">{config.POINTS_NAME}</span><span className="d-inline d-md-none">{config.POINTS_ACRONYM}s</span></Col>
                                 <Col xs={2} sm={2} md={3} lg={1} className="d-none d-lg-block">TPs</Col>
                             </Row>
                         </Col>

@@ -5,7 +5,7 @@ import TournamentPlayerEditor from "./TournamentPlayerEditor";
 import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 
 export default function Ladder(props) {
-    const {tournament, dispatchTournament, isOwner, finalizedOnly, setFinalizedOnly } = useContext(TournamentHomeContext);
+    const {tournament, dispatchTournament, isOwner, finalizedOnly, setFinalizedOnly, config } = useContext(TournamentHomeContext);
     const [showTournamentPlayerEditor, setShowTournamentPlayerEditor] = useState(false);
     const [editPlayerNames, setEditPlayerNames] = useState(false);
     const [disqualifyMode, setDisqualifyMode] = useState(false);
@@ -37,12 +37,13 @@ export default function Ladder(props) {
 
           </div>
           <Row className="pb-1 header mb-3">
-            <Col className="col-1 col-md-1"><span className="d-none d-md-inline">Rank</span><span className="d-inline d-md-none">#</span></Col>
-            <Col className="col-5 col-md-4">Player</Col>
-            <Col className="col-2 col-md-1">W/L</Col>
-            <Col className="col-1">TP</Col>
-            <Col className="col-3 col-md-2">MoV<span className="d-none d-md-inline">/SoS</span></Col>
-            <Col className="col-3 d-none d-md-block">Club
+            <Col xs={1} md={1}><span className="d-none d-md-inline">Rank</span><span className="d-inline d-md-none">#</span></Col>
+            <Col xs={11} md={4}>Player</Col>
+            <Col xs={1} className="d-md-none"></Col>
+            <Col xs={2} md={1} >W/L</Col>
+            <Col xs={4} md={2}  title={config.TPS_NAME}>{config.LADDER_COLS[0][0]}</Col>
+            <Col xs={5} md={2} >{config.LADDER_COLS[1][0]}{/*MoV<span className="d-none d-md-inline">/SoS</span>*/}</Col>
+            <Col xs={2} className="d-none d-md-block">Club
             </Col>
           </Row>
           {tournament.Ladder.map((player) => (

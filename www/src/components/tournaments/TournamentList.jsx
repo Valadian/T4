@@ -102,6 +102,16 @@ export default function TournamentList(props) {
       if(props.filter['live']){
         where_expression['Rounds'] = {finalized: {_eq: false}}
       }
+      if(props.filter["game"]){
+        where_expression['_and'] = [{_or :props.filter["game"].map(g => {return {game:{_eq:g}}})}]
+      }
+      if(props.filter["search"]){
+        where_expression['_or'] = [
+          {name: {_ilike: "%"+props.filter["search"]+"%"}},
+          {location: {_ilike: "%"+props.filter["search"]+"%"}},
+          {description: {_ilike: "%"+props.filter["search"]+"%"}}
+        ]
+      }
     }
     const fetchData = async () => {
       var accessToken = undefined
@@ -123,7 +133,7 @@ export default function TournamentList(props) {
     }
     fetchData();
         
-  }, [getAccessTokenSilently, props.filter, user, page, pageSize])
+  }, [getAccessTokenSilently, props.filter, props.orderBy, user, page, pageSize])
     
   return (
     <>

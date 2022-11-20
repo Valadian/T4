@@ -1,3 +1,5 @@
+const calcTpForMatchPlayer = (mp) => ptsToTp(mp.points, mp.opp_points, mp.win)
+
 const ptsToTp = (points, oppPts, win) => {
     var mov = points-oppPts
     var delta = Math.abs(points-oppPts)
@@ -13,4 +15,4 @@ const ptsToTp = (points, oppPts, win) => {
         return (mov>0||win)?10:1
     }
 }
-export default ptsToTp
+export {calcTpForMatchPlayer, ptsToTp}

@@ -1,5 +1,6 @@
 
 import Query from "../data/T4GraphContext";
+import getScoringConfig from "./rulesets"
 
 const playersDoc = `
 query AllTournamentPlayers($tournament_id: uuid!) {
@@ -16,6 +17,15 @@ query AllTournamentPlayers($tournament_id: uuid!) {
             }
         }
     }
+    Tournament(where: {id: {_eq: $tournament_id}}){
+        Game {
+            key
+            value
+        }
+        ScoringRuleset {
+            name
+        }
+    }
 }`
 const insertMatchDoc = `
   mutation InsertMatch(
@@ -28,11 +38,11 @@ const insertMatchDoc = `
     $round_id: uuid = "", 
     $table_num: Int = null, 
     $player1_points: Int = null,
-    $player1_mov: Int = null, 
+    $player1_mov: numeric = null, 
     $player1_tp: Int = null,
     $player1_win: Boolean = null,
     $player2_points: Int = null,
-    $player2_mov: Int = null, 
+    $player2_mov: numeric = null, 
     $player2_tp: Int = null,
     $player2_win: Boolean = null,) {
       insert_Match(objects: {round_id: $round_id, table_num: $table_num, Players: {data: [
@@ -67,12 +77,14 @@ function tournamentPlayersToMap(players){
     }
     return playerMap
 }
-function bakeTournamentPoints(players){
+function bakeTournamentPoints(players, config){
+    //Currently all systems use tournament_points only for pairing
     for(let p of players){
         p.tournament_points = p.Matches.map(m => m.tournament_points).reduce((a,b)=>a+b,0)
     }
 }
 function sortByTournamentPoints(players){
+    //Currently all implemented systems use tournament_points only for pairing
     //Shuffle first to randomize equal values
     players = players
         .map(value => ({ value, sort: Math.random() }))
@@ -96,13 +108,15 @@ async function generatePairings(tournament_id, round_id, accessToken, updateTour
     } ,accessToken)
     .then((response) => {
         if (response && response.TournamentPlayer){
+            //Currently all implemented systems use tournament_points only for pairing
+            let config = getScoringConfig(response.Tournament?.Game?.key,response.Tournament?.ScoringRuleset?.name)
             let players = response.TournamentPlayer
             let matches;
             let playerMap;
             let success;
             let RETRIES = 6;
             for(var i = 1; !success && i<=RETRIES; i++ ){
-                ({ matches, playerMap, success } = buildMatches(players, (i<RETRIES && first_round)));
+                ({ matches, playerMap, success } = buildMatches(players, config, (i<RETRIES && first_round)));
             }
             let table_num = 1
             for(let m of matches){
@@ -141,12 +155,12 @@ async function generatePairings(tournament_id, round_id, accessToken, updateTour
 
 export default generatePairings
 
-function buildMatches(players, first_round) {
+function buildMatches(players, config, first_round) {
     console.log("Attempt building ladder")
     let success = true;
     let matches = [];
     let playerMap = tournamentPlayersToMap(players);
-    bakeTournamentPoints(players);
+    bakeTournamentPoints(players, config);
     players = sortByTournamentPoints(players);
     let byes = [];
     let edges = {};
