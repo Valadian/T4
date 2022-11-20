@@ -20,9 +20,142 @@ import TournamentResultSubmission from "../../components/tournaments/TournamentR
 import TournamentSignUp from "../../components/tournaments/TournamentSignUp"
 import getScoringConfig from "../../util/rulesets"
 
+// const tournamentByIdDoc = `
+//   query TournamentById($id: uuid) {
+//     Tournament(order_by: {start: desc}, where: {id: {_eq: $id}}) {
+//       id
+//       name
+//       description
+//       location
+//       start
+//       lists_visible
+//       lists_locked
+//       ladder_visible
+//       signups_open
+//       public
+//       Ladder_aggregate {
+//         aggregate {
+//           count
+//         }
+//       }
+//       Game {
+//         key
+//         value
+//       }
+//       ScoringRuleset {
+//         name
+//       }
+//       Creator {
+//         name
+//         id
+//       }
+//       Ladder {
+//         player_list_id
+//         rank
+//         player_name
+//         mov
+//         loss
+//         win
+//         tournament_points
+//         sos
+//         club
+//         group
+//         id
+//         tournament_id
+//         disqualified
+//         user_id
+//         User {
+//           id
+//           name
+//         }
+//         Matches(order_by: {Match: {Round: {round_num: asc}}}) {
+//           id
+//           confirmed
+//           points
+//           opp_points
+//           mov
+//           win
+//           draw
+//           tournament_points
+//           disqualified
+//           tournament_opponent_id
+//           TournamentOpponent {
+//             id
+//             player_name
+//             User {
+//               id
+//               name
+//             }
+//             Matches {
+//               tournament_points
+//               confirmed
+//               Match {
+//                 Round {
+//                   finalized
+//                 }
+//               }
+//             }
+//           }
+//           Match {
+//             table_num
+//             Round {
+//               round_num
+//               finalized
+//             }
+//           }
+//         }
+//       }
+//       Rounds(order_by: {round_num: asc}) {
+//         Matches(order_by: {table_num: asc}) {
+//             id
+//             table_num
+//             Players(order_by: {id: asc}) {
+//                 id
+//                 match_id
+//                 win
+//                 draw
+//                 tournament_points
+//                 points
+//                 opp_points
+//                 confirmed
+//                 player_name
+//                 mov
+//                 disqualified
+//                 User {
+//                     id
+//                     name
+//                 }
+//                 tournament_opponent_id
+//                 TournamentOpponent {
+//                     id
+//                     player_name
+//                     User {
+//                         id
+//                         name
+//                     }
+//                 }
+//                 tournament_player_id
+//                 TournamentPlayer {
+//                     id
+//                     player_name
+//                     User {
+//                         id
+//                         name
+//                     }
+//                 }
+//             }
+//         }
+//         id
+//         round_num
+//         description
+//         finalized
+//       }
+//     }
+//   }
+// `;
 const tournamentByIdDoc = `
   query TournamentById($id: uuid) {
-    Tournament(order_by: {start: desc}, where: {id: {_eq: $id}}) {
+    Tournament(order_by: { start: desc }, where: { id: { _eq: $id } }) {
       id
       name
       description
@@ -68,7 +201,10 @@ const tournamentByIdDoc = `
           id
           name
         }
-        Matches(order_by: {Match: {Round: {round_num: asc}}}) {
+        Matches(
+          order_by: { Match: { Round: { round_num: asc } } },
+          where: { deleted: { _eq: false } }
+        ) {
           id
           confirmed
           points
@@ -89,33 +225,32 @@ const tournamentByIdDoc = `
           }
         }
       }
-      Rounds(order_by: {round_num: asc}) {
-        Matches(order_by: {table_num: asc}) {
+      Rounds(order_by: { round_num: asc }, where: { deleted: { _eq: false } }) {
+        Matches(
+          order_by: { table_num: asc }
+          where: { deleted: { _eq: false } }
+        ) {
+          id
+          table_num
+          Players(order_by: { id: asc }, where: { deleted: { _eq: false } }) {
             id
-            table_num
-            round_id
-            Players(order_by: {id: asc}) {
-                id
-                match_id
-                win
-                draw
-                tournament_points
-                points
-                opp_points
-                confirmed
-                player_name
-                mov
-                disqualified
-                User {
-                    id
-                    name
-                }
-                Match {
-                    round_id
-                }
-                tournament_opponent_id
-                tournament_player_id
+            match_id
+            win
+            draw
+            tournament_points
+            points
+            opp_points
+            confirmed
+            player_name
+            mov
+            disqualified
+            User {
+              id
+              name
             }
+            tournament_opponent_id
+            tournament_player_id
+          }
         }
         id
         round_num
@@ -124,7 +259,7 @@ const tournamentByIdDoc = `
       }
     }
   }
-`;
+  `;
 const TournamentHomeContext = createContext();
 
 function TournamentHome() {
@@ -217,8 +352,6 @@ function TournamentHome() {
                 rank++
             }
         }
-        return tournament
-    }
     return tournament;
   };
   const ladderReducer = (state, action) => {
@@ -410,5 +543,5 @@ function TournamentHome() {
       </>
     );
   }
-}
+};
 export { TournamentHome, TournamentHomeContext };

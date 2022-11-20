@@ -24,21 +24,18 @@ mutation SwapPlayers($id1: uuid!, $match_id1: uuid!, $id2: uuid!, $match_id2: uu
     }
 }
 `;
-
 const updateDoc = `
 mutation updateMatchPlayer($id: uuid!, $points: Int!, $opp_points: Int!, $tournament_points: Int!, $win: Boolean = null, $draw: Boolean = null, $mov: numeric = 0) {
     update_MatchPlayer_by_pk(pk_columns: {id: $id}, _set: {points: $points, opp_points: $opp_points, tournament_points: $tournament_points, win: $win, draw: $draw, mov: $mov}) {
         id
     }
 }`;
-
 const deleteDoc = `
 mutation deleteMatch($id: uuid!) {
-    update_Match(where: {id: {_eq: $id}}, _set: {deleted: true}) {
-      affected_rows
+    delete_Match_by_pk(id: $id) {
+        id
     }
 }`;
-
 const assignDoc = `
 mutation AssignPlayer($ladder_name: String = null, $ladder_user_id: String = null, $id: uuid!, $match_id: uuid!, $tournament_player_id: uuid!) {
     update1: update_MatchPlayer(where: {match_id: {_eq: $match_id}, id: {_neq: $id}}, _set: {tournament_opponent_id: $tournament_player_id}) {
@@ -49,7 +46,6 @@ mutation AssignPlayer($ladder_name: String = null, $ladder_user_id: String = nul
         id
     }
 }`;
-
 const withdrawDoc = `
 mutation WithdrawPlayer($id: uuid!, $disqualified: Boolean = true) {
     update_MatchPlayer_by_pk(pk_columns: {id: $id}, _set: {disqualified: $disqualified, tournament_points: 0, mov: 0, win: false}) {
@@ -335,16 +331,27 @@ export default function TournamentMatch({ match, round, swapping, setSwapping, s
                     onChange={(evt) => setPlayer2Pts(evt.target.value)}
                   ></input>
                   <button
+                    tabindex="-1"
                     className={
                       "btn btn-sm " +
-                      (player1Win ? "btn-outline-secondary" : "btn-warning")
+                      (!player1Win && !player1Draw
+                        ? "btn-warning"
+                        : "btn-outline-secondary")
                     }
                     type="button"
-                    onClick={() => setPlayer1Win(false)}
+                    onClick={() => {
+                      setPlayer1Win(false);
+                      setPlayer1Draw(false);
+                    }}
                   >
-                    <i className="bi bi-trophy-fill" title="win"></i>
+                    {player1Draw ? (
+                      "="
+                    ) : (
+                      <i className="bi bi-trophy-fill" title="win"></i>
+                    )}
                   </button>
                   <button
+                    tabindex="-1"
                     className={
                       "btn btn-sm " +
                       (player2.disqualified
@@ -386,8 +393,8 @@ export default function TournamentMatch({ match, round, swapping, setSwapping, s
             >
               <TournamentColoredText
                 value={player2?.tournament_points}
-                min={1}
-                max={10}
+                min={config.MIN_TPS}
+                max={config.MAX_TPS}
               />
             </Col>
 
