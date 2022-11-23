@@ -17,14 +17,14 @@ export default function TournamentResultSubmission(props) {
     if(tournament){
         return (
         <>
-            <Row className="pb-1 header mb-3">
+            <Row className="pb-1 header mb-3 sticky-top">
                 <Col className="col-12 col-lg-3">Opponent</Col>
-                <Col className="col-2">Self</Col>
-                <Col className="col-2">Opp</Col>
-                <Col className="col-2 col-lg-1">Mov</Col>
-                <Col className="col-2 col-lg-1">TP</Col>
-                <Col className="col-2">W/L</Col>
-                <Col className="col-2 col-lg-1"></Col>
+                <Col className="col-4 col-md-2">Self</Col>
+                <Col className="col-4 col-md-2">Opp</Col>
+                <Col className="col-4 col-md-2">W/L</Col>
+                <Col className="col-4 col-md-2 col-lg-1">Mov</Col>
+                <Col className="col-4 col-md-2 col-lg-1">TP</Col>
+                <Col className="col-4 col-md-2 col-lg-1"></Col>
             </Row>
             {tournament?.Rounds.filter(roundHasMyGame).map(r => { 
                 var m = myGame(r)

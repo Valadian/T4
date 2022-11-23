@@ -36,14 +36,14 @@ export default function Ladder(props) {
             {!finalizedOnly?<span className="form-group"><button className="btn btn-outline-danger" onClick={toggleFinalizedOnly}>LIVE</button></span>:<></>}
 
           </div>
-          <Row className="pb-1 header mb-3">
-            <Col xs={1} md={1}><span className="d-none d-md-inline">Rank</span><span className="d-inline d-md-none">#</span></Col>
-            <Col xs={11} md={4}>Player</Col>
-            <Col xs={1} className="d-md-none"></Col>
-            <Col xs={2} md={1} >W/L</Col>
-            <Col xs={4} md={2}  title={config.TPS_NAME}>{config.LADDER_COLS[0][0]}</Col>
-            <Col xs={5} md={2} >{config.LADDER_COLS[1][0]}{/*MoV<span className="d-none d-md-inline">/SoS</span>*/}</Col>
-            <Col xs={2} className="d-none d-md-block">Club
+          <Row className="pb-1 header mb-3 sticky-top">
+            <Col xs={1} lg={1}><span className="d-none d-md-inline">Rank</span><span className="d-inline d-md-none">#</span></Col>
+            <Col xs={11} lg={4}>Player</Col>
+            <Col xs={1} className="d-lg-none"></Col>
+            <Col xs={3} lg={1} >W/L</Col>
+            <Col xs={3} lg={2}  title={config.TPS_NAME}>{config.LADDER_COLS[0][0]}</Col>
+            <Col xs={5} lg={2} >{config.LADDER_COLS[1][0]}{/*MoV<span className="d-none d-md-inline">/SoS</span>*/}</Col>
+            <Col xs={2} className="d-none d-lg-block">Club
             </Col>
           </Row>
           {tournament.Ladder.map((player) => (

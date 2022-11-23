@@ -4,7 +4,7 @@ import Query from "../../data/T4GraphContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 import TournamentPlayerName from "./TournamentPlayerName";
-
+import TournamentColoredText from "./TournamentColoredText";
 
 const updateDoc = `
 mutation updateMatchPlayer($id: uuid!, $points: Int!, $opp_points: Int!, $tournament_points: Int!, $win: Boolean!, $draw: Boolean!, $mov: numeric!) {
@@ -86,15 +86,13 @@ export default function TournamentResultSubmissionMatch(props){
     const notNullAndAddsTo11 = (v1,v2) => v1!=null && v2!=null && v1+v2===11
     const EditCols = () => {
         return <>
-            <Col className="col-2">
+            <Col className="col-4 col-md-2">
                 <input className="form-control w-100" value={points} onChange={(evt) => setPoints(evt.target.value)}></input>
             </Col>
-            <Col className="col-2">
+            <Col className="col-4 col-md-2">
                 <input className="form-control w-100" value={oppPts} onChange={(evt) => setOppPts(evt.target.value)}></input>
             </Col>
-            <Col className="col-2 col-lg-1 paddedLikeInput">{config.MOV_DATATYPE==="numeric"?mov.toFixed(2):mov}</Col>
-            <Col className="col-2 col-lg-1 paddedLikeInput">{tp}</Col>
-            <Col className="col-2">
+            <Col className="col-4 col-md-2">
                 <select className={"form-select"+(result===WIN?" text-success":(result===LOSS?" text-danger":""))} value={result} onChange={(evt) => setResult(evt.target.value)}>
                     <option className="text-success" value={WIN}>Win</option>
                     <option className="text-danger" value={LOSS}>Loss</option>
@@ -102,7 +100,9 @@ export default function TournamentResultSubmissionMatch(props){
                     <option className="text-muted" value={NO_RESULT}>?</option>
                 </select>
             </Col>
-            <Col className="col-2 col-lg-1">
+            <Col className="col-4 col-md-2 col-lg-1 paddedLikeInput">{config.MOV_DATATYPE==="numeric"?mov.toFixed(2):mov}</Col>
+            <Col className="col-4 col-md-2 col-lg-1 paddedLikeInput">{tp}</Col>
+            <Col className="col-4 col-md-2 col-lg-1">
                 <button className="btn btn-outline-success" onClick={() => saveMatch()} title="Save Match"><i className="bi bi-check-square"></i></button>
                 <button className="btn btn-outline-danger" onClick={cancelMatch} title="Cancel Edit"><i className="bi bi-x-square"></i></button>
             </Col>
@@ -110,28 +110,29 @@ export default function TournamentResultSubmissionMatch(props){
     }
     const ViewCols = () => {
         return <>
-            <Col className="col-2 paddedLikeInput">
+            <Col className="col-4 col-md-2 paddedLikeInput">
                 <span>{props.mp_self.points}&nbsp;
                     {notNullAndNotEqual(props.mp_opp.opp_points,props.mp_self.points)?<span className="text-danger" title="Opponent Reported Value">({props.mp_opp.opp_points})</span>:<></>}
-                    {notNullAndEqual(props.mp_opp.opp_points,props.mp_self.points)?<i className="bi bi-check-circle-fill d-none d-md-inline text-success" title="Verified"></i>:<></>}
+                    {notNullAndEqual(props.mp_opp.opp_points,props.mp_self.points)?<i className="bi bi-check-circle-fill text-success" title="Verified"></i>:<></>}
                 </span>
             </Col>
-            <Col className="col-2 paddedLikeInput">
+            <Col className="col-4 col-md-2 paddedLikeInput">
                 <span>{props.mp_self.opp_points}&nbsp;
                     {notNullAndNotEqual(props.mp_opp.points,props.mp_self.opp_points)?<span className="text-danger" title="Opponent Reported Value">({props.mp_opp.points})</span>:<></>}
-                    {notNullAndEqual(props.mp_opp.points,props.mp_self.opp_points)?<i className="bi bi-check-circle-fill d-none d-md-inline text-success" title="Verified"></i>:<></>}
+                    {notNullAndEqual(props.mp_opp.points,props.mp_self.opp_points)?<i className="bi bi-check-circle-fill text-success" title="Verified"></i>:<></>}
                 </span>
             </Col>
-            <Col className="col-2 col-lg-1 paddedLikeInput">{config.MOV_DATATYPE==="numeric"?props.mp_self.mov.toFixed(2):props.mp_self.mov}</Col>
-            <Col className="col-2 col-lg-1 paddedLikeInput">{props.mp_self.tournament_points}&nbsp;
-                    {notNullAndAddsTo11(props.mp_self.tournament_points,props.mp_opp.tournament_points)?<i className="bi bi-check-circle-fill d-none d-md-inline text-success" title="Verified"></i>:<></>}
-            </Col>
-            <Col className="col-2 paddedLikeInput">
+            <Col className="col-4 col-md-2 paddedLikeInput">
                 <span>{props.mp_self.win?<span className="text-success">Win</span>:(props.mp_self.draw?<span className="text-muted">Draw</span>:<span className="text-danger">Loss</span>)}&nbsp;
-                    {notNullAndNotEqual(props.mp_opp.win,props.mp_self.win)?<i className="bi bi-check-circle-fill d-none d-md-inline text-success" title="Verified"></i>:<></>}
+                    {(notNullAndNotEqual(props.mp_opp.win,props.mp_self.win) || 
+                     (notNullAndEqual(props.mp_opp.draw,true) && notNullAndEqual(props.mp_self.draw,true)))?<i className="bi bi-check-circle-fill text-success" title="Verified"></i>:<></>}
                 </span>
             </Col>
-            <Col className="col-2 col-lg-1">
+            <Col className="col-4 col-md-2 col-lg-1 paddedLikeInput"><TournamentColoredText value={config.MOV_DATATYPE==="numeric"?props.mp_self.mov.toFixed(2):props.mp_self.mov} min={0} max={config.MAX_POINTS}/></Col>
+            <Col className="col-4 col-md-2 col-lg-1 paddedLikeInput"><TournamentColoredText value={props.mp_self.tournament_points} min={config.MIN_TPS} max={config.MAX_TPS}/>&nbsp;
+                    {/* {notNullAndAddsTo11(props.mp_self.tournament_points,props.mp_opp.tournament_points)?<i className="bi bi-check-circle-fill d-none d-md-inline text-success" title="Verified"></i>:<></>} */}
+            </Col>
+            <Col className="col-4 col-md-2 col-lg-1">
                 {!props.round.finalized?
                 <button className="btn btn-outline-primary" onClick={() => editMatch()}><i className="bi bi-pen"></i></button>:
                 <></>}
@@ -141,12 +142,16 @@ export default function TournamentResultSubmissionMatch(props){
     }
     var verified =  notNullAndEqual(props.mp_opp.opp_points,props.mp_self.points) && 
                     notNullAndEqual(props.mp_opp.points,props.mp_self.opp_points) &&
-                    notNullAndAddsTo11(props.mp_self.tournament_points,props.mp_opp.tournament_points) &&
-                    notNullAndNotEqual(props.mp_opp.win,props.mp_self.win)
+                    // Can no longer easily verify tournament points 
+                    // notNullAndAddsTo11(props.mp_self.tournament_points,props.mp_opp.tournament_points) &&
+                    ((notNullAndEqual(props.mp_opp.draw,false) && notNullAndEqual(props.mp_self.draw,false) && notNullAndNotEqual(props.mp_opp.win,props.mp_self.win)) ||
+                    (notNullAndEqual(props.mp_opp.draw,true) && notNullAndEqual(props.mp_self.draw,true) && notNullAndEqual(props.mp_opp.win,props.mp_self.win)))
                     
     var conflict =  notNullAndNotEqual(props.mp_opp.opp_points,props.mp_self.points) || 
                     notNullAndNotEqual(props.mp_opp.points,props.mp_self.opp_points) ||
-                    notNullAndEqual(props.mp_opp.win,props.mp_self.win)
+                    notNullAndNotEqual(props.mp_opp.draw,props.mp_self.draw) ||
+                    ((notNullAndEqual(props.mp_opp.draw,false) && notNullAndEqual(props.mp_self.draw,false) && notNullAndEqual(props.mp_opp.win,props.mp_self.win)) ||
+                     (notNullAndEqual(props.mp_opp.draw,true) && notNullAndEqual(props.mp_self.draw,true) && notNullAndNotEqual(props.mp_opp.win,props.mp_self.win)))
     return (
         <Row className={"pb-3 roundRow"+(verified?" roundVerified":"")+(conflict?" roundConflict":"")}>
             <Col className="col-12 col-lg-3 paddedLikeInput"><span title={"Round "+props.round.round_num}>Rnd {props.round.round_num}</span>, <span title={"Table "+props.match.table_num}>Tbl #{props.match.table_num}</span> vs. <TournamentPlayerName player={props.mp_opp}/></Col>

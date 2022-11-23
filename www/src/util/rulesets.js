@@ -20,7 +20,7 @@ class TournamentRuleset {
     BUY_OPP_TPS = 0
     LADDER_COLS = [
         ["TP",['tournament_points']],
-        ["MOV/SOS",['mov','sos']]
+        ["MOV / SOS",['mov','sos']]
     ]
     CONCESSION_POINTS = 0
     LADDER_SORT = ['tournament_points', 'mov', 'sos']
@@ -73,8 +73,8 @@ LegionBattlePoints.LADDER_SORT = ['tournament_points','mov','emov','sos','esos']
 // LegionBattlePoints.LADDER_SORT = ['wins','mov'/*==battle_points*/,'sos_mov','sos','esos']
 LegionBattlePoints.SWISS_PAIRING_ORDER = ['tournament_points'] 
 LegionBattlePoints.LADDER_COLS = [
-    ['MOV/eMOV',['mov','emov']],
-    ['SOS/eSOS',['sos','esos']]
+    ['MOV / eMOV',['mov','emov']],
+    ['SOS / eSOS',['sos','esos']]
 ]
 
 let XWingHotshot = new TournamentRuleset()

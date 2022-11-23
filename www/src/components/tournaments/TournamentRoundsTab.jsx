@@ -148,15 +148,15 @@ export default function TournamentRoundsTab(props) {
                         {isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-danger" onClick={() => deleteRound(r.id)}><i className="bi bi-x"></i> Delete Round</button></span>:<></>}
                         
                     </div>
-                    <Row className="pb-1 header mb-3">
+                    <Row className="pb-1 header mb-3 sticky-top">
                         <Col className="col-1"><span className="d-none d-lg-inline">Table #</span><span className="d-inline d-lg-none">Tbl</span></Col>
                         <Col xs={isOwner?10:11}>
                             <Row>
-                                <Col xs={5} sm={7} md={6} lg={4}></Col>
-                                <Col xs={5} sm={3} md={3} lg={1}><span className="d-none d-md-inline">{config.POINTS_NAME}</span><span className="d-inline d-md-none">{config.POINTS_ACRONYM}s</span></Col>
+                                <Col xs={5} sm={7} md={6} lg={3}></Col>
+                                <Col xs={5} sm={3} md={3} lg={2}><span className="d-none d-md-inline">{config.POINTS_NAME}</span><span className="d-inline d-md-none">{config.POINTS_ACRONYM}s</span></Col>
                                 <Col xs={2} sm={2} md={3} lg={1}>TPs</Col>
-                                <Col xs={5} sm={7} md={6} lg={4} className="d-none d-lg-block"></Col>
-                                <Col xs={5} sm={3} md={3} lg={1} className="d-none d-lg-block"><span className="d-none d-md-inline">{config.POINTS_NAME}</span><span className="d-inline d-md-none">{config.POINTS_ACRONYM}s</span></Col>
+                                <Col xs={5} sm={7} md={6} lg={3} className="d-none d-lg-block"></Col>
+                                <Col xs={5} sm={3} md={3} lg={2} className="d-none d-lg-block"><span className="d-none d-md-inline">{config.POINTS_NAME}</span><span className="d-inline d-md-none">{config.POINTS_ACRONYM}s</span></Col>
                                 <Col xs={2} sm={2} md={3} lg={1} className="d-none d-lg-block">TPs</Col>
                             </Row>
                         </Col>

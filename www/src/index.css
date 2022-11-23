@@ -46,6 +46,10 @@ a {
   .text-info2 {
     color: rgb(23, 162,184)
   }
+  
+  .header {
+    background-color: #333;
+  }
 }
 @media (prefers-color-scheme: light) {
   .roundVerified {
@@ -65,6 +69,10 @@ a {
   }
   .text-info2 {
     color: rgb(0, 60,137)
+  }
+  
+  .header {
+    background-color: #DDD;
   }
 }
 
