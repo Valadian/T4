@@ -3,6 +3,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import Query from "../data/T4GraphContext";
 import LogoutButton from "../auth/LogoutButton";
 import { Row, Col, Form, FloatingLabel } from "react-bootstrap";
+import {DarkLightToggle} from "../components/theme/DarkLightToggle";
 
 const updateDoc = `
 mutation UpdateUserPreferences($user_id: String!, $club: String = null, $location: String = null, $player_name: String = null) {
@@ -188,6 +189,19 @@ const Profile = () => {
                     </div>
                     <input type="text" className={"form-control "+(gamePreferences.includes(g.key)?"text-success":"text-muted")} readOnly={true} value={g.value} aria-label="Text input with checkbox"/>
                   </div>)}
+                </div>
+              </div>
+            </Col>
+          </Row>
+          <Row>
+            <Col className="mb-3">
+              <div className="card">
+                <div className="card-header d-flex">
+                  <span className="me-auto">Theme</span>
+                  <DarkLightToggle />
+                </div>
+                <div className="card-body">
+                  <b>Note: </b>If you change your OS/browser dark mode setting, then you must refresh the page to clear the override.
                 </div>
               </div>
             </Col>

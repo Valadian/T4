@@ -1,8 +1,23 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Outlet} from "react-router-dom";
 import Navbar from "../components/Navbar";
+import setPreferredColorScheme from "../util/theme"
 
 const Layout = () => {
+  //Detect and apply color scheme
+  useEffect(() => {
+    if(window.matchMedia && localStorage.getItem("theme")){
+      if(localStorage.getItem("theme") === "dark" && window.matchMedia("(prefers-color-scheme: light)").matches){
+        console.log("Overriding to Dark theme")
+        setPreferredColorScheme("dark")
+      }
+      if(localStorage.getItem("theme") === "light" && window.matchMedia("(prefers-color-scheme: dark)").matches){
+        console.log("Overriding to Light theme")
+        setPreferredColorScheme("light")
+      }
+    }
+  },[])
+  
   return (
     <> 
       <Navbar />

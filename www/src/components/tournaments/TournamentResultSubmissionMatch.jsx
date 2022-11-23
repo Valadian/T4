@@ -144,13 +144,13 @@ export default function TournamentResultSubmissionMatch(props){
                     notNullAndEqual(props.mp_opp.points,props.mp_self.opp_points) &&
                     // Can no longer easily verify tournament points 
                     // notNullAndAddsTo11(props.mp_self.tournament_points,props.mp_opp.tournament_points) &&
-                    ((notNullAndEqual(props.mp_opp.draw,false) && notNullAndEqual(props.mp_self.draw,false) && notNullAndNotEqual(props.mp_opp.win,props.mp_self.win)) ||
+                    ((props.mp_opp.draw!==true && props.mp_self.draw!==true && notNullAndNotEqual(props.mp_opp.win,props.mp_self.win)) ||
                     (notNullAndEqual(props.mp_opp.draw,true) && notNullAndEqual(props.mp_self.draw,true) && notNullAndEqual(props.mp_opp.win,props.mp_self.win)))
                     
     var conflict =  notNullAndNotEqual(props.mp_opp.opp_points,props.mp_self.points) || 
                     notNullAndNotEqual(props.mp_opp.points,props.mp_self.opp_points) ||
                     notNullAndNotEqual(props.mp_opp.draw,props.mp_self.draw) ||
-                    ((notNullAndEqual(props.mp_opp.draw,false) && notNullAndEqual(props.mp_self.draw,false) && notNullAndEqual(props.mp_opp.win,props.mp_self.win)) ||
+                    ((props.mp_opp.draw!==true && props.mp_self.draw!==true && notNullAndEqual(props.mp_opp.win,props.mp_self.win)) ||
                      (notNullAndEqual(props.mp_opp.draw,true) && notNullAndEqual(props.mp_self.draw,true) && notNullAndNotEqual(props.mp_opp.win,props.mp_self.win)))
     return (
         <Row className={"pb-3 roundRow"+(verified?" roundVerified":"")+(conflict?" roundConflict":"")}>

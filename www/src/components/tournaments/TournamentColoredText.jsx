@@ -5,7 +5,7 @@ export default function TournamentColoredText(props){
     // let r = Math.floor(Math.min(1,2*(1-scalar))*255)
     // let g = Math.floor(Math.min(1,2*scalar)*255)
     let brightness = 0.6
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    if ((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) || localStorage.getItem("theme")==="dark") {
         // dark mode
         brightness = 1.0
     }

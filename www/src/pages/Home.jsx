@@ -3,7 +3,35 @@ import { useNavigate, Link } from "react-router-dom";
 import {Col, Row} from 'react-bootstrap'
 import { useAuth0 } from "@auth0/auth0-react";
 import TournamentList from "../components/tournaments/TournamentList";
+import {DarkLightToggle, DarkModeButton} from "../components/theme/DarkLightToggle";
 
+function DarkModePrompt() {
+    const [visible, setVisible] = useState(localStorage.getItem('theme')===null)
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        // dark mode
+        if(visible){
+            return (
+                <div className='card mb-3'>
+                    <div className='card-header d-flex'>
+                        <span className='me-auto'> Dark Mode </span>
+                        <DarkLightToggle />
+                    </div>
+                    <div className='card-body'>
+                        <p>This website is best in dark mode! You can toggle here or later in your profile</p>
+                        <div className="d-flex gap-3">
+                            <button className="btn btn-secondary" onClick={() => {localStorage.setItem('theme', ''); setVisible(false);}}>Dismiss</button>
+                            <DarkModeButton title="Enable Dark Mode"/>
+                        </div>
+                    </div>
+                </div>
+            )
+        } else {
+            return <></>
+        }
+    } else {
+        return <></>
+    }
+}
 function Home() {
     const { user, loginWithRedirect } = useAuth0();
     const navigate = useNavigate()
@@ -32,6 +60,7 @@ function Home() {
                 <div className="progress-bar progress-bar-striped bg-warning progress-bar-animated" role="progressbar" style={{width: '100%'}}></div>
             </div>
         </div>
+        <DarkModePrompt/>
         {/* {user?<></>:<div className="homeIcon btn btn-outline-primary" onClick={() => loginWithRedirect()}>
             <span>
                 <h3 className="mb-0"><i className="bi bi-box-arrow-in-right"></i></h3>

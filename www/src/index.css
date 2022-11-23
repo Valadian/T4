@@ -44,9 +44,8 @@ a {
     background-color: #303030
   }
   .text-info2 {
-    color: rgb(23, 162,184)
+    color: #0dcaf0;
   }
-  
   .header {
     background-color: #333;
   }
@@ -68,7 +67,7 @@ a {
     background-color: #DDDDDD
   }
   .text-info2 {
-    color: rgb(0, 60,137)
+    color: #0ca2c0;
   }
   
   .header {
