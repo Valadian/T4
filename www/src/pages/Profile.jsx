@@ -201,7 +201,7 @@ const Profile = () => {
                   <DarkLightToggle />
                 </div>
                 <div className="card-body">
-                  <b>Note: </b>If you change your OS/browser dark mode setting, then you must refresh the page to clear the override.
+                  <b>Note: </b>If you change your OS/browser dark mode setting, then you must either: refresh the page or click your desired theme to clear the override.
                 </div>
               </div>
             </Col>

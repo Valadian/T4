@@ -18,6 +18,7 @@ function DarkModePrompt() {
                     </div>
                     <div className='card-body'>
                         <p>This website is best in dark mode! You can toggle here or later in your profile</p>
+                        <p>If you really like light mode, happy to support your choice. Dismiss this notification to never see it again.</p>
                         <div className="d-flex gap-3">
                             <button className="btn btn-secondary" onClick={() => {localStorage.setItem('theme', ''); setVisible(false);}}>Dismiss</button>
                             <DarkModeButton title="Enable Dark Mode"/>
