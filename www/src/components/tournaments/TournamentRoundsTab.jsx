@@ -148,7 +148,7 @@ export default function TournamentRoundsTab(props) {
                         {isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-danger" onClick={() => deleteRound(r.id)}><i className="bi bi-x"></i> Delete Round</button></span>:<></>}
                         
                     </div>
-                    <Row className="pb-1 header mb-3 sticky-top">
+                    {r.Matches.length>0?<Row className="pb-1 header mb-3 sticky-top">
                         <Col className="col-1"><span className="d-none d-lg-inline">Table #</span><span className="d-inline d-lg-none">Tbl</span></Col>
                         <Col xs={isOwner?10:11}>
                             <Row>
@@ -161,7 +161,7 @@ export default function TournamentRoundsTab(props) {
                             </Row>
                         </Col>
                         <Col xs={isOwner?1:0} md={isOwner?1:0}></Col>
-                    </Row>
+                    </Row>:<></>}
                     {r.Matches.map(m => <TournamentMatch key={m.id} match={m} round={r}/>)}
                     {isOwner&&r.Matches.length>0&&!r.finalized?<Row>
                         <Col className="col-10 col-md-11"></Col>

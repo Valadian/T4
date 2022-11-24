@@ -128,7 +128,7 @@ export default function TournamentResultSubmissionMatch(props){
                      (notNullAndEqual(props.mp_opp.draw,true) && notNullAndEqual(props.mp_self.draw,true)))?<i className="bi bi-check-circle-fill text-success" title="Verified"></i>:<></>}
                 </span>
             </Col>
-            <Col className="col-4 col-md-2 col-lg-1 paddedLikeInput"><TournamentColoredText value={config.MOV_DATATYPE==="numeric"?props.mp_self.mov.toFixed(2):props.mp_self.mov} min={0} max={config.MAX_POINTS}/></Col>
+            <Col className="col-4 col-md-2 col-lg-1 paddedLikeInput"><TournamentColoredText value={config.MOV_DATATYPE==="numeric"?props.mp_self.mov?.toFixed(2):props.mp_self.mov} min={0} max={config.MAX_POINTS}/></Col>
             <Col className="col-4 col-md-2 col-lg-1 paddedLikeInput"><TournamentColoredText value={props.mp_self.tournament_points} min={config.MIN_TPS} max={config.MAX_TPS}/>&nbsp;
                     {/* {notNullAndAddsTo11(props.mp_self.tournament_points,props.mp_opp.tournament_points)?<i className="bi bi-check-circle-fill d-none d-md-inline text-success" title="Verified"></i>:<></>} */}
             </Col>
