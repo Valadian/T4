@@ -249,7 +249,7 @@ export default function TournamentMatch({ match, round, swapping, setSwapping, s
         if(player===swapTarget){
             setSwapTarget(null)
         } else if(swapTarget){
-            if(player.Match.round_id!==swapTarget.Match.round_id){
+            if(player.Match && swapTarget.Match && player.Match.round_id!==swapTarget.Match.round_id){
                 console.log("Why are you swapping between rounds. I can't let you do that Dave.")
                 setSwapTarget(null)
                 setSwapping(false)

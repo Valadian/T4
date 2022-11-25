@@ -204,7 +204,7 @@ export default function TournamentRoundsTab(props) {
                     <div className="form-group mb-1">
                         <label htmlFor="roundNum">Round Num</label>
                         <input type="number" min="0" className={"form-control"+(isNaN(parseFloat(roundNum))?" is-invalid":"")} placeholder="Enter Round Num" value={roundNum} onChange={(e) => setRoundNum(e.target.value)} />
-                        <div class="invalid-feedback">
+                        <div className="invalid-feedback">
                         Must be a number.
                         </div>
                     </div>

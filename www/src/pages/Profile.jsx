@@ -182,8 +182,6 @@ const Profile = () => {
                 <div className="card-header">Preferred Games</div>
                 <div className="card-body">
                   {games.map(g => <div key={g.key} className="input-group mb-3">
-                    {/* <button className="btn btn-sm btn-outline-success" onClick={() => setGamePreference(g.key, true)}><i class="bi bi-plus"></i></button>
-                    <button className="btn btn-sm btn-outline-danger" onClick={() => setGamePreference(g.key, false)}><i class="bi bi-dash"></i></button> */}
                     <div className="input-group-text">
                       <input className="form-check-input mt-0" onChange={(event) => setGamePreference(g.key,event.target.checked)} checked={gamePreferences.includes(g.key)} type="checkbox" aria-label="Checkbox for following text input"/>
                     </div>
