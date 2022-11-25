@@ -267,9 +267,9 @@ export default function TournamentMatch(props){
                         {player1empty?"":(editing?
                         <div className="input-group">
                             <input className="form-control" value={player1Pts} onFocus={(event) => event.target.select()} onChange={(evt) => setPlayer1Pts(evt.target.value)}></input>
-                            <button tabindex="-1" className={"btn btn-sm "+((player1Win&&!player1Draw)?"btn-warning":"btn-outline-secondary")} type="button" onClick={() => {setPlayer1Win(true);setPlayer1Draw(false)}}>
+                            <button tabIndex="-1" className={"btn btn-sm "+((player1Win&&!player1Draw)?"btn-warning":"btn-outline-secondary")} type="button" onClick={() => {setPlayer1Win(true);setPlayer1Draw(false)}}>
                                 {player1Draw?"=":<i className="bi bi-trophy-fill" title="win"></i>}</button>
-                            <button tabindex="-1" className={"btn btn-sm "+(player1.disqualified?"btn-danger":"btn-outline-danger")} type="button" onClick={() => disqualify(player1.id, !player1.disqualified)}><i className="bi bi-slash-circle" title="disqualify"></i></button>
+                            <button tabIndex="-1" className={"btn btn-sm "+(player1.disqualified?"btn-danger":"btn-outline-danger")} type="button" onClick={() => disqualify(player1.id, !player1.disqualified)}><i className="bi bi-slash-circle" title="disqualify"></i></button>
                         </div>:
                         <>
                         <TournamentColoredText value={player1?.points} min={0} max={config.MAX_POINTS} />
@@ -287,9 +287,9 @@ export default function TournamentMatch(props){
                         {player2empty?"":(editing?
                         <div className="input-group">
                             <input className="form-control" value={player2Pts} onFocus={(event) => event.target.select()} onChange={(evt) => setPlayer2Pts(evt.target.value)}></input>
-                            <button tabindex="-1" className={"btn btn-sm "+((!player1Win&&!player1Draw)?"btn-warning":"btn-outline-secondary")} type="button" onClick={() => {setPlayer1Win(false);setPlayer1Draw(false)}}>
+                            <button tabIndex="-1" className={"btn btn-sm "+((!player1Win&&!player1Draw)?"btn-warning":"btn-outline-secondary")} type="button" onClick={() => {setPlayer1Win(false);setPlayer1Draw(false)}}>
                                 {player1Draw?"=":<i className="bi bi-trophy-fill" title="win"></i>}</button>
-                            <button tabindex="-1" className={"btn btn-sm "+(player2.disqualified?"btn-danger":"btn-outline-danger")} type="button" onClick={() => disqualify(player2.id, !player2.disqualified)}><i className="bi bi-slash-circle" title="disqualify"></i></button>
+                            <button tabIndex="-1" className={"btn btn-sm "+(player2.disqualified?"btn-danger":"btn-outline-danger")} type="button" onClick={() => disqualify(player2.id, !player2.disqualified)}><i className="bi bi-slash-circle" title="disqualify"></i></button>
                         </div>:
                         <>
                         <TournamentColoredText value={player2?.points} min={0} max={config.MAX_POINTS} />
@@ -306,10 +306,10 @@ export default function TournamentMatch(props){
             <Col className="col-1 p-0">
                 {editing?
                 <>
-                    <button tabindex="-1" className="btn btn-outline-primary" onClick={cancel} title="Cancel Edit"><i className="bi bi-pen"></i></button>
+                    <button tabIndex="-1" className="btn btn-outline-primary" onClick={cancel} title="Cancel Edit"><i className="bi bi-pen"></i></button>
                     <button className="btn btn-outline-success" onClick={save} title="Save Scores"><i className="bi bi-check-square"></i></button>
-                    <button tabindex="-1" className="btn btn-outline-danger" onClick={wipe} title="Wipe Scores"><i className="bi bi-recycle"></i></button>
-                    <button tabindex="-1" className="btn btn-danger" onClick={deleteMatch} title="Delete Match"><i className="bi bi-trash-fill"></i></button>
+                    <button tabIndex="-1" className="btn btn-outline-danger" onClick={wipe} title="Wipe Scores"><i className="bi bi-recycle"></i></button>
+                    <button tabIndex="-1" className="btn btn-danger" onClick={deleteMatch} title="Delete Match"><i className="bi bi-trash-fill"></i></button>
                 </>:
                 !props.round.finalized?
                     <button className="btn btn-outline-primary" onClick={edit} title="Edit Scores"><i className="bi bi-pen"></i></button>:
