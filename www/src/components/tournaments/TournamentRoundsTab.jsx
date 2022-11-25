@@ -134,19 +134,29 @@ export default function TournamentRoundsTab(props) {
                 {tournament.Rounds.map(r => {
                 var unmatched = []
                 if(isOwner&&r.Matches.length>0&&!r.finalized){
-                    var all_players = tournament.Ladder.map(l => {return {'player_name':l.player_name, 'User':l.User, 'id':l.id}});
-                    var match_players = r.Matches.flatMap(m => m.Players.map(mp => {return {'player_name':mp.player_name, 'User':mp.User}}))
-                    unmatched = all_players.filter(p => match_players.filter(mp => mp.player_name===p.player_name && mp.User?.id===p.User?.id).length===0);
+                    // var all_players = tournament.Ladder.map(l => {return {'player_name':l.player_name, 'User':l.User, 'id':l.id}});
+                    var all_players = tournament.Ladder.filter(l => !l.disqualified);
+                    //var match_players = r.Matches.flatMap(m => m.Players.map(mp => {return {'player_name':mp.player_name, 'User':mp.User}}))
+                    var match_players = r.Matches.flatMap(m => m.Players.map(mp => mp.TournamentPlayer))
+                    unmatched = all_players.filter(p => !match_players.includes(p));
                 }
-                return <Tab key={r.id} eventKey={"round_"+r.round_num} title={<span><i className="bi bi-bullseye"></i> <span className="d-none d-md-inline">Round </span>{r.round_num}</span>}>
+                let UnmatchedIndicator = () => unmatched.length>0?<i className="bi bi-exclamation-triangle-fill text-warning"></i>:""
+                let LiveIndicator = () => (r.Matches.length>0 && !r.finalized)?<span className="badge bg-danger">Live</span>:""
+                let UnmatchedPlayersWarningLabel = () => unmatched.length>0?<h2 className="text-warning me-auto">Unmatched Players!</h2>:<span className="me-auto"></span>
+                let ReopenRoundButton = () => isOwner&&r.Matches.length>0&&r.finalized?<span className="form-group"><button className="btn btn-outline-secondary" onClick={() => setRoundLocked(r.id, false)}><i className="bi bi-trophy-fill"></i> Reopen Round</button></span>:<></>
+                let FinalizeRoundButton = () => isOwner&&r.Matches.length>0&&!r.finalized?<span className="form-group"><button className="btn btn-outline-warning" onClick={() => setRoundLocked(r.id, true)}><i className="bi bi-trophy-fill"></i> Finalize Round</button></span>:<></>
+                let FinalizePreviousWarningLabel = () =>(isOwner&&r.Matches.length===0&&tournament.Rounds.filter(or=>!or.finalized && or.round_num<r.round_num).length>0)?<h2 className="text-warning">Finalize Previous Rounds!</h2>:<></>
+                let GenerateMatchesButton = () => isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-success" onClick={() => generateRound(r.id,r.round_num===1)}><i className="bi bi-trophy-fill"></i> Generate Matches</button></span>:<></>
+                let DeleteRoundButton = () => isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-danger" onClick={() => deleteRound(r.id)}><i className="bi bi-x"></i> Delete Round</button></span>:<></>
+
+                return <Tab key={r.id} eventKey={"round_"+r.round_num} title={<span><i className="bi bi-bullseye"></i> <span className="d-none d-md-inline">Round </span>{r.round_num} <LiveIndicator /> <UnmatchedIndicator/> </span> }>
                     <div className="d-flex">
-                        {unmatched.length>0?<h2 className="text-warning me-auto">Unmatched Players!</h2>:<span className="me-auto"></span>}
-                        {isOwner&&r.Matches.length>0&&r.finalized?<span className="form-group"><button className="btn btn-outline-secondary" onClick={() => setRoundLocked(r.id, false)}><i className="bi bi-trophy-fill"></i> Reopen Round</button></span>:<></>}
-                        {isOwner&&r.Matches.length>0&&!r.finalized?<span className="form-group"><button className="btn btn-outline-warning" onClick={() => setRoundLocked(r.id, true)}><i className="bi bi-trophy-fill"></i> Finalize Round</button></span>:<></>}
-                        {(isOwner&&r.Matches.length===0&&tournament.Rounds.filter(or=>!or.finalized && or.round_num<r.round_num).length>0)?<h2 className="text-warning">Finalize Previous Rounds!</h2>:<></>}
-                        {isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-success" onClick={() => generateRound(r.id,r.round_num===1)}><i className="bi bi-trophy-fill"></i> Generate Matches</button></span>:<></>}
-                        {isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-danger" onClick={() => deleteRound(r.id)}><i className="bi bi-x"></i> Delete Round</button></span>:<></>}
-                        
+                        <UnmatchedPlayersWarningLabel />
+                        <ReopenRoundButton />
+                        <FinalizeRoundButton />
+                        <FinalizePreviousWarningLabel />
+                        <GenerateMatchesButton />
+                        <DeleteRoundButton />
                     </div>
                     {r.Matches.length>0?<Row className="pb-1 header mb-3 sticky-top">
                         <Col className="col-1"><span className="d-none d-lg-inline">Table #</span><span className="d-inline d-lg-none">Tbl</span></Col>

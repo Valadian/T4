@@ -129,19 +129,19 @@ export default function TournamentPlayerSummary(props) {
         </Col>
         <Col xs={1} className="d-lg-none"></Col>
         <Col xs={3} lg={1}><nobr>
-          <span className={props.player.win>0?"text-info2":""}>{props.player.win}</span><span className="d-none d-md-inline"> </span>/
+          <span className={(props.player.win>0 && !props.player.disqualified)?"text-info2":""}>{props.player.win}</span><span className="d-none d-md-inline"> </span>/
           {config.CAN_DRAW?<><span className="d-none d-md-inline"> </span><span className={props.player.draw>0?"text-muted":""}>{props.player.draw}</span><span className="d-none d-md-inline"> </span>/</>:<></>}
-          <span className="d-none d-md-inline"> </span><span className={props.player.loss>0?"text-danger":""}>{props.player.loss}</span>
+          <span className="d-none d-md-inline"> </span><span className={(props.player.loss>0 && !props.player.disqualified)?"text-danger":""}>{props.player.loss}</span>
           </nobr></Col>
         <Col xs={3} lg={2}><nobr>
-          {(config.LADDER_COLS[0][1].includes("tournament_points"))?<TournamentColoredText value={props.player.tournament_points} min={min_tp} max={max_tp}/>:<></>}
-          {(config.LADDER_COLS[0][1].includes("mov"))?<TournamentColoredText value={props.player.mov.toFixed(2)} min={min_mov} max={max_mov}/>:<></>}
-          {(config.LADDER_COLS[0][1].includes("emov"))?<>/<span className="d-none d-md-inline"> </span><TournamentColoredText value={props.player.emov.toFixed(2)} min={min_mov} max={max_mov}/></>:<></>}
+          {(config.LADDER_COLS[0][1].includes("tournament_points"))?(!props.player.disqualified?<TournamentColoredText value={props.player.tournament_points} min={min_tp} max={max_tp}/>:props.player.tournament_points):<></>}
+          {(config.LADDER_COLS[0][1].includes("mov"))?(!props.player.disqualified?<TournamentColoredText value={props.player.mov?.toFixed(2)} min={min_mov} max={max_mov}/>:props.player.mov?.toFixed(2)):<></>}
+          {(config.LADDER_COLS[0][1].includes("emov"))?<>/<span className="d-none d-md-inline"> </span>(!props.player.disqualified?<TournamentColoredText value={props.player.emov?.toFixed(2)} min={min_mov} max={max_mov}/>:props.player.emov?.toFixed(2))</>:<></>}
           </nobr></Col>
         <Col xs={3} lg={2}><nobr>
-          {(config.LADDER_COLS[1][1].includes("mov"))?<TournamentColoredText value={config.MOV_DATATYPE==="numeric"?props.player.mov.toFixed(2):props.player.mov} min={min_mov} max={max_mov}/>:<></>}
-          {(config.LADDER_COLS[1][1].includes("sos"))?<><span className="d-none d-md-inline"> </span>{config.LADDER_COLS[1][1].includes("mov")?"/":""}<span className="d-none d-md-inline"> </span><TournamentColoredText value={props.player.sos.toFixed(2)} min={min_sos} max={max_sos}/></>:<></>}
-          {(config.LADDER_COLS[1][1].includes("esos"))?<><span className="d-none d-md-inline"> </span>/<span className="d-none d-md-inline"> </span><TournamentColoredText value={props.player.esos.toFixed(2)} min={min_sos} max={max_sos}/></>:<></>}
+          {(config.LADDER_COLS[1][1].includes("mov"))?(!props.player.disqualified?<TournamentColoredText value={config.MOV_DATATYPE==="numeric"?props.player.mov?.toFixed(2):props.player.mov} min={min_mov} max={max_mov}/>:config.MOV_DATATYPE==="numeric"?props.player.mov?.toFixed(2):props.player.mov):<></>}
+          {(config.LADDER_COLS[1][1].includes("sos"))?<><span className="d-none d-md-inline"> </span>{config.LADDER_COLS[1][1].includes("mov")?"/":""}<span className="d-none d-md-inline"> </span>{!props.player.disqualified?<TournamentColoredText value={props.player.sos?.toFixed(2)} min={min_sos} max={max_sos}/>:props.player.sos?.toFixed(2)}</>:<></>}
+          {(config.LADDER_COLS[1][1].includes("esos"))?<><span className="d-none d-md-inline"> </span>/<span className="d-none d-md-inline"> </span>{!props.player.disqualified?<TournamentColoredText value={props.player.esos?.toFixed(2)} min={min_sos} max={max_sos}/>:props.player.esos?.toFixed(2)}</>:<></>}
           </nobr></Col>
         <Col xs={2} lg={2} className="d-flex" style={{position:'relative'}}>
           <span className="w-100">
