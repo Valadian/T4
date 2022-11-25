@@ -157,3 +157,20 @@ body {
     right:-20px;
   }
 }
+.swapping {
+  animation: swapping 1s ease-out;
+  animation-iteration-count: infinite; 
+  opacity: 0.2;
+  color: #f39c12
+}
+@keyframes swapping {
+    0% { 
+        opacity: 0.2;
+    }
+    50% { 
+        opacity: 1.0;
+    }
+    100% { 
+        opacity: 0.2;
+    }
+}

@@ -219,6 +219,7 @@ const tournamentByIdDoc = `
         Matches(order_by: {table_num: asc}) {
             id
             table_num
+            round_id
             Players(order_by: {id: asc}) {
                 id
                 match_id
@@ -234,6 +235,9 @@ const tournamentByIdDoc = `
                 User {
                     id
                     name
+                }
+                Match {
+                    round_id
                 }
                 tournament_opponent_id
                 tournament_player_id
@@ -252,7 +256,7 @@ const TournamentHomeContext = createContext()
 function TournamentHome() {
     const { id } = useParams();
     const { user, getAccessTokenSilently } = useAuth0();
-    const [finalizedOnly, setFinalizedOnly] = useState(true);
+    const [finalizedOnly, setFinalizedOnly] = useState(false);
     const [activeTab, setActiveTab] = useState("ladder")
     const toaster = useRef(null);
     const [showSignUpTab, setShowSignUpTab] = useState(false);

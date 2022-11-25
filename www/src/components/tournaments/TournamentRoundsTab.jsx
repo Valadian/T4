@@ -11,6 +11,9 @@ const insertDoc = `
 mutation addNewRound($tournament_id: uuid!, $round_num: numeric!, $description: String!) {
     insert_TournamentRound(objects: {round_num: $round_num, description: $description, tournament_id: $tournament_id}) {
       affected_rows
+      returning {
+        id
+      }
     }
   }`
 const deleteDoc = `
@@ -38,7 +41,9 @@ export default function TournamentRoundsTab(props) {
     const { getAccessTokenSilently } = useAuth0();
     const [roundNum, setRoundNum] = useState(0);
     const [roundDesc, setRoundDesc] = useState("");
-    const [activeTab, setActiveTab] = useState("round_1")
+    const [activeTab, setActiveTab] = useState()
+    const [swapping, setSwapping] = useState(false);
+    const [swapTarget, setSwapTarget] = useState()
     const {tournament, updateTournament, isOwner, config} = useContext(TournamentHomeContext);
     
     useEffect(() => {
@@ -51,12 +56,10 @@ export default function TournamentRoundsTab(props) {
             round_num: roundNum,
             description: roundDesc,
         },accessToken).then((data) => {
-            setActiveTab("round_"+roundNum)
-            //setRoundNum(+roundNum+1);
+            setActiveTab(data.insert_TournamentRound.returning[0].id)
             updateTournament()
         });
     }
-    
     const deleteRound = async (round_id) => {
         const accessToken = await getAccessTokenSilently()
         Query("deleteRound", deleteDoc, {
@@ -65,8 +68,9 @@ export default function TournamentRoundsTab(props) {
             //setRoundNum(+roundNum+1);
             var remaining_rounds = tournament?.Rounds.filter(r => r.id !== data.delete_TournamentRound_by_pk.id)
             if(remaining_rounds.length>0){
-                var last_round_num = remaining_rounds[remaining_rounds.length - 1].round_num
-                setActiveTab("round_"+last_round_num)
+                
+                var last_round_id = remaining_rounds[remaining_rounds.length-1].id
+                setActiveTab(last_round_id)
             } else {
                 setActiveTab("addRound")
             }
@@ -122,12 +126,12 @@ export default function TournamentRoundsTab(props) {
     if (tournament) {
         return (
         <>
-            
+            {(!isOwner && tournament.Rounds.length===0)?<p className="text-muted">No Rounds have been created...</p>:<></>}
             {isOwner?<div className="mb-3 text-muted">TOs can <b>set/override</b> all <b>match scores</b> in this tab</div>:<></>}
             <Tabs
                 activeKey={activeTab}
                 onSelect={setActiveTab}
-                defaultActiveKey={tournament.Rounds.length>0?"round_1":"addRound"}
+                defaultActiveKey={tournament.Rounds.length>0?(tournament.Rounds[tournament.Rounds.length-1].id):"addRound"}
                 id="uncontrolled-tab-example"
                 className="mb-3"
             >
@@ -148,9 +152,12 @@ export default function TournamentRoundsTab(props) {
                 let FinalizePreviousWarningLabel = () =>(isOwner&&r.Matches.length===0&&tournament.Rounds.filter(or=>!or.finalized && or.round_num<r.round_num).length>0)?<h2 className="text-warning">Finalize Previous Rounds!</h2>:<></>
                 let GenerateMatchesButton = () => isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-success" onClick={() => generateRound(r.id,r.round_num===1)}><i className="bi bi-trophy-fill"></i> Generate Matches</button></span>:<></>
                 let DeleteRoundButton = () => isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-danger" onClick={() => deleteRound(r.id)}><i className="bi bi-x"></i> Delete Round</button></span>:<></>
-
-                return <Tab key={r.id} eventKey={"round_"+r.round_num} title={<span><i className="bi bi-bullseye"></i> <span className="d-none d-md-inline">Round </span>{r.round_num} <LiveIndicator /> <UnmatchedIndicator/> </span> }>
-                    <div className="d-flex">
+                
+                let SwapPlayersButton = () => isOwner&&r.Matches.length>0&&!r.finalized?<span className="form-group"><button className={"btn"+(swapping?" btn-warning text-dark swapping":" btn-outline-warning")} onClick={() => setSwapping(v => !v)} title="Swap Players"><i className="bi bi-arrow-left-right"></i></button></span>:<></>
+                let AddMatchButton = () => isOwner&&r.Matches.length>0&&!r.finalized?<span className="form-group"><button className="btn btn-outline-success" onClick={() => addMatch(r)} title="Add Match"><i className="bi bi-plus"></i></button></span>:<></>
+                
+                return <Tab key={r.id} eventKey={ r.id} title={<span><i className="bi bi-bullseye"></i> <span className="d-none d-md-inline">Round </span>{r.round_num} <LiveIndicator /> <UnmatchedIndicator/> </span> }>
+                    <div className="d-flex mb-3">
                         <UnmatchedPlayersWarningLabel />
                         <ReopenRoundButton />
                         <FinalizeRoundButton />
@@ -172,27 +179,34 @@ export default function TournamentRoundsTab(props) {
                         </Col>
                         <Col xs={isOwner?1:0} md={isOwner?1:0}></Col>
                     </Row>:<></>}
-                    {r.Matches.map(m => <TournamentMatch key={m.id} match={m} round={r}/>)}
+                    {r.Matches.map(m => <TournamentMatch key={m.id} match={m} round={r} swapping={swapping} setSwapping={setSwapping} swapTarget={swapTarget} setSwapTarget={setSwapTarget}/>)}
                     {isOwner&&r.Matches.length>0&&!r.finalized?<Row>
-                        <Col className="col-10 col-md-11"></Col>
-                        <Col className="col-2 col-md-1">
-                        <span className="form-group"><button className="btn btn-outline-success" onClick={() => addMatch(r)} title="Add Match"><i className="bi bi-plus"></i></button></span>
+                        <Col className="col-8 col-md-10"></Col>
+                        <Col className="col-2 col-md-1 p-0 ">
+                        <SwapPlayersButton />
+                        </Col>
+                        <Col className="col-2 col-md-1 p-0 ">
+                        <AddMatchButton />
                         </Col>
                     </Row>
                     :<></>}
                     {isOwner&&r.Matches.length>0&&!r.finalized?
                     <div className="d-flex flex-wrap gap-3">
-                        {unmatched.length>0?<span className="text-muted">Unassigned Players:</span>:<></>}
-                        {unmatched.map(mp => <span key={mp.User?.id??mp.player_name} className="draggablePlayer d-inline-flex" draggable="true" onDragStart={dragPlayer(mp)}>
-                            <TournamentPlayerName player={mp} />
+                        {unmatched.length>0?<span className="text-warning"><b>Unassigned Players:</b></span>:<></>}
+                        {unmatched.map(mp => <span key={mp.User?.id??mp.player_name} className={"draggablePlayer d-inline-flex "+(mp===swapTarget?" swapping":"")} draggable="true" onDragStart={dragPlayer(mp)}>
+                            <TournamentPlayerName player={mp} /> {swapping?<button className="btn btn-sm btn-warning" onClick={() => mp===swapTarget?setSwapTarget(null):setSwapTarget(mp)}><i className="bi bi-arrow-left-right"></i></button>:<></>}
                         </span>)}
                     </div>:<></>}
+                    {(isOwner&&r.Matches.length>0&&!r.finalized)?<p><b>Note:</b> Swapping players require table to be unscored. Reset <i className="text-warning bi bi-recycle"></i> the table if needed.</p>:<></>}
                 </Tab>})}
                 {isOwner?
                 <Tab eventKey="addRound" title={<span><i className="bi bi-plus-circle-fill"></i></span>}>
                     <div className="form-group mb-1">
                         <label htmlFor="roundNum">Round Num</label>
-                        <input className="form-control" placeholder="Enter Round Num" value={roundNum} onChange={(e) => setRoundNum(e.target.value)} />
+                        <input type="number" min="0" className={"form-control"+(isNaN(parseFloat(roundNum))?" is-invalid":"")} placeholder="Enter Round Num" value={roundNum} onChange={(e) => setRoundNum(e.target.value)} />
+                        <div class="invalid-feedback">
+                        Must be a number.
+                        </div>
                     </div>
                     <div className="form-group mb-1">
                         <label htmlFor="roundDesc">Round Description</label>

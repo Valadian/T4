@@ -53,33 +53,32 @@ mutation WithdrawPlayer($id: uuid!, $disqualified: Boolean = true) {
         disqualified
     }
 }`
-export default function TournamentMatch(props){
+export default function TournamentMatch({ match, round, swapping, setSwapping, swapTarget, setSwapTarget}){
     const { getAccessTokenSilently } = useAuth0();
     const {updateTournament, isOwner, config} = useContext(TournamentHomeContext);
     const [editing, setEditing] = useState(false)
     const [player1Pts, setPlayer1Pts] = useState(0)
     const [player2Pts, setPlayer2Pts] = useState(0)
     const [player1Win, setPlayer1Win] = useState(true)
-    const [player1Draw, setPlayer1Draw] = useState(false)
+    // const [player2Win, setPlayer2Win] = useState(true)
+    const [playersDraw, setPlayersDraw] = useState(false)
 
-    var player1 = props.match.Players[0]
-    var player2 = props.match.Players[1]
+    var player1 = match.Players[0]
+    var player2 = match.Players[1]
+
+    var player2IsNotPlayer = !(player2.User || (player2.player_name && player2.player_name!==""))
+    if(player2IsNotPlayer){
+        player1 = match.Players[1]
+        player2 = match.Players[0]
+    }
     const allowDrop = (ev) => ev.preventDefault();
-    const dragPlayer1 = (e) => e.dataTransfer.setData("player",JSON.stringify({
-        'id':player1.id,
-        'tournament_opponent_id':player1.tournament_opponent_id,
-        'tournament_player_id':player1.tournament_player_id,
-        'match_id':player1.match_id,
-        'player_name':player1.player_name,
-        'User':player1.User
-    }));
-    const dragPlayer2 = (e) => e.dataTransfer.setData("player",JSON.stringify({
-        'id':player2.id,
-        'tournament_opponent_id':player2.tournament_opponent_id,
-        'tournament_player_id':player2.tournament_player_id,
-        'match_id':player2.match_id,
-        'player_name':player2.player_name,
-        'User':player2.User
+    const dragPlayer = (e,player) => e.dataTransfer.setData("player",JSON.stringify({
+        'id':player.id,
+        'tournament_opponent_id':player.tournament_opponent_id,
+        'tournament_player_id':player.tournament_player_id,
+        'match_id':player.match_id,
+        'player_name':player.player_name,
+        'User':player.User
     }));
     const assign = async (tp1, p2) => {
         const accessToken = await getAccessTokenSilently()
@@ -97,19 +96,23 @@ export default function TournamentMatch(props){
         })
     }
     const swap = async (p1, p2) => {
-        const accessToken = await getAccessTokenSilently()
-        Query("SwapPlayers", swapDoc, { 
-            id1: p1.id, 
-            match_id1: p1.match_id,
-            tournament_opponent_id1: p1.tournament_opponent_id,
-            tournament_player_id1: p1.tournament_player_id,
-            id2: p2.id, 
-            match_id2: p2.match_id,
-            tournament_opponent_id2: p2.tournament_opponent_id,
-            tournament_player_id2: p2.tournament_player_id },accessToken)
-        .then((response) => {
-            updateTournament();
-        })
+        if(p1.match_id===p2.match_id){
+            return
+        } else {
+            const accessToken = await getAccessTokenSilently()
+            Query("SwapPlayers", swapDoc, { 
+                id1: p1.id, 
+                match_id1: p1.match_id,
+                tournament_opponent_id1: p1.tournament_opponent_id,
+                tournament_player_id1: p1.tournament_player_id,
+                id2: p2.id, 
+                match_id2: p2.match_id,
+                tournament_opponent_id2: p2.tournament_opponent_id,
+                tournament_player_id2: p2.tournament_player_id },accessToken)
+            .then((response) => {
+                updateTournament();
+            })
+        }
     }
     const disqualify = async (id, dq) => {
         const accessToken = await getAccessTokenSilently()
@@ -121,42 +124,35 @@ export default function TournamentMatch(props){
         })
     }
     useEffect(() => {
-        let win = config.WIN_SCORING(+player1Pts,+player2Pts)
+        let p1Win = config.WIN_SCORING(+player1Pts,+player2Pts)
         let draw = config.DRAW_SCORING(+player1Pts,+player2Pts)
-        setPlayer1Win(win??(draw?false:true))
-        setPlayer1Draw(draw)
+        if(draw){
+            p1Win = false
+        }
+        setPlayer1Win(p1Win??(draw?false:true))
+        setPlayersDraw(draw)
     },[player1Pts,player2Pts,config])
 
-    const handleDropPlayer1 = (e) => {
-        var from = JSON.parse(e.dataTransfer.getData("player"))
-        var to = player1
+    const assignOrSwap = (from, to) => {
         if (from.match_id==null) {
-            if (to.player_name==null && to.User==null) {
+            if (to.User==null && (to.player_name==null || to.player_name==="")) {
                 assign(from, to);
             }
         } else {
             swap(from, to);
         }
-        //console.log("Swapping: "+JSON.parse(e.dataTransfer.getData("player"))?.player_name+" for: "+player1?.player_name)
     }
-    const handleDropPlayer2 = (e) => {
+    const handleDropPlayer = (e, to) => {
         var from = JSON.parse(e.dataTransfer.getData("player"))
-        var to = player2
-        if (from.match_id==null) {
-            if (to.player_name==null && to.User==null) {
-                assign(from, to);
-            }
-        } else {
-            swap(from, to);
-        }
-        //console.log("Swapping: "+JSON.parse(e.dataTransfer.getData("player"))?.player_name+" for: "+player2?.player_name)
+        assignOrSwap(from, to)
     }
     const edit = () => {
         setEditing(true)
         setPlayer1Pts((player1?.points)??(player2?.opp_points)??0)
         setPlayer2Pts((player2?.points)??(player1?.opp_points)??0)
         setPlayer1Win((player1?.win)??true)
-        setPlayer1Draw((player1?.draw)??false)
+        // setPlayer2Win((player2?.win)??false)
+        setPlayersDraw((player1?.draw)??false)
     }
     const MatchPlayerBg = (mp) => {
         if(mp.TournamentPlayer===undefined) {return ""}
@@ -168,18 +164,18 @@ export default function TournamentMatch(props){
     // const notNullAndEqual = (v1,v2) => v1!=null && v2!=null && v1===v2
     const notNullAndNotEqual = (v1,v2) => v1!=null && v2!=null && v1!==v2
     
-    const save = async () => {
+    const save = async (player1Pts, player2Pts, player1Win, playersDraw) => {
         player1.points = +(player1.disqualified?0:(player2.disqualified?Math.max(config.CONCESSION_POINTS,player1Pts):player1Pts))
         player1.opp_points = +(player2.disqualified?0:(player1.disqualified?Math.max(config.CONCESSION_POINTS,player2Pts):player2Pts))
         player1.mov = config.MOV_SCORING(player1.points,player1.opp_points)
-        player1.win = player1.disqualified?false:player1Win
-        player1.draw = player1.disqualified?false:player1Draw
+        player1.win = player1.disqualified?false:(playersDraw?false:player1Win)
+        player1.draw = player1.disqualified?false:playersDraw
         player1.tp = player1.disqualified?0:config.TP_SCORING(player1.points,player1.opp_points,player1.win,player1.draw)
         player2.points = +(player2.disqualified?0:(player1.disqualified?Math.max(config.CONCESSION_POINTS,player2Pts):player2Pts))
         player2.opp_points = +(player1.disqualified?0:(player2.disqualified?Math.max(config.CONCESSION_POINTS,player1Pts):player1Pts))
         player2.mov = config.MOV_SCORING(player2.points,player2.opp_points)
-        player2.win = player2.disqualified?false:player1Draw?false:!player1Win
-        player2.draw = player2.disqualified?false:player1Draw
+        player2.win = player2.disqualified?false:(playersDraw?false:!player1Win)
+        player2.draw = player2.disqualified?false:playersDraw
         player2.tp = player2.disqualified?0:config.TP_SCORING(player2.points,player2.opp_points,player2.win,player2.draw)
 
         
@@ -215,7 +211,7 @@ export default function TournamentMatch(props){
     const deleteMatch = async () => {
         const accessToken = await getAccessTokenSilently()
         Query("deleteMatch", deleteDoc, {
-            id: props.match.id
+            id: match.id
         },accessToken)
         .then(() => {
             updateTournament();
@@ -249,69 +245,80 @@ export default function TournamentMatch(props){
             setEditing(false);
         });
     }
-    //TODO: Handle null player 2 (Buy)
-    var player1empty = player1.TournamentPlayer===undefined
-    var player2empty = player2.TournamentPlayer===undefined
-    var player1draggable = player1?.points===null
-    var player2draggable = player2?.points===null
+    const CheckAndSetSwapTarget = (player) => {
+        if(player===swapTarget){
+            setSwapTarget(null)
+        } else if(swapTarget){
+            if(player.Match.round_id!==swapTarget.Match.round_id){
+                console.log("Why are you swapping between rounds. I can't let you do that Dave.")
+                setSwapTarget(null)
+                setSwapping(false)
+                return
+            }
+            assignOrSwap(swapTarget, player)
+            setSwapTarget(null)
+            setSwapping(false)
+        } else {
+            setSwapTarget(player)
+        }
+    }
+    const AutoScoreBye = () => {
+        save(0, config.BUY_POINTS, false, false)
+    }
+    const PlayerColumns = ({player,opponent,playerPts,setPlayerPts,getPlayerWin,setPlayerWin,playersDraw,setPlayersDraw}) => {
+        var isPlayer = player.User || (player.player_name && player.player_name!=="")
+        var playerEmpty = player.TournamentPlayer===undefined
+        var playerDraggable = isPlayer && player?.points===null
+        var playerDragTargetable = player?.points===null
+        var showSwapButton = playerDraggable || (swapTarget && player?.points===null && swapTarget.match_id!==player?.match_id)
+        return <>
+            <Col xs={5} sm={7} md={6} lg={3} className={"pb-3 paddedLikeInput"+(playerDraggable?" draggablePlayer":"")+MatchPlayerBg(player)+(player.disqualified?" withdrawn":"")+(player===swapTarget?" swapping":"")} 
+                draggable={playerDraggable?"true":"false"}  
+                onDragStart={playerDraggable?(e) => dragPlayer(e,player):()=>{}} 
+                onDragOver={playerDragTargetable?(e) => allowDrop(e):()=>{}} 
+                onDrop={playerDragTargetable?e => handleDropPlayer(e,player):()=>{}}>
+                <TournamentPlayerName player={player} />
+                {(!swapping && playerEmpty && player.points===null && player.tournament_opponent_id)?<>&nbsp;<button className="btn btn-sm btn-success" onClick={AutoScoreBye}>Auto-Score</button></>:<></>}
+                {(swapping && showSwapButton)?<>&nbsp;<button className="btn btn-sm btn-warning" onClick={() => CheckAndSetSwapTarget(player)}><i className="bi bi-arrow-left-right"></i></button></>:<></>}
+            </Col>
+            <Col xs={5} sm={3} md={3} lg={2} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player)+(player.disqualified?" withdrawn":"")+(editing?" ps-0":"")}>
+                {playerEmpty?"":(editing?
+                <div className="input-group">
+                    <input className="form-control" value={playerPts} onFocus={(event) => event.target.select()} onChange={(evt) => setPlayerPts(evt.target.value)}></input>
+                    <button tabIndex="-1" className={"btn btn-sm "+((getPlayerWin()&&!playersDraw)?"btn-warning":"btn-outline-secondary")} type="button" onClick={() => {setPlayerWin(v => !v)}}>
+                        {playersDraw?"=":<i className="bi bi-trophy-fill" title="win"></i>}</button>
+                    <button tabIndex="-1" className={"btn btn-sm "+(player.disqualified?"btn-danger":"btn-outline-danger")} type="button" onClick={() => disqualify(player.id, !player.disqualified)}><i className="bi bi-slash-circle" title="disqualify"></i></button>
+                </div>:
+                <>
+                <TournamentColoredText value={player?.points} min={0} max={config.MAX_POINTS} />
+                {player?.points===null && opponent?.opp_points!==null?<span className="text-muted" title="Opponent Reported Value">({opponent?.opp_points})</span>:<></>}
+                {notNullAndNotEqual(player?.points,opponent?.opp_points)?<span className="text-danger" title="Opponent Reported Value">({opponent?.opp_points})</span>:<></>}
+                </>)}
+            </Col>
+            <Col xs={2} sm={2} md={3} lg={1} className={"col-r-border pb-3 paddedLikeInput"+MatchPlayerBg(player)+(player.disqualified?" withdrawn":"")}>
+                {playerEmpty?"":<TournamentColoredText value={player?.tournament_points} min={config.MIN_TPS} max={config.MAX_TPS}/>}
+            </Col>
+        </>
+    }
     if(isOwner){
         return (
         <Row className={"roundRow"+(editing?" editing":"")}>
-            <Col className="col-1">{props.match.table_num}</Col>
+            <Col className="col-1">{match.table_num}</Col>
             <Col className="col-10">
                 <Row className="h-100">
-                    <Col xs={5} sm={7} md={6} lg={3} className={"pb-3 paddedLikeInput"+(player1draggable?" draggablePlayer":"")+MatchPlayerBg(player1)+(player1.disqualified?" withdrawn":"")} draggable={player1draggable?"true":"false"}  onDragStart={player1draggable?dragPlayer1:()=>{}} onDragOver={player1draggable?e => allowDrop(e):()=>{}} onDrop={player1draggable?e => handleDropPlayer1(e):()=>{}}>
-                        <TournamentPlayerName player={player1} />
-                    </Col>
-                    <Col xs={5} sm={3} md={3} lg={2} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player1)+(player1.disqualified?" withdrawn":"")+(editing?" ps-0":"")}>
-                        {player1empty?"":(editing?
-                        <div className="input-group">
-                            <input className="form-control" value={player1Pts} onFocus={(event) => event.target.select()} onChange={(evt) => setPlayer1Pts(evt.target.value)}></input>
-                            <button tabIndex="-1" className={"btn btn-sm "+((player1Win&&!player1Draw)?"btn-warning":"btn-outline-secondary")} type="button" onClick={() => {setPlayer1Win(true);setPlayer1Draw(false)}}>
-                                {player1Draw?"=":<i className="bi bi-trophy-fill" title="win"></i>}</button>
-                            <button tabIndex="-1" className={"btn btn-sm "+(player1.disqualified?"btn-danger":"btn-outline-danger")} type="button" onClick={() => disqualify(player1.id, !player1.disqualified)}><i className="bi bi-slash-circle" title="disqualify"></i></button>
-                        </div>:
-                        <>
-                        <TournamentColoredText value={player1?.points} min={0} max={config.MAX_POINTS} />
-                        {player1?.points===null && player2?.opp_points!==null?<span className="text-muted" title="Opponent Reported Value">({player2?.opp_points})</span>:<></>}
-                        {notNullAndNotEqual(player1?.points,player2?.opp_points)?<span className="text-danger" title="Opponent Reported Value">({player2?.opp_points})</span>:<></>}
-                        </>)}
-                    </Col>
-                    <Col xs={2} sm={2} md={3} lg={1} className={"col-r-border pb-3 paddedLikeInput"+MatchPlayerBg(player1)+(player1.disqualified?" withdrawn":"")}>
-                        {player1empty?"":<TournamentColoredText value={player1?.tournament_points} min={config.MIN_TPS} max={config.MAX_TPS}/>}
-                    </Col>
-                    <Col xs={5} sm={7} md={6} lg={3} className={"pb-3 paddedLikeInput"+(player2draggable?" draggablePlayer":"")+MatchPlayerBg(player2)+(player2.disqualified?" withdrawn":"")} draggable={player2draggable?"true":"false"}  onDragStart={player2draggable?dragPlayer2:()=>{}} onDragOver={player2draggable?e => allowDrop(e):()=>{}} onDrop={player2draggable?e => handleDropPlayer2(e):()=>{}}>
-                        <TournamentPlayerName player={player2} />
-                    </Col>
-                    <Col xs={5} sm={3} md={3} lg={2} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player2)+(player2.disqualified?" withdrawn":"")+(editing?" ps-0":"")}>
-                        {player2empty?"":(editing?
-                        <div className="input-group">
-                            <input className="form-control" value={player2Pts} onFocus={(event) => event.target.select()} onChange={(evt) => setPlayer2Pts(evt.target.value)}></input>
-                            <button tabIndex="-1" className={"btn btn-sm "+((!player1Win&&!player1Draw)?"btn-warning":"btn-outline-secondary")} type="button" onClick={() => {setPlayer1Win(false);setPlayer1Draw(false)}}>
-                                {player1Draw?"=":<i className="bi bi-trophy-fill" title="win"></i>}</button>
-                            <button tabIndex="-1" className={"btn btn-sm "+(player2.disqualified?"btn-danger":"btn-outline-danger")} type="button" onClick={() => disqualify(player2.id, !player2.disqualified)}><i className="bi bi-slash-circle" title="disqualify"></i></button>
-                        </div>:
-                        <>
-                        <TournamentColoredText value={player2?.points} min={0} max={config.MAX_POINTS} />
-                        {player2?.points===null && player1?.opp_points!==null?<span className="text-muted" title="Opponent Reported Value">({player1?.opp_points})</span>:<></>}
-                        {notNullAndNotEqual(player2?.points,player1?.opp_points)?<span className="text-danger" title="Opponent Reported Value">({player1?.opp_points})</span>:<></>}
-                        
-                        </>)}
-                    </Col>
-                    <Col xs={2} sm={2} md={3} lg={1} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player2)+(player2.disqualified?" withdrawn":"")}>
-                        {player2empty?"":<TournamentColoredText value={player2?.tournament_points} min={config.MIN_TPS} max={config.MAX_TPS}/>}
-                    </Col>
+                    {PlayerColumns({player:player1,opponent:player2,playerPts:player1Pts,setPlayerPts:setPlayer1Pts,getPlayerWin:() => player1Win,setPlayerWin:setPlayer1Win,playersDraw:playersDraw,setPlayersDraw:(v) => {if(v){setPlayer1Win(false)};setPlayersDraw(v)}})}
+                    {PlayerColumns({player:player2,opponent:player1,playerPts:player2Pts,setPlayerPts:setPlayer2Pts, getPlayerWin:() => !player1Win,setPlayerWin:(v) => setPlayer1Win(!v),playersDraw:playersDraw,setPlayersDraw:(v) => {if(v){setPlayer1Win(false)};setPlayersDraw(v)}})}
                 </Row>
             </Col>
             <Col className="col-1 p-0">
                 {editing?
                 <>
                     <button tabIndex="-1" className="btn btn-outline-primary" onClick={cancel} title="Cancel Edit"><i className="bi bi-pen"></i></button>
-                    <button className="btn btn-outline-success" onClick={save} title="Save Scores"><i className="bi bi-check-square"></i></button>
-                    <button tabIndex="-1" className="btn btn-outline-danger" onClick={wipe} title="Wipe Scores"><i className="bi bi-recycle"></i></button>
+                    <button className="btn btn-outline-success" onClick={() => save(player1Pts,player2Pts,player1Win,playersDraw)} title="Save Scores"><i className="bi bi-check-square"></i></button>
+                    <button tabIndex="-1" className="btn btn-outline-warning" onClick={wipe} title="Wipe Scores"><i className="bi bi-recycle"></i></button>
                     <button tabIndex="-1" className="btn btn-danger" onClick={deleteMatch} title="Delete Match"><i className="bi bi-trash-fill"></i></button>
                 </>:
-                !props.round.finalized?
+                !round.finalized?
                     <button className="btn btn-outline-primary" onClick={edit} title="Edit Scores"><i className="bi bi-pen"></i></button>:
                     <></>
                 }
@@ -321,9 +328,11 @@ export default function TournamentMatch(props){
         </Row>
         )
     } else {
+        let player1empty = player1.tournament_player_id===null
+        let player2empty = player2.tournament_player_id===null
         return (
             <Row className="roundRow">
-                <Col xs={1}>{props.match.table_num}</Col>
+                <Col xs={1}>{match.table_num}</Col>
                 <Col xs={isOwner?10:11}>
                     <Row>
                         <Col xs={5} sm={7} md={6} lg={4} className={"pb-3 paddedLikeInput"+MatchPlayerBg(player1)}>
