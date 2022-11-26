@@ -61,10 +61,16 @@ const Profile = () => {
         user_id: user.sub
       },accessToken)
       .then((response) => {
-        let {player_name, club, location} = response.UserPreferences_by_pk
-        setPlayerName(player_name??"")
-        setClub(club??"")
-        setLocation(location??"")
+        if(response.UserPreferences_by_pk){
+          let {player_name, club, location} = response.UserPreferences_by_pk
+          setPlayerName(player_name??name)
+          setClub(club??"")
+          setLocation(location??"")
+        } else {
+          setPlayerName(name)
+          setClub("")
+          setLocation("")
+        }
         setGamePreferences((response.UserGamePreferences?.map(ugp => ugp.game))??[])
         setGames(response.Game)
       })
