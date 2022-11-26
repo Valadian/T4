@@ -1,6 +1,7 @@
 from operator import itemgetter
 from application import QueryContext
 import random
+from time import time
 
 from flask import current_app as app
 
@@ -72,6 +73,36 @@ class Matchmaker:
         self.pairings = []
         self.bye = None
 
+    def calculateScores(self):
+        """Calculate TP/MoV/SoS"""
+
+        for player in self.players:
+            for player_match in player["Matches"]:
+                player["tournament_points"] += player_match["tournament_points"]
+                match_mov = int(player_match["points"] - player_match["opp_points"])
+                player["mov"] += match_mov if match_mov > 0 else 0
+
+        for player in self.players:
+            opp_performance = {"tournament_points": 0, "rounds_played": 0}
+            for opponent in player["previous_opponents"]:
+                if opponent["player_name"].upper() == "BYE":
+                    continue
+                opp_performance["tournament_points"] += opponent["tournament_points"]
+                opp_performance["rounds_played"] += len(opponent["Matches"])
+            player["sos"] = not opp_performance["rounds_played"] or (
+                opp_performance["tournament_points"] / opp_performance["rounds_played"]
+            )
+
+        return [
+            {
+                "id": tourney_player["id"],
+                "tournament_points": tourney_player["tournament_points"],
+                "mov": tourney_player["mov"],
+                "sos": tourney_player["sos"],
+            }
+            for tourney_player in self.players
+        ]
+
     def deleteRoundsAtOrAfter(self, this_round):
         """Delete any round with a higher round_num than this_round,
         including all matches and match_players."""
@@ -95,6 +126,10 @@ class Matchmaker:
         if not self.players:
             return False
 
+        [self.addPreviousOpponents(player) for player in self.unpaired_players]
+        scores = self.calculateScores()
+        app.logger.debug(scores)
+
         # Bye bye bye
         if len(self.players) % 2:
             # Rank players to find last place for the bye
@@ -108,7 +143,6 @@ class Matchmaker:
             self.unpaired_players.remove(self.bye)
 
         # Shuffle then sort on TP only to randomize within TP tiers
-        [self.addPreviousOpponents(player) for player in self.unpaired_players]
         random.shuffle(self.players)
         self.players_in_pairing_order = sorted(
             self.players, key=itemgetter("tournament_points"), reverse=True
@@ -134,17 +168,19 @@ class Matchmaker:
 
         player["previous_opponents"] = []
 
-        app.logger.debug("[+] Opponents of {}".format(player["id"]))
+        # app.logger.debug("[+] Opponents of {}".format(player["id"]))
 
-        for previous_opponent in player["Matches"]:
-            player["previous_opponents"].append(
-                previous_opponent["TournamentOpponent"]["id"]
+        for previous_match in player["Matches"]:
+            # app.logger.debug("  - {}".format(previous_match["TournamentOpponent"]))
+            not previous_match["TournamentOpponent"] or player[
+                "previous_opponents"
+            ].append(
+                [
+                    p
+                    for p in self.players
+                    if p["id"] == previous_match["TournamentOpponent"]["id"]
+                ][0]
             )
-
-        [
-            app.logger.debug("  - {}".format(opponent))
-            for opponent in player["previous_opponents"]
-        ]
 
         return player
 
@@ -152,19 +188,18 @@ class Matchmaker:
         """Recurse through the pairings order until we find the first
         player this player hasn't played against before, then pair them."""
 
-        if (
-            self.players_in_pairing_order[player_index + 1]
-            not in player["previous_opponents"]
-        ):
+        if self.players_in_pairing_order[player_index + 1] not in [
+            p["id"] for p in player["previous_opponents"]
+        ]:
             self.unpaired_players.remove(player)
             self.unpaired_players.remove(
                 self.players_in_pairing_order[player_index + 1]
             )
-            app.logger.debug(
-                "{} playing {}".format(
-                    player["id"], self.players_in_pairing_order[player_index + 1]
-                )
-            )
+            # app.logger.debug(
+            #     "{} playing {}".format(
+            #         player["id"], self.players_in_pairing_order[player_index + 1]
+            #     )
+            # )
             return [player, self.players_in_pairing_order[player_index + 1]]
         elif len(self.players_in_pairing_order) == player_index + 1:
             return
@@ -179,39 +214,30 @@ class Matchmaker:
         if self.bye:
             match_count += 1
 
+        app.logger.debug("[+] Creating matches...")
+        start_time = time()
         new_matches = QueryContext.createMatches(
             self.tournament_id, self.round, match_count
         )
+        match_create_time = time() - start_time
+        app.logger.debug("[*] Finished in {}sec".format(str(match_create_time)))
 
         self.new_match_ids = [
             match["id"] for match in new_matches["data"]["insert_Match"]["returning"]
         ]
         self.new_match_ids.reverse()
 
-        self.populated_match_ids = []
+        app.logger.debug("[+] Creating and assigning match players...")
+        start_time = time()
+        self.populated_match_ids = QueryContext.createMatchPlayers(
+            self.pairings, self.new_match_ids
+        )
+        match_player_create_time = time() - start_time
+        app.logger.debug("[*] Finished in {}sec".format(str(match_player_create_time)))
 
-        for pair in self.pairings:
-            match_id = self.new_match_ids.pop()
-            success = QueryContext.createMatchPlayers(pair, match_id)
-            if success:
-                self.populated_match_ids.append(match_id)
-            else:
-                app.logger.info(
-                    "Failed to assign players {} to match {}.".format(
-                        (pair[0]["id"], pair[1]["id"]), match_id
-                    )
-                )
-
-        if self.bye:
-            bye_match_id = self.new_match_ids.pop()
-            success = QueryContext.createMatchPlayers((self.bye, "bye"), bye_match_id)
-            if success:
-                self.populated_match_ids.append(bye_match_id)
-            else:
-                app.logger.info(
-                    "Failed to assign player {} to match {}.".format(self.bye, match_id)
-                )
-
-        self.populated_match_ids = list(dict.fromkeys(self.populated_match_ids))
+        app.logger.debug(
+            "[*] POPULATED MATCH IDS: {}".format(str(self.populated_match_ids))
+        )
+        # self.populated_match_ids = list(dict.fromkeys(self.populated_match_ids))
 
         return True

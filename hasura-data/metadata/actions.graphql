@@ -9,3 +9,4 @@ type Mutation {
 type NextRoundMatchesOutput {
   match_ids: [String!]!
 }
+

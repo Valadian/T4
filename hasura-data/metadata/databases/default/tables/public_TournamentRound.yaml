@@ -44,6 +44,7 @@ select_permissions:
   - role: user
     permission:
       columns:
+        - deleted
         - description
         - finalized
         - id
@@ -66,6 +67,7 @@ update_permissions:
   - role: user
     permission:
       columns:
+        - deleted
         - description
         - finalized
         - round_num

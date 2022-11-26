@@ -31,10 +31,26 @@ select_permissions:
   - role: user
     permission:
       columns:
+        - deleted
         - id
         - round_id
         - table_num
       filter: {}
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - deleted
+      filter:
+        _and:
+          - Round:
+              Tournament:
+                creator_id:
+                  _eq: X-Hasura-User-Id
+          - Round:
+              finalized:
+                _eq: false
+      check: null
 delete_permissions:
   - role: user
     permission:

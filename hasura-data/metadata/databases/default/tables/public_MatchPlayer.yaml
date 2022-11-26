@@ -63,6 +63,7 @@ select_permissions:
     permission:
       columns:
         - confirmed
+        - deleted
         - disqualified
         - draw
         - id
@@ -82,6 +83,7 @@ update_permissions:
   - role: user
     permission:
       columns:
+        - deleted
         - disqualified
         - draw
         - match_id

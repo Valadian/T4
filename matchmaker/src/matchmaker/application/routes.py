@@ -12,11 +12,9 @@ def NextRoundMatchesHandler():
         getTournamentData(args.tournament_id)["data"]["Tournament"][0]["game"]
     ).upper()
     app.logger.debug(game)
-    exit()
-
     match game:
         case "STAR_WARS_ARMADA":
-            print(3)
+            mm = Matchmaker(args.tournament_id, args.round_num, args.no_delete)
         case "XWING_MINIA":
             print(4)
         case "LEGION":

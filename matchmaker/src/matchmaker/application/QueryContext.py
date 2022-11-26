@@ -30,6 +30,46 @@ def getTournamentData(tourney_id):
     operation_name = "getTournamentData"
     vars = {"tournament_id": str(tourney_id)}
 
+    # get_tournament_data_doc = """
+    #     query getTournamentData($tournament_id: uuid = "") {
+    #         Tournament(where: {id: {_eq: $tournament_id}, deleted: {_eq: false}}) {
+    #             game
+    #             scoring_ruleset_id
+    #             Ladder {
+    #                 id
+    #                 player_name
+    #                 tournament_points
+    #                 mov
+    #                 sos
+    #                 Matches(where: {Match: {Round: {finalized: {_eq: true}} _and: {deleted: {_eq: false}}}}) {
+    #                     tournament_points
+    #                     points
+    #                     TournamentOpponent {
+    #                         id
+    #                     }
+    #                 }
+    #             }
+    #             Rounds_aggregate(where: {deleted: {_eq: false}}) {
+    #                 aggregate {
+    #                     max {
+    #                         round_num
+    #                     }
+    #                 }
+    #             }
+    #             Rounds(where: {deleted: {_eq: false}}) {
+    #                 Matches {
+    #                     id
+    #                     Players {
+    #                         id
+    #                     }
+    #                 }
+    #                 id
+    #                 round_num
+    #             }
+    #         }
+    #     }
+    # """
+
     get_tournament_data_doc = """
         query getTournamentData($tournament_id: uuid = "") {
             Tournament(where: {id: {_eq: $tournament_id}, deleted: {_eq: false}}) {
@@ -41,10 +81,14 @@ def getTournamentData(tourney_id):
                     tournament_points
                     mov
                     sos
-                    Matches(where: {Match: {Round: {finalized: {_eq: true}} _and: {deleted: {_eq: false}}}}) {
+                    Matches(where: {Match: {Round: {finalized: {_eq: true}}, _and: {deleted: {_eq: false}}}}) {
+                        tournament_points
+                        points
                         TournamentOpponent {
                             id
+                            player_name
                         }
+                        opp_points
                     }
                 }
                 Rounds_aggregate(where: {deleted: {_eq: false}}) {
@@ -157,72 +201,84 @@ def createMatches(tourney_id, round_num, count):
     return new_matches
 
 
-def createMatchPlayers(pair, match_id):
+def createMatchPlayers(pairings, match_ids):
 
-    operation_name = "CreateMatchPlayer"
+    """Take the list of player pairings and the list of match ids and
+    create MatchPlayers in those matches appropriately."""
+
+    # app.logger.debug("[*] PAIRINGS")
+    # [app.logger.debug(p) for p in pairings]
+    # app.logger.debug("[*] MATCH IDS")
+    # [app.logger.debug(m) for m in match_ids]
+
+    operation_name = "CreateMatchPlayers"
     create_match_player_doc = """
-        mutation CreateMatchPlayer(
-            $tournament_player_id: uuid!, 
-            $player_name: String!
-            $tournament_opponent_id: uuid, 
-            $match_id: uuid!
-            ) {
-        insert_MatchPlayer(
-            objects: {
-                tournament_player_id: $tournament_player_id,
-                player_name: $player_name,
-                tournament_opponent_id: $tournament_opponent_id,
-                match_id: $match_id,
-                confirmed: false,
-                disqualified: false
-                
-            }) {
+        mutation CreateMatchPlayers($match_players: [MatchPlayer_insert_input!] = {}) {
+            insert_MatchPlayer(objects: $match_players) {
                 affected_rows
+                returning {
+                    Match {
+                        id
+                    }
+                }
             }
         }
     """
 
-    # Pair bye with null
-    if pair[1] == "bye":
-        vars = {
-            "tournament_player_id": pair[0]["id"],
-            "player_name": pair[0]["player_name"],
-            "tournament_opponent_id": None,
-            "match_id": match_id,
-        }
-        response = Query(operation_name, create_match_player_doc, vars)
-        success_a = not bool("errors" in response.keys())
+    populated_matches = []
 
-        vars = {
-            "tournament_player_id": None,
-            "player_name": "BYE",
-            "tournament_opponent_id": pair[0]["id"],
-            "match_id": match_id,
-        }
-        response = Query(operation_name, create_match_player_doc, vars)
-        success_b = not bool("errors" in response.keys())
+    for pair in pairings:
+        match_id = match_ids.pop()
 
-        return success_a and success_b
+        if pair[1] == "bye":
+            populated_matches.append(
+                {
+                    "tournament_player_id": pair[0]["id"],
+                    "player_name": pair[0]["player_name"],
+                    "tournament_opponent_id": None,
+                    "match_id": match_id,
+                    "confirmed": False,
+                    "disqualified": False,
+                }
+            )
+            populated_matches.append(
+                {
+                    "tournament_player_id": None,
+                    "player_name": "BYE",
+                    "tournament_opponent_id": pair[0]["id"],
+                    "match_id": match_id,
+                    "confirmed": False,
+                    "disqualified": False,
+                }
+            )
+        else:
+            populated_matches.append(
+                {
+                    "tournament_player_id": pair[0]["id"],
+                    "player_name": pair[0]["player_name"],
+                    "tournament_opponent_id": pair[1]["id"],
+                    "match_id": match_id,
+                    "confirmed": False,
+                    "disqualified": False,
+                }
+            )
+            populated_matches.append(
+                {
+                    "tournament_player_id": pair[1]["id"],
+                    "player_name": pair[1]["player_name"],
+                    "tournament_opponent_id": pair[0]["id"],
+                    "match_id": match_id,
+                    "confirmed": False,
+                    "disqualified": False,
+                }
+            )
 
-    vars = {
-        "tournament_player_id": pair[0]["id"],
-        "player_name": pair[0]["player_name"],
-        "tournament_opponent_id": pair[1]["id"],
-        "match_id": match_id,
-    }
+    vars = {"match_players": populated_matches}
+
     response = Query(operation_name, create_match_player_doc, vars)
-    success_a = not bool("errors" in response.keys())
 
-    vars = {
-        "tournament_player_id": pair[1]["id"],
-        "player_name": pair[1]["player_name"],
-        "tournament_opponent_id": pair[0]["id"],
-        "match_id": match_id,
-    }
-    response = Query(operation_name, create_match_player_doc, vars)
-    success_b = not bool("errors" in response.keys())
-
-    success = success_a and success_b
+    success = not bool("errors" in response.keys())
     if not success:
         app.logger.debug(response)
-    return success
+        return False
+    return response["data"]
