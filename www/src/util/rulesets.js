@@ -97,16 +97,13 @@ XWingHotshot.LADDER_SORT = ['tournament_points','sos','points']
 XWingHotshot.SWISS_PAIRING_ORDER = ['tournament_points']
 
 const getScoringConfig = (game, scoringRulesetName) =>{
-    if(game==="STAR_WARS_ARMADA" && scoringRulesetName==="400pt Standard"){
+    if(game==="STAR_WARS_ARMADA"){ // && ["400pt Standard","Star Wars Armada - 400pt Standard"].includes(scoringRulesetName)
         return ArmadaStandardTournamentRuleset
     }
-    if(game==="STAR_WARS_ARMADA" && scoringRulesetName==="Star Wars Armada - 400pt Standard"){
-        return ArmadaStandardTournamentRuleset
-    }
-    if(game==="STAR_WARS_LEGION" && scoringRulesetName==="800pt Battle Points"){
+    if(game==="STAR_WARS_LEGION"){// && scoringRulesetName==="800pt Battle Points"
         return LegionBattlePoints
     }
-    if(game==="STAR_WARS_XWING" && scoringRulesetName==="20pt Hotshot"){
+    if(game==="STAR_WARS_XWING"){ // && ["20pt Hotshot","2.5 AMG 20pts"].includes(scoringRulesetName)
         return XWingHotshot
     }
     return new TournamentRuleset()
