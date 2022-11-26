@@ -230,7 +230,7 @@ def createMatchPlayers(pairings, match_ids):
     for pair in pairings:
         match_id = match_ids.pop()
 
-        if pair[1] == "bye":
+        if pair[1] == "BYE":
             populated_matches.append(
                 {
                     "tournament_player_id": pair[0]["id"],

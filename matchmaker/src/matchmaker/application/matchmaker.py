@@ -156,6 +156,8 @@ class Matchmaker:
             ):
                 self.pairings.append(player_pair)
 
+        not self.bye or self.pairings.append([self.bye, "BYE"])
+
         app.logger.debug("=" * 30)
         app.logger.debug("[+] Pairings")
 
@@ -210,9 +212,6 @@ class Matchmaker:
         """Create the next round, its matches, then post the players to them."""
 
         match_count = len(self.pairings)
-
-        if self.bye:
-            match_count += 1
 
         app.logger.debug("[+] Creating matches...")
         start_time = time()
