@@ -22,7 +22,11 @@ export default function LocationDropdown(props) {
               accessToken = await getAccessTokenSilently()
             }
             Query("AllLocations", operationsDoc,null,accessToken)
-                .then((data)=> setLocations(data.Tournament));
+                .then((data)=> {
+                  if(data){
+                    setLocations(data.Tournament)
+                  }
+                });
         }
         fetchData();
     }, [getAccessTokenSilently])
