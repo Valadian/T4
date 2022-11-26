@@ -199,6 +199,8 @@ def createMatchPlayers(pairings, match_ids):
                     "match_id": match_id,
                     "confirmed": False,
                     "disqualified": False,
+                    "tournament_points": 0,
+                    "mov": 0,
                 }
             )
             populated_matches.append(
@@ -209,6 +211,8 @@ def createMatchPlayers(pairings, match_ids):
                     "match_id": match_id,
                     "confirmed": False,
                     "disqualified": False,
+                    "tournament_points": 0,
+                    "mov": 0,
                 }
             )
         else:
@@ -221,6 +225,8 @@ def createMatchPlayers(pairings, match_ids):
                     "match_id": match_id,
                     "confirmed": False,
                     "disqualified": False,
+                    "tournament_points": 0,
+                    "mov": 0,
                 }
             )
             populated_matches.append(
@@ -232,6 +238,8 @@ def createMatchPlayers(pairings, match_ids):
                     "match_id": match_id,
                     "confirmed": False,
                     "disqualified": False,
+                    "tournament_points": 0,
+                    "mov": 0,
                 }
             )
 
