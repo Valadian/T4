@@ -48,8 +48,8 @@ let match_battle_points = (mp) => mp.points + mp.opp_points === 0 ? 0.5 : mp.poi
 // let battle_points = (tp) => sum(tp.Matches.filter(m=>m.win!=null).map((m,i)=> m.points+tp.OpponentMatches[i]?.points===0?0.5:(m.points / (m.points+tp.OpponentMatches[i]?.points))))
 // let battle_points = (tp,match_filter=()=>true) => sum(tp.Matches.filter(match_filter).filter(m=>m.win!=null).map((m)=> m.mov))
 let mov = (tp,match_filter=()=>true) => avg(tp.Matches.filter(match_filter).filter(mp=>mp.win!=null).map(mp=>mp.mov))
-let sos_mov = (tp,match_filter=()=>true) => avg(tp.Matches.filter(match_filter).filter(mp=>mp.win!=null).map(mp => avg(mp.TournamentOpponent?.Matches.filter(match_filter).filter(mp=>mp.win!=null).map(mp => mp['mov']))))
-let sos_sos = (tp,match_filter=()=>true) => avg(tp.Matches.filter(match_filter).filter(mp=>mp.win!=null).map(mp=>mp.TournamentOpponent?.sos))
+let sos_mov = (tp,match_filter=()=>true) => avg(tp.Matches.filter(match_filter).filter(mp=>mp.win!=null && mp.TournamentOpponent).map(mp => avg(mp.TournamentOpponent.Matches.filter(match_filter).filter(mp=>mp.win!=null).map(mp => mp['mov']))))
+let sos_sos = (tp,match_filter=()=>true) => avg(tp.Matches.filter(match_filter).filter(mp=>mp.win!=null && mp.TournamentOpponent).map(mp=>mp.TournamentOpponent.sos))
 let LegionBattlePoints = new TournamentRuleset();
 LegionBattlePoints.POINTS_NAME =  "Victory Points"
 LegionBattlePoints.POINTS_ACRONYM = "VP"

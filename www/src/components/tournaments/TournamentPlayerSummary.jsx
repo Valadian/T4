@@ -136,7 +136,7 @@ export default function TournamentPlayerSummary(props) {
         <Col xs={3} lg={2}><nobr>
           {(config.LADDER_COLS[0][1].includes("tournament_points"))?(!props.player.disqualified?<TournamentColoredText value={props.player.tournament_points} min={min_tp} max={max_tp}/>:props.player.tournament_points):<></>}
           {(config.LADDER_COLS[0][1].includes("mov"))?(!props.player.disqualified?<TournamentColoredText value={props.player.mov?.toFixed(2)} min={min_mov} max={max_mov}/>:props.player.mov?.toFixed(2)):<></>}
-          {(config.LADDER_COLS[0][1].includes("emov"))?<>/<span className="d-none d-md-inline"> </span>(!props.player.disqualified?<TournamentColoredText value={props.player.emov?.toFixed(2)} min={min_mov} max={max_mov}/>:props.player.emov?.toFixed(2))</>:<></>}
+          {(config.LADDER_COLS[0][1].includes("emov"))?<>/<span className="d-none d-md-inline"> </span>{!props.player.disqualified?<TournamentColoredText value={props.player.emov?.toFixed(2)} min={min_mov} max={max_mov}/>:props.player.emov?.toFixed(2)}</>:<></>}
           </nobr></Col>
         <Col xs={3} lg={2}><nobr>
           {(config.LADDER_COLS[1][1].includes("mov"))?(!props.player.disqualified?<TournamentColoredText value={config.MOV_DATATYPE==="numeric"?props.player.mov?.toFixed(2):props.player.mov} min={min_mov} max={max_mov}/>:config.MOV_DATATYPE==="numeric"?props.player.mov?.toFixed(2):props.player.mov):<></>}
