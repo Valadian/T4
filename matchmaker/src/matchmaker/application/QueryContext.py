@@ -30,46 +30,6 @@ def getTournamentData(tourney_id):
     operation_name = "getTournamentData"
     vars = {"tournament_id": str(tourney_id)}
 
-    # get_tournament_data_doc = """
-    #     query getTournamentData($tournament_id: uuid = "") {
-    #         Tournament(where: {id: {_eq: $tournament_id}, deleted: {_eq: false}}) {
-    #             game
-    #             scoring_ruleset_id
-    #             Ladder {
-    #                 id
-    #                 player_name
-    #                 tournament_points
-    #                 mov
-    #                 sos
-    #                 Matches(where: {Match: {Round: {finalized: {_eq: true}} _and: {deleted: {_eq: false}}}}) {
-    #                     tournament_points
-    #                     points
-    #                     TournamentOpponent {
-    #                         id
-    #                     }
-    #                 }
-    #             }
-    #             Rounds_aggregate(where: {deleted: {_eq: false}}) {
-    #                 aggregate {
-    #                     max {
-    #                         round_num
-    #                     }
-    #                 }
-    #             }
-    #             Rounds(where: {deleted: {_eq: false}}) {
-    #                 Matches {
-    #                     id
-    #                     Players {
-    #                         id
-    #                     }
-    #                 }
-    #                 id
-    #                 round_num
-    #             }
-    #         }
-    #     }
-    # """
-
     get_tournament_data_doc = """
         query getTournamentData($tournament_id: uuid = "") {
             Tournament(where: {id: {_eq: $tournament_id}, deleted: {_eq: false}}) {
@@ -81,6 +41,7 @@ def getTournamentData(tourney_id):
                     tournament_points
                     mov
                     sos
+                    user_id
                     Matches(where: {Match: {Round: {finalized: {_eq: true}}, _and: {deleted: {_eq: false}}}}) {
                         tournament_points
                         points
@@ -120,7 +81,7 @@ def getTournamentData(tourney_id):
 def deleteRounds(rounds_to_delete=[]):
     """Deletes the list of rounds and all children."""
 
-    app.logger.debug(rounds_to_delete)
+    # app.logger.debug(rounds_to_delete)
     things_to_delete = {
         "rounds": [round["id"] for round in rounds_to_delete],
         "matches": [],
@@ -206,11 +167,6 @@ def createMatchPlayers(pairings, match_ids):
     """Take the list of player pairings and the list of match ids and
     create MatchPlayers in those matches appropriately."""
 
-    # app.logger.debug("[*] PAIRINGS")
-    # [app.logger.debug(p) for p in pairings]
-    # app.logger.debug("[*] MATCH IDS")
-    # [app.logger.debug(m) for m in match_ids]
-
     operation_name = "CreateMatchPlayers"
     create_match_player_doc = """
         mutation CreateMatchPlayers($match_players: [MatchPlayer_insert_input!] = {}) {
@@ -230,11 +186,15 @@ def createMatchPlayers(pairings, match_ids):
     for pair in pairings:
         match_id = match_ids.pop()
 
+        app.logger.debug("[+] Next pair...")
+        app.logger.debug(pair)
+
         if pair[1] == "BYE":
             populated_matches.append(
                 {
                     "tournament_player_id": pair[0]["id"],
                     "player_name": pair[0]["player_name"],
+                    "user_id": pair[0]["user_id"],
                     "tournament_opponent_id": None,
                     "match_id": match_id,
                     "confirmed": False,
@@ -256,6 +216,7 @@ def createMatchPlayers(pairings, match_ids):
                 {
                     "tournament_player_id": pair[0]["id"],
                     "player_name": pair[0]["player_name"],
+                    "user_id": pair[0]["user_id"],
                     "tournament_opponent_id": pair[1]["id"],
                     "match_id": match_id,
                     "confirmed": False,
@@ -266,6 +227,7 @@ def createMatchPlayers(pairings, match_ids):
                 {
                     "tournament_player_id": pair[1]["id"],
                     "player_name": pair[1]["player_name"],
+                    "user_id": pair[1]["user_id"],
                     "tournament_opponent_id": pair[0]["id"],
                     "match_id": match_id,
                     "confirmed": False,

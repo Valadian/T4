@@ -54,8 +54,6 @@ class Matchmaker:
             app.logger.debug("Generating Round {}...".format(self.round))
             app.logger.debug("=" * 30)
             self.players = self.tournament_data["Ladder"]
-            app.logger.debug("  Player list:")
-            [app.logger.debug(p) for p in self.players]
         except KeyError:
             app.logger.debug(
                 "Aborting... found no players in the ladder for tournament {}.".format(
@@ -128,7 +126,6 @@ class Matchmaker:
 
         [self.addPreviousOpponents(player) for player in self.unpaired_players]
         scores = self.calculateScores()
-        app.logger.debug(scores)
 
         # Bye bye bye
         if len(self.players) % 2:
@@ -158,9 +155,6 @@ class Matchmaker:
 
         not self.bye or self.pairings.append([self.bye, "BYE"])
 
-        app.logger.debug("=" * 30)
-        app.logger.debug("[+] Pairings")
-
         if self.bye:
             app.logger.debug("{} has the bye".format(self.bye["id"]))
         else:
@@ -170,10 +164,7 @@ class Matchmaker:
 
         player["previous_opponents"] = []
 
-        # app.logger.debug("[+] Opponents of {}".format(player["id"]))
-
         for previous_match in player["Matches"]:
-            # app.logger.debug("  - {}".format(previous_match["TournamentOpponent"]))
             not previous_match["TournamentOpponent"] or player[
                 "previous_opponents"
             ].append(
@@ -197,11 +188,7 @@ class Matchmaker:
             self.unpaired_players.remove(
                 self.players_in_pairing_order[player_index + 1]
             )
-            # app.logger.debug(
-            #     "{} playing {}".format(
-            #         player["id"], self.players_in_pairing_order[player_index + 1]
-            #     )
-            # )
+
             return [player, self.players_in_pairing_order[player_index + 1]]
         elif len(self.players_in_pairing_order) == player_index + 1:
             return
@@ -233,10 +220,5 @@ class Matchmaker:
         )
         match_player_create_time = time() - start_time
         app.logger.debug("[*] Finished in {}sec".format(str(match_player_create_time)))
-
-        app.logger.debug(
-            "[*] POPULATED MATCH IDS: {}".format(str(self.populated_match_ids))
-        )
-        # self.populated_match_ids = list(dict.fromkeys(self.populated_match_ids))
 
         return True
