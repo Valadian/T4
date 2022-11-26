@@ -5,6 +5,7 @@ import { Form, Button, Col, FloatingLabel, Row } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import { useAuth0 } from "@auth0/auth0-react";
 import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
+import ReactMarkdown from 'react-markdown'
 
 const updateTournamentDescriptionDoc = `
   mutation updateTournamentDescription($description: String = "", $tournament_id: uuid = "") {
@@ -37,9 +38,9 @@ export default function TournamenDescriptionEditor(props) {
         .then(() => {
             updateTournament();
         })
-        .then(() => {
-          setNewTournamentDescription("");
-        });
+        // .then(() => {
+        //   setNewTournamentDescription("");
+        // });
         props.onHide();
         // TODO: insert a "success" toast
     };
@@ -57,6 +58,7 @@ export default function TournamenDescriptionEditor(props) {
         <Modal
           onHide={props.onHide}
           size="lg"
+          fullscreen={true}
           aria-labelledby="contained-modal-title-vcenter"
           centered
           show={props.show}
@@ -67,32 +69,48 @@ export default function TournamenDescriptionEditor(props) {
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Form>
-              <Row>
-                <Form.Group
-                  as={Col}
-                  controlId="formEventLocation"
-                  xs={{ span: 8, offset: 2 }}
-                >
-                  <FloatingLabel
-                    controlId="eventLocation"
-                    label="Event Description"
-                    className="mb-3"
+            {/* <Form> */}
+              <Row> {/* className="h-50 h-md-100"*/}
+                <Col xs={12} md={6} className="mb-3">
+                  <Form.Group
+                    controlId="formEventLocation"
+                    // className="h-100"
                   >
-                    <Form.Control
-                      type="text"
-                      placeholder="f"
-                      required
-                      onChange={handleUpdate}
-                      value={newTournamentDescription}
-                      autoFocus
-                    />
-                  </FloatingLabel>
-                </Form.Group>
+                    {/* <FloatingLabel
+                      controlId="eventLocation"
+                      label=""
+                      className="mb-3"
+                      // h-100
+                    > */}
+                      <Form.Control
+                        // className="h-100"
+                        as="textarea"
+                        placeholder="f"
+                        rows={10}
+                        required
+                        onChange={handleUpdate}
+                        value={newTournamentDescription}
+                        autoFocus
+                      />
+                    {/* </FloatingLabel> */}
+                  </Form.Group>
+                </Col>
+                <Col xs={12} md={6}>
+                  <div className="card">
+                    <div className="card-header">
+                      Preview:
+                    </div>
+                    <div className="card-body">
+                      <ReactMarkdown>{newTournamentDescription}</ReactMarkdown>
+                    </div>
+                  </div>
+                </Col>
               </Row>
-            </Form>
+              <Row></Row>
+            {/* </Form> */}
           </Modal.Body>
           <Modal.Footer>
+            <p className="me-auto">For Formatting help see: <a href="https://www.markdownguide.org/basic-syntax/">MarkDown Guide</a></p>
             <Button onClick={save}>Ok</Button>
             <Button onClick={props.onHide}>Cancel</Button>
           </Modal.Footer>

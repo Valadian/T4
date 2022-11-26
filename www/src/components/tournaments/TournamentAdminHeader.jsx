@@ -15,6 +15,7 @@ import TournamentPlayerEditor from "./TournamentPlayerEditor";
 import TournamentRegistrationToggle from "./TournamentRegistrationToggle";
 import TournamentDeleteModal from "./TournamentDeleteModal";
 import { TournamentHomeContext } from "../../pages/tournaments/TournamentHome";
+import ReactMarkdown from 'react-markdown'
 
 function TournamentAdminHeader(props) {
   const [showTournamentDateEditor, setShowTournamentDateEditor] =
@@ -79,7 +80,8 @@ function TournamentAdminHeader(props) {
       </h4>
       <Row>
         <Col xs={10} md={11} >
-          <p>{tournament.description}</p>
+          <div className="card">
+          <ReactMarkdown className="card-body pb-0">{tournament.description}</ReactMarkdown></div>
         </Col>
         <Col xs={2} md={1}>
           <button className="btn btn-outline-primary" onClick={() => {
