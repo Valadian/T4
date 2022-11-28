@@ -25,12 +25,13 @@ def Query(operation_name, operation_doc, variables):
     return r.json()
 
 
-def getTournamentData(tourney_id):
+def getTournamentData(tourney_id, live=True):
 
     operation_name = "getTournamentData"
     vars = {"tournament_id": str(tourney_id)}
 
-    get_tournament_data_doc = """
+    get_tournament_data_doc = (
+        """
         query getTournamentData($tournament_id: uuid = "") {
             Tournament(where: {id: {_eq: $tournament_id}, deleted: {_eq: false}}) {
                 game
@@ -42,7 +43,9 @@ def getTournamentData(tourney_id):
                     mov
                     sos
                     user_id
-                    Matches(where: {Match: {Round: {finalized: {_eq: true}}, _and: {deleted: {_eq: false}}}}) {
+                    Matches(where: {Match: {Round: """
+        + ("" if live else "{finalized: {_eq: true}}, _and: ")
+        + """{deleted: {_eq: false}}}}) {
                         tournament_points
                         points
                         TournamentOpponent {
@@ -72,6 +75,7 @@ def getTournamentData(tourney_id):
             }
         }
     """
+    )
 
     match_history = Query(operation_name, get_tournament_data_doc, vars)
 

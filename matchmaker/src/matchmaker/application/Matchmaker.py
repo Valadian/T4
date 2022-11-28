@@ -222,3 +222,27 @@ class Matchmaker:
         app.logger.debug("[*] Finished in {}sec".format(str(match_player_create_time)))
 
         return True
+
+
+class Armada(Matchmaker):
+    """Matchmaking class for Armada."""
+
+    def __init__(self, tournament_id, round_num=False, no_delete=False):
+
+        super().__init__(tournament_id, round_num, no_delete)
+
+
+class Legion(Matchmaker):
+    """Matchmaking class for Legion."""
+
+    def __init__(self, tournament_id, round_num=False, no_delete=False):
+
+        super().__init__(tournament_id, round_num, no_delete)
+
+
+class XWing(Matchmaker):
+    """Matchmaking class for X-Wing."""
+
+    def __init__(self, tournament_id, round_num=False, no_delete=False):
+
+        super().__init__(tournament_id, round_num, no_delete)
