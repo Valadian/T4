@@ -79,7 +79,7 @@ class ScoreUpdater:
                     match_mov = (
                         int(player_match["points"] - player_match["opp_points"])
                         if player_match["points"] and player_match["opp_points"]
-                        else None
+                        else 0
                     )
                     player["mov"] += match_mov if match_mov > 0 else 0
 
