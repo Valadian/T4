@@ -6,7 +6,22 @@ type Mutation {
   ): NextRoundMatchesOutput
 }
 
+type Mutation {
+  UpdateScores(
+    tournament_id: uuid
+    live: Boolean
+  ): UpdateScoresOutput
+}
+
 type NextRoundMatchesOutput {
   match_ids: [String!]!
+}
+
+type MyMutationOutput {
+  tournament_players: [String!]!
+}
+
+type UpdateScoresOutput {
+  tournament_players: [String!]!
 }
 
