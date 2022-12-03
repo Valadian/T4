@@ -1,5 +1,5 @@
 from dataclasses import dataclass, asdict
-from typing import Optional, List
+from typing import Optional, List, AnyStr
 import json
 
 
@@ -16,6 +16,7 @@ class RequestMixin:
 
 @dataclass
 class NextRoundMatchesOutput(RequestMixin):
+    round_id: AnyStr
     match_ids: List[str]
 
 

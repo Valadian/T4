@@ -44,7 +44,7 @@ const addMatchDoc = `
 const generateMatchesDoc = `
   mutation generateMatches($tournament_id: uuid!, $round_num: numeric = 0, $no_delete: Boolean = false) {
     NextRoundMatches(tournament_id: $tournament_id, round_num: $round_num, no_delete: $no_delete) {
-      match_ids
+      round_id
     }
   }
   `;
@@ -78,7 +78,7 @@ export default function TournamentRoundsTab(props) {
             id: round_id
         },accessToken).then((data) => {
             //setRoundNum(+roundNum+1);
-            var remaining_rounds = tournament?.Rounds.filter(r => r.id !== data.delete_TournamentRound_by_pk.id)
+            var remaining_rounds = tournament?.Rounds
             if(remaining_rounds.length>0){
                 
                 var last_round_id = remaining_rounds[remaining_rounds.length-1].id
@@ -88,14 +88,16 @@ export default function TournamentRoundsTab(props) {
             }
             updateTournament()
         });
-    }
+    };
     const generateRound = async (round_number, no_delete) => {
       const accessToken = await getAccessTokenSilently();
+
       if (round_number === null) {
-        round_number = roundNum;
-      } else {
-        round_number = 1;
+        round_number = roundNum
+      } else if (round_number < 1) {
+        round_number = 1
       }
+
       let vars = {
         tournament_id: tournament.id,
         round_num: round_number,
@@ -103,10 +105,12 @@ export default function TournamentRoundsTab(props) {
       };
   
       Query("generateMatches", generateMatchesDoc, vars, accessToken)
+        .then((generate_round_data) => {
+          setActiveTab(generate_round_data.NextRoundMatches.round_id)
+        })
         .then(() => {
           updateTournament();
         })
-        .then(() => setActiveTab("round_" + roundNum));
     };
     const setRoundLocked = async (round_id, finalized) => {
         const accessToken = await getAccessTokenSilently()
@@ -174,9 +178,11 @@ export default function TournamentRoundsTab(props) {
                 let UnmatchedIndicator = () => unmatched.length>0?<i className="bi bi-exclamation-triangle-fill text-warning"></i>:""
                 let LiveIndicator = () => (r.Matches.length>0 && !r.finalized)?<span className="badge bg-danger">Live</span>:""
                 let UnmatchedPlayersWarningLabel = () => unmatched.length>0?<h2 className="text-warning me-auto">Unmatched Players!</h2>:<span className="me-auto"></span>
+                // let ReopenRoundButton = () => isOwner&&r.Matches.length>0&&r.finalized?<span className="form-group"><button className="btn btn-outline-secondary" onClick={() => console.log(r)}><i className="bi bi-trophy-fill"></i> Reopen Round</button></span>:<></>
                 let ReopenRoundButton = () => isOwner&&r.Matches.length>0&&r.finalized?<span className="form-group"><button className="btn btn-outline-secondary" onClick={() => setRoundLocked(r.id, false)}><i className="bi bi-trophy-fill"></i> Reopen Round</button></span>:<></>
                 let FinalizeRoundButton = () => isOwner&&r.Matches.length>0&&!r.finalized?<span className="form-group"><button className="btn btn-outline-warning" onClick={() => setRoundLocked(r.id, true)}><i className="bi bi-trophy-fill"></i> Finalize Round</button></span>:<></>
                 let FinalizePreviousWarningLabel = () =>(isOwner&&r.Matches.length===0&&tournament.Rounds.filter(or=>!or.finalized && or.round_num<r.round_num).length>0)?<h2 className="text-warning">Finalize Previous Rounds!</h2>:<></>
+                // let GenerateMatchesButton = () => isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-success" onClick={() => console.log(r)}><i className="bi bi-trophy-fill"></i> Generate Matches</button></span>:<></>
                 let GenerateMatchesButton = () => isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-success" onClick={() => generateRound(r.round_num,false)}><i className="bi bi-trophy-fill"></i> Generate Matches</button></span>:<></>
                 let DeleteRoundButton = () => isOwner&&r.Matches.length===0?<span className="form-group"><button className="btn btn-outline-danger" onClick={() => deleteRound(r.id)}><i className="bi bi-x"></i> Delete Round</button></span>:<></>
                 

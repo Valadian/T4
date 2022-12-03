@@ -124,6 +124,9 @@ class Matchmaker:
         if not self.players:
             return False
 
+        # app.logger.debug("Players to pair: ")
+        # app.logger.debug(self.players)
+        
         [self.addPreviousOpponents(player) for player in self.unpaired_players]
         scores = self.calculateScores()
 
@@ -147,7 +150,7 @@ class Matchmaker:
 
         # iterate through the shuffled player list and generate pairings
         for p_idx, player in enumerate(self.players_in_pairing_order):
-
+        
             if (player in self.unpaired_players) and (
                 player_pair := self.matchmakePlayer(player, p_idx)
             ):
@@ -160,7 +163,12 @@ class Matchmaker:
         else:
             app.logger.debug("No bye.")
 
+        app.logger.debug("Number of pairings: "+str(len(self.pairings)))
+
+
     def addPreviousOpponents(self, player):
+
+        # app.logger.debug("Adding previous opponents of {}".format(player['player_name']))
 
         player["previous_opponents"] = []
 
@@ -174,6 +182,9 @@ class Matchmaker:
                     if p["id"] == previous_match["TournamentOpponent"]["id"]
                 ][0]
             )
+
+        # app.logger.debug("And here they are: ")
+        # app.logger.debug(player)
 
         return player
 
@@ -202,14 +213,14 @@ class Matchmaker:
 
         app.logger.debug("[+] Creating matches...")
         start_time = time()
-        new_matches = QueryContext.createMatches(
+        self.round_id, self.new_matches = QueryContext.createMatches(
             self.tournament_id, self.round, match_count
         )
         match_create_time = time() - start_time
         app.logger.debug("[*] Finished in {}sec".format(str(match_create_time)))
 
         self.new_match_ids = [
-            match["id"] for match in new_matches["data"]["insert_Match"]["returning"]
+            match["id"] for match in self.new_matches["data"]["insert_Match"]["returning"]
         ]
         self.new_match_ids.reverse()
 

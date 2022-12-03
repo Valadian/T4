@@ -36,7 +36,7 @@ def NextRoundMatchesHandler():
         return NextRoundMatchesOutput(0).to_json()
     mm.postPairings()
     app.logger.debug("Generated round in {}".format(str(time() - start)))
-    return NextRoundMatchesOutput(mm.populated_match_ids).to_json()
+    return NextRoundMatchesOutput(mm.round_id, mm.populated_match_ids).to_json()
 
 
 @app.route("/UpdateScores", methods=["POST"])

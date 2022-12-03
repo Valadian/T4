@@ -7,7 +7,7 @@ actions:
       - role: user
   - name: UpdateScores
     definition:
-      kind: synchronous
+      kind: ""
       handler: '{{HASURA_MATCHMAKER_URL}}/UpdateScores'
     permissions:
       - role: user

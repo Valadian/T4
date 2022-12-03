@@ -6,7 +6,7 @@ type Mutation {
   ): NextRoundMatchesOutput
 }
 
-type Mutation {
+type Query {
   UpdateScores(
     tournament_id: uuid
     live: Boolean

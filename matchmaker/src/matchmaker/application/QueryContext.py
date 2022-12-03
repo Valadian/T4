@@ -163,7 +163,7 @@ def createMatches(tourney_id, round_num, count):
 
     new_matches = Query(operation_name, create_matches_doc, vars)
 
-    return new_matches
+    return round_id, new_matches
 
 
 def createMatchPlayers(pairings, match_ids):
@@ -191,7 +191,6 @@ def createMatchPlayers(pairings, match_ids):
         match_id = match_ids.pop()
 
         app.logger.debug("[+] Next pair...")
-        app.logger.debug(pair)
 
         if pair[1] == "BYE":
             populated_matches.append(

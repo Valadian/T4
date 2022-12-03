@@ -311,63 +311,8 @@ export default function TournamentMatch({ match, round, swapping, setSwapping, s
                     {PlayerColumns({player:player2,opponent:player1,playerPts:player2Pts,setPlayerPts:setPlayer2Pts, getPlayerWin:() => !player1Win,setPlayerWin:(v) => setPlayer1Win(!v),playersDraw:playersDraw,setPlayersDraw:(v) => {if(v){setPlayer1Win(false)};setPlayersDraw(v)}})}
                 </Row>
             </Col>
-            <Col
-              xs={5}
-              sm={3}
-              md={3}
-              lg={2}
-              className={
-                "pb-3 paddedLikeInput" +
-                MatchPlayerBg(player2) +
-                (player2.disqualified ? " withdrawn" : "") +
-                (editing ? " ps-0" : "")
-              }
-            >
-              {editing ? (
-                <div className="input-group">
-                  <input
-                    className="form-control"
-                    value={player2Pts}
-                    onFocus={(event) => event.target.select()}
-                    onChange={(evt) => setPlayer2Pts(evt.target.value)}
-                  ></input>
-                  <button
-                    tabindex="-1"
-                    className={
-                      "btn btn-sm " +
-                      (!player1Win && !player1Draw
-                        ? "btn-warning"
-                        : "btn-outline-secondary")
-                    }
-                    type="button"
-                    onClick={() => {
-                      setPlayer1Win(false);
-                      setPlayer1Draw(false);
-                    }}
-                  >
-                    {player1Draw ? (
-                      "="
-                    ) : (
-                      <i className="bi bi-trophy-fill" title="win"></i>
-                    )}
-                  </button>
-                  <button
-                    tabindex="-1"
-                    className={
-                      "btn btn-sm " +
-                      (player2.disqualified
-                        ? "btn-danger"
-                        : "btn-outline-danger")
-                    }
-                    type="button"
-                    onClick={() =>
-                      disqualify(player2.id, !player2.disqualified)
-                    }
-                  >
-                    <i className="bi bi-slash-circle" title="disqualify"></i>
-                  </button>
-                </div>
-              ) : (
+            <Col className="col-1 p-0">
+              {editing?
                 <>
                     <button tabIndex="-1" className="btn btn-outline-primary" onClick={cancel} title="Cancel Edit"><i className="bi bi-pen"></i></button>
                     <button className="btn btn-outline-success" onClick={() => save(player1Pts,player2Pts,player1Win,playersDraw)} title="Save Scores"><i className="bi bi-check-square"></i></button>
@@ -377,26 +322,7 @@ export default function TournamentMatch({ match, round, swapping, setSwapping, s
                 !round.finalized?
                     <button className="btn btn-outline-primary" onClick={edit} title="Edit Scores"><i className="bi bi-pen"></i></button>:
                     <></>
-                  )}
-                </>
-              )}
-            </Col>
-            <Col
-              xs={2}
-              sm={2}
-              md={3}
-              lg={1}
-              className={
-                "pb-3 paddedLikeInput" +
-                MatchPlayerBg(player2) +
-                (player2.disqualified ? " withdrawn" : "")
               }
-            >
-              <TournamentColoredText
-                value={player2?.tournament_points}
-                min={config.MIN_TPS}
-                max={config.MAX_TPS}
-              />
             </Col>
 
         </Row>
