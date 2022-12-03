@@ -1,6 +1,7 @@
 from operator import itemgetter
 from application import QueryContext
 import random
+import application.UpdateScores as UpdateScores
 from time import time
 
 from flask import current_app as app
@@ -71,36 +72,6 @@ class Matchmaker:
         self.pairings = []
         self.bye = None
 
-    def calculateScores(self):
-        """Calculate TP/MoV/SoS"""
-
-        for player in self.players:
-            for player_match in player["Matches"]:
-                player["tournament_points"] += player_match["tournament_points"]
-                match_mov = int(player_match["points"] - player_match["opp_points"])
-                player["mov"] += match_mov if match_mov > 0 else 0
-
-        for player in self.players:
-            opp_performance = {"tournament_points": 0, "rounds_played": 0}
-            for opponent in player["previous_opponents"]:
-                if opponent["player_name"].upper() == "BYE":
-                    continue
-                opp_performance["tournament_points"] += opponent["tournament_points"]
-                opp_performance["rounds_played"] += len(opponent["Matches"])
-            player["sos"] = not opp_performance["rounds_played"] or (
-                opp_performance["tournament_points"] / opp_performance["rounds_played"]
-            )
-
-        return [
-            {
-                "id": tourney_player["id"],
-                "tournament_points": tourney_player["tournament_points"],
-                "mov": tourney_player["mov"],
-                "sos": tourney_player["sos"],
-            }
-            for tourney_player in self.players
-        ]
-
     def deleteRoundsAtOrAfter(self, this_round):
         """Delete any round with a higher round_num than this_round,
         including all matches and match_players."""
@@ -126,9 +97,30 @@ class Matchmaker:
 
         # app.logger.debug("Players to pair: ")
         # app.logger.debug(self.players)
-        
+
         [self.addPreviousOpponents(player) for player in self.unpaired_players]
-        scores = self.calculateScores()
+
+        scorer = UpdateScores.ScoreUpdater(
+            self.tournament_id, tournament_data=self.tournament_data
+        )
+
+        scored_players = scorer.calculateScores()
+        for p in self.players:
+            scored_player = list(
+                filter(lambda pl: pl["id"] == p["id"], scored_players)
+            )[0]
+            (p["tournament_points"], p["mov"], p["sos"],) = itemgetter(
+                "tournament_points", "mov", "sos"
+            )(scored_player)
+            app.logger.debug(
+                "{},{},{},{}".format(
+                    str(scored_player["player_name"]),
+                    str(scored_player["tournament_points"]),
+                    str(scored_player["mov"]),
+                    str(scored_player["sos"]),
+                )
+            )
+            # exit()
 
         # Bye bye bye
         if len(self.players) % 2:
@@ -150,7 +142,7 @@ class Matchmaker:
 
         # iterate through the shuffled player list and generate pairings
         for p_idx, player in enumerate(self.players_in_pairing_order):
-        
+
             if (player in self.unpaired_players) and (
                 player_pair := self.matchmakePlayer(player, p_idx)
             ):
@@ -163,8 +155,7 @@ class Matchmaker:
         else:
             app.logger.debug("No bye.")
 
-        app.logger.debug("Number of pairings: "+str(len(self.pairings)))
-
+        app.logger.debug("Number of pairings: " + str(len(self.pairings)))
 
     def addPreviousOpponents(self, player):
 
@@ -220,7 +211,8 @@ class Matchmaker:
         app.logger.debug("[*] Finished in {}sec".format(str(match_create_time)))
 
         self.new_match_ids = [
-            match["id"] for match in self.new_matches["data"]["insert_Match"]["returning"]
+            match["id"]
+            for match in self.new_matches["data"]["insert_Match"]["returning"]
         ]
         self.new_match_ids.reverse()
 
