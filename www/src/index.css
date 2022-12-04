@@ -192,6 +192,9 @@ body {
   display: flex;
   /*align-items: center;*/ /* vertical */
   justify-content: center; /* horizontal */
+  
+  user-select: none;
+  pointer-events: none;
 }
 .listFactionIconWrapperModal{
   position:absolute;
