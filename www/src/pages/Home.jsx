@@ -1,6 +1,7 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { useNavigate, Link } from "react-router-dom";
 import {Col, Row} from 'react-bootstrap'
+import Query from "../data/T4GraphContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import TournamentList from "../components/tournaments/TournamentList";
 import {DarkLightToggle, DarkModeButton} from "../components/theme/DarkLightToggle";
@@ -33,13 +34,45 @@ function DarkModePrompt() {
         return <></>
     }
 }
+const getPreferencesDoc = `
+  query GetPreferences($user_id: String!) {
+    UserPreferences_by_pk(user_id: $user_id) {
+      club
+      location
+      player_name
+    }
+  }`
 function Home() {
-    const { user, loginWithRedirect } = useAuth0();
+    const { user, loginWithRedirect, getAccessTokenSilently } = useAuth0();
     const navigate = useNavigate()
     const [ showPast, setShowPast] = useState(false);
+    const [playerName, setPlayerName] = useState(null);
+
+    useEffect(() => {
+        if(user){
+            let fetchData = async () => {
+                let accessToken = await getAccessTokenSilently()
+                Query("GetPreferences", getPreferencesDoc, { 
+                    user_id: user.sub
+                },accessToken)
+                .then((response) => {
+                  if (response.UserPreferences_by_pk){
+                    let {player_name, club} = response.UserPreferences_by_pk
+                    setPlayerName(player_name)
+                  } else {
+                    setPlayerName(user.name)
+                  }
+                })
+            }
+            fetchData();
+        }
+    },[user, getAccessTokenSilently])
+
     return (
         <>
-        {user?<></>:<div className="d-flex flex-row-reverse">
+        {user?((user && playerName===null)?<div className="d-flex flex-row-reverse">
+            <Link to="/profile"><h4 className="text-warning">Set your username in Profile! <i className="bi bi-arrow-up-circle-fill"></i></h4></Link>
+        </div>:<></>):<div className="d-flex flex-row-reverse">
             <h4 className="text-success" onClick={() => loginWithRedirect()}>Log in to create Event <i className="bi bi-arrow-up-circle-fill"></i></h4>
         </div>}
         {/* <nav className="" aria-label="breadcrumb">
