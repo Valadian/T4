@@ -17,6 +17,9 @@ export default function TournamentHeader(props) {
   var signup_availability = tournament.signups_open
     ? "Signups open"
     : "Signups closed";
+  var lists_class = (tournament.lists_visible && !tournament.lists_locked)?"":" text-danger"
+  var ladder_vis_class = tournament.ladder_visible?"":" text-danger"
+  var signups_class = tournament.signups_open?"":" text-warning"
 
   return (
     <div>
@@ -58,7 +61,7 @@ export default function TournamentHeader(props) {
           <Row>
             <Col>
               <i className="bi bi-person-plus-fill text-primary"></i>{" "}
-              {signup_availability}
+              <span className={signups_class}>{signup_availability}</span>
             </Col>
           </Row>
         </Col>
@@ -66,12 +69,12 @@ export default function TournamentHeader(props) {
           <Row>
             <Col>
               <i className="bi bi-file-text text-primary"></i>{" "}
-              {list_availability}
+              <span className={lists_class}>{list_availability}</span>
             </Col>
           </Row>
           <Row>
             <Col>
-              <i className="bi bi-list-ol text-primary"></i> {ladder_visibility}
+              <i className="bi bi-list-ol text-primary"></i> <span className={ladder_vis_class}>{ladder_visibility}</span>
             </Col>
           </Row>
         </Col>

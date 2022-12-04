@@ -1,6 +1,10 @@
 table:
   name: Entity
   schema: public
+object_relationships:
+  - name: Faction
+    using:
+      foreign_key_constraint_on: faction
 array_relationships:
   - name: PlayerListEntities
     using:

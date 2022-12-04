@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
-import { Col, Row, Form, FloatingLabel } from "react-bootstrap";
+import { Col, Row, Form, FloatingLabel, Button } from "react-bootstrap";
 import { useAuth0 } from "@auth0/auth0-react";
 import Query from "../../data/T4GraphContext";
 import TournamentPlayerName from "./TournamentPlayerName"
@@ -35,7 +35,7 @@ mutation UpdateNameTournamentPlayer($id: uuid = "", $player_name: String = null,
   }
 }`
 export default function TournamentPlayerSummary(props) {
-    const {updateTournament, isOwner, tournament, config} = useContext(TournamentHomeContext);
+    const {updateTournament, isOwner, tournament, config, showList} = useContext(TournamentHomeContext);
     const { getAccessTokenSilently } = useAuth0();
     const [nameUpdate, setNameUpdate] = useState(props.player.player_name);
     const [clubUpdate, setClubUpdate] = useState(props.player.club);
@@ -125,7 +125,10 @@ export default function TournamentPlayerSummary(props) {
               value={nameUpdate}
               autoFocus
             />
-          </FloatingLabel>:<TournamentPlayerName player={props.player} />}
+          </FloatingLabel>:<>
+            {props.player.PlayerList?<img onClick={(event) => {stopPropagation(event);showList(props.player)}} title="Show List" src={props.player.PlayerList?.Faction?.image} height={20} width={20} alt="Faction Icon"/>:<span className="ladderFactionIconSpacer"></span>}
+            <TournamentPlayerName player={props.player} />
+          </>}
         </Col>
         <Col xs={1} className="d-lg-none"></Col>
         <Col xs={3} lg={1}><nobr>

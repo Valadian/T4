@@ -7,7 +7,11 @@ object_relationships:
       foreign_key_constraint_on: match_id
   - name: PlayerList
     using:
-      foreign_key_constraint_on: participant_list_id
+      foreign_key_constraint_on:
+        column: match_player_id
+        table:
+          name: PlayerList
+          schema: public
   - name: TournamentOpponent
     using:
       foreign_key_constraint_on: tournament_opponent_id
@@ -31,7 +35,6 @@ insert_permissions:
         - match_id
         - mov
         - opp_points
-        - participant_list_id
         - player_name
         - points
         - tournament_opponent_id
@@ -50,7 +53,6 @@ select_permissions:
         - match_id
         - mov
         - opp_points
-        - participant_list_id
         - player_name
         - points
         - tournament_opponent_id
@@ -69,7 +71,6 @@ select_permissions:
         - match_id
         - mov
         - opp_points
-        - participant_list_id
         - player_name
         - points
         - tournament_opponent_id

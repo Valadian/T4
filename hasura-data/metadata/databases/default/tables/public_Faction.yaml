@@ -1,0 +1,22 @@
+table:
+  name: Faction
+  schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - key
+        - name
+        - game
+        - image
+        - acronym
+      filter: {}
+  - role: user
+    permission:
+      columns:
+        - acronym
+        - game
+        - image
+        - key
+        - name
+      filter: {}

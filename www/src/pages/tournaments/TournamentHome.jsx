@@ -11,141 +11,10 @@ import TournamentHeader from "../../components/tournaments/TournamentHeader";
 import TournamentRoundsTab from "../../components/tournaments/TournamentRoundsTab";
 import TournamentResultSubmission from "../../components/tournaments/TournamentResultSubmission"
 import TournamentSignUp from "../../components/tournaments/TournamentSignUp"
+import TournamentListsTab from "../../components/tournaments/TournamentListsTab"
+import TournamentPlayerListModal from "../../components/tournaments/TournamentPlayerListModal"
 import getScoringConfig from "../../util/rulesets"
 
-// const tournamentByIdDoc = `
-//   query TournamentById($id: uuid) {
-//     Tournament(order_by: {start: desc}, where: {id: {_eq: $id}}) {
-//       id
-//       name
-//       description
-//       location
-//       start
-//       lists_visible
-//       lists_locked
-//       ladder_visible
-//       signups_open
-//       public
-//       Ladder_aggregate {
-//         aggregate {
-//           count
-//         }
-//       }
-//       Game {
-//         key
-//         value
-//       }
-//       ScoringRuleset {
-//         name
-//       }
-//       Creator {
-//         name
-//         id
-//       }
-//       Ladder {
-//         player_list_id
-//         rank
-//         player_name
-//         mov
-//         loss
-//         win
-//         tournament_points
-//         sos
-//         club
-//         group
-//         id
-//         tournament_id
-//         disqualified
-//         user_id
-//         User {
-//           id
-//           name
-//         }
-//         Matches(order_by: {Match: {Round: {round_num: asc}}}) {
-//           id
-//           confirmed
-//           points
-//           opp_points
-//           mov
-//           win
-//           draw
-//           tournament_points
-//           disqualified
-//           tournament_opponent_id
-//           TournamentOpponent {
-//             id
-//             player_name
-//             User {
-//               id
-//               name
-//             }
-//             Matches {
-//               tournament_points
-//               confirmed
-//               Match {
-//                 Round {
-//                   finalized
-//                 }
-//               }
-//             }
-//           }
-//           Match {
-//             table_num
-//             Round {
-//               round_num
-//               finalized
-//             }
-//           }
-//         }
-//       }
-//       Rounds(order_by: {round_num: asc}) {
-//         Matches(order_by: {table_num: asc}) {
-//             id
-//             table_num
-//             Players(order_by: {id: asc}) {
-//                 id
-//                 match_id
-//                 win
-//                 draw
-//                 tournament_points
-//                 points
-//                 opp_points
-//                 confirmed
-//                 player_name
-//                 mov
-//                 disqualified
-//                 User {
-//                     id
-//                     name
-//                 }
-//                 tournament_opponent_id
-//                 TournamentOpponent {
-//                     id
-//                     player_name
-//                     User {
-//                         id
-//                         name
-//                     }
-//                 }
-//                 tournament_player_id
-//                 TournamentPlayer {
-//                     id
-//                     player_name
-//                     User {
-//                         id
-//                         name
-//                     }
-//                 }
-//             }
-//         }
-//         id
-//         round_num
-//         description
-//         finalized
-//       }
-//     }
-//   }
-// `;
 const tournamentByIdDoc = `
   query TournamentById($id: uuid) {
     Tournament(order_by: {start: desc}, where: {id: {_eq: $id}}) {
@@ -176,7 +45,6 @@ const tournamentByIdDoc = `
         id
       }
       Ladder {
-        player_list_id
         rank
         player_name
         mov
@@ -193,6 +61,32 @@ const tournamentByIdDoc = `
         User {
           id
           name
+        }
+        PlayerList {
+            id
+            faction
+            Faction {
+                key
+                name
+                image
+                acronym
+            }
+            raw
+            PlayerListEntities {
+                count
+                Entity {
+                    name
+                    cost
+                    faction
+                    type
+                    Upgrades {
+                        name
+                        cost
+                        faction
+                        type
+                    }
+                }
+            }
         }
         Matches(order_by: {Match: {Round: {round_num: asc}}}) {
           id
@@ -261,6 +155,14 @@ function TournamentHome() {
     const toaster = useRef(null);
     const [showSignUpTab, setShowSignUpTab] = useState(false);
     const [config, setConfig] = useState(getScoringConfig())
+
+    const [showListModal, setShowListModal] = useState(false);
+    const [listModalTp, setListModalTp] = useState(null);
+
+    const showList = (tp) => {
+        setListModalTp(tp)
+        setShowListModal(true)
+    }
     const sum = (arr) => arr.reduce((a, b) => a + b,0)
     const avg = (arr) => arr.length===0?0:sum(arr)/arr.length
     // const max = (arr) => arr.reduce((a, b) => Math.max(a, b),0)
@@ -429,13 +331,19 @@ function TournamentHome() {
             setActiveTab,
             finalizedOnly,
             setFinalizedOnly,
-            config
+            config,
+            showList
             // rebakeLadder
         }
 
         //var round_count = matches.map(m => m.)
         return (
             <TournamentHomeContext.Provider value={context}>
+                <TournamentPlayerListModal
+                    show={showListModal}
+                    onHide={() => setShowListModal(false)}
+                    tp={listModalTp}
+                />
                 {breadcrumbs()}
                 {isOwner && !tournament.public?<>
                     <h2 className="text-warning">This event is a Draft and hidden</h2>
@@ -461,6 +369,9 @@ function TournamentHome() {
                     </Tab>
                     {/* <Tab eventKey="log" title={<span><i className="bi bi-journals"></i> <span className="d-none d-md-inline">Event </span>Logs</span>}>
                     </Tab> */}
+                    <Tab eventKey="lists" title={<span><i className="bi bi-card-list"></i> Lists</span>}>
+                        <TournamentListsTab tournament_id={tournament.id}/>
+                    </Tab>
                     {isParticipant?<Tab eventKey="submit" title={<span><i className="bi bi-trophy-fill"></i> My Scores</span>}>
                         <TournamentResultSubmission />
                     </Tab>:<></>}

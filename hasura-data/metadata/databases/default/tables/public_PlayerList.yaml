@@ -1,14 +1,17 @@
 table:
   name: PlayerList
   schema: public
-array_relationships:
-  - name: MatchPlayers
+object_relationships:
+  - name: Faction
     using:
-      foreign_key_constraint_on:
-        column: participant_list_id
-        table:
-          name: MatchPlayer
-          schema: public
+      foreign_key_constraint_on: faction
+  - name: MatchPlayer
+    using:
+      foreign_key_constraint_on: match_player_id
+  - name: TournamentPlayer
+    using:
+      foreign_key_constraint_on: tournament_player_id
+array_relationships:
   - name: PlayerListEntities
     using:
       foreign_key_constraint_on:
@@ -16,43 +19,45 @@ array_relationships:
         table:
           name: PlayerListEntity
           schema: public
-  - name: TournamentPlayers
-    using:
-      foreign_key_constraint_on:
-        column: player_list_id
-        table:
-          name: TournamentPlayer
-          schema: public
 insert_permissions:
   - role: user
     permission:
       check:
         _or:
-          - TournamentPlayers:
+          - TournamentPlayer:
               Tournament:
                 creator_id:
                   _eq: X-Hasura-User-Id
-          - TournamentPlayers:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-          - MatchPlayers:
+          - _and:
+              - TournamentPlayer:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
+              - TournamentPlayer:
+                  Tournament:
+                    lists_locked:
+                      _eq: false
+          - MatchPlayer:
               User:
                 id:
                   _eq: X-Hasura-User-Id
       columns:
         - faction
-        - import_url
         - id
+        - match_player_id
+        - raw
+        - tournament_player_id
 select_permissions:
   - role: anonymous
     permission:
       columns:
         - faction
-        - import_url
         - id
+        - match_player_id
+        - raw
+        - tournament_player_id
       filter:
-        MatchPlayers:
+        MatchPlayer:
           Match:
             Round:
               Tournament:
@@ -60,51 +65,75 @@ select_permissions:
   - role: user
     permission:
       columns:
-        - id
         - faction
-        - import_url
+        - id
+        - match_player_id
+        - raw
+        - tournament_player_id
       filter:
         _or:
-          - MatchPlayers:
+          - MatchPlayer:
               Match:
                 Round:
                   Tournament:
-                    lists_visible: {}
-          - MatchPlayers:
+                    lists_visible:
+                      _eq: true
+          - MatchPlayer:
               user_id:
                 _eq: X-Hasura-User-Id
+          - TournamentPlayer:
+              user_id:
+                _eq: X-Hasura-User-Id
+          - TournamentPlayer:
+              Tournament:
+                lists_visible:
+                  _eq: true
+          - TournamentPlayer:
+              Tournament:
+                creator_id:
+                  _eq: X-Hasura-User-Id
 update_permissions:
   - role: user
     permission:
       columns:
         - faction
-        - import_url
+        - raw
         - id
       filter:
         _or:
-          - TournamentPlayers:
+          - TournamentPlayer:
               Tournament:
                 creator_id:
                   _eq: X-Hasura-User-Id
-          - TournamentPlayers:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-          - MatchPlayers:
+          - _and:
+              - TournamentPlayer:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
+              - TournamentPlayer:
+                  Tournament:
+                    lists_locked:
+                      _eq: false
+          - MatchPlayer:
               User:
                 id:
                   _eq: X-Hasura-User-Id
       check:
         _or:
-          - TournamentPlayers:
+          - TournamentPlayer:
               Tournament:
                 creator_id:
                   _eq: X-Hasura-User-Id
-          - TournamentPlayers:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-          - MatchPlayers:
+          - _and:
+              - TournamentPlayer:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
+              - TournamentPlayer:
+                  Tournament:
+                    lists_locked:
+                      _eq: false
+          - MatchPlayer:
               User:
                 id:
                   _eq: X-Hasura-User-Id

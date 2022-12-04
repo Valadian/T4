@@ -203,10 +203,10 @@ function TournamentAdminHeader(props) {
           </Row>
         </Col>
         <Col xs={12} md={3}>
-          {/* <Row>
+          <Row>
             <Col>
               <div className="d-grid">
-                {/ * List Availability * /}
+                {/* List Availability */}
                 <Button
                   variant={tournament.lists_visible?"outline-secondary":"outline-danger"}
                   onClick={() => {
@@ -223,7 +223,7 @@ function TournamentAdminHeader(props) {
                 onHide={() => setShowTournamentListProtectionEditor(false)}
               />
             </Col>
-          </Row> */}
+          </Row>
           <Row>
             <Col>
               <div className="d-grid">

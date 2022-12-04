@@ -1,5 +1,6 @@
 - "!include public_Entity.yaml"
 - "!include public_EntityUpgrade.yaml"
+- "!include public_Faction.yaml"
 - "!include public_Game.yaml"
 - "!include public_Match.yaml"
 - "!include public_MatchPlayer.yaml"
