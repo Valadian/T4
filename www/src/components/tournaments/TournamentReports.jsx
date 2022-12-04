@@ -24,10 +24,10 @@ export default function TournamentReports() {
                         let player1name = player1.player_name??player1.User?.name
                         let isBye = player2.User==null && player2.player_name===""
                         if(isBye){
-                            return <p key={m.id} className="mb-0">{round_prefix+player1name+" ("+player1.points+") has BYE"}</p>
+                            return <p key={m.id} className="mb-0">{round_prefix+player1name+" ("+player1.points+" ["+player1.tournament_points+"]) has BYE"}</p>
                         } else {
                             let player2name = player2.player_name??player2.User?.name
-                            return <p key={m.id} className="mb-0">{round_prefix+player1name+" ("+player1.points+") def. "+player2name+" ("+player2.points+")"}</p>
+                            return <p key={m.id} className="mb-0">{round_prefix+player1name+" ("+player1.points+" ["+player1.tournament_points+"]) def. "+player2name+" ("+player2.points+" ["+player2.tournament_points+"])"}</p>
                         }
                     })
                 })}
