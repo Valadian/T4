@@ -13,6 +13,7 @@ import TournamentResultSubmission from "../../components/tournaments/TournamentR
 import TournamentSignUp from "../../components/tournaments/TournamentSignUp"
 import TournamentListsTab from "../../components/tournaments/TournamentListsTab"
 import TournamentPlayerListModal from "../../components/tournaments/TournamentPlayerListModal"
+import TournamentReports from "../../components/tournaments/TournamentReports"
 import getScoringConfig from "../../util/rulesets"
 
 const tournamentByIdDoc = `
@@ -377,6 +378,9 @@ function TournamentHome() {
                     </Tab>:<></>}
                     {showSignUpTab?<Tab eventKey="signup" title={<span><i className="bi bi-person-plus-fill"></i> Sign Up</span>}>
                         <TournamentSignUp />
+                    </Tab>:<></>}
+                    {isOwner?<Tab eventKey="reports" title={<span><i className="bi bi-clipboard2-data-fill"></i> Reports</span>}>
+                        <TournamentReports />
                     </Tab>:<></>}
                 </Tabs>
             </TournamentHomeContext.Provider>
