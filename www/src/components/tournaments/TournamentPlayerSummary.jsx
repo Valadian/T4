@@ -40,8 +40,12 @@ export default function TournamentPlayerSummary(props) {
     const [nameUpdate, setNameUpdate] = useState(props.player.player_name);
     const [clubUpdate, setClubUpdate] = useState(props.player.club);
     const [expanded, setExpanded] = useState(false);
+    const [factionImage, setFactionImage] = useState(playerLists[props.player.id]?.Faction?.image)
 
-    let PlayerList = playerLists[props.player.id]
+    useEffect(() => {
+      setFactionImage(playerLists[props.player.id]?.Faction?.image)
+    },[playerLists, props.player.id])
+
     const stopPropagation = (event) =>{
       event.stopPropagation();
       event.nativeEvent.stopImmediatePropagation();
@@ -127,7 +131,7 @@ export default function TournamentPlayerSummary(props) {
               autoFocus
             />
           </FloatingLabel>:<>
-            {PlayerList?<img onClick={(event) => {stopPropagation(event);showList(props.player)}} title="Show List" src={PlayerList?.Faction?.image} height={20} width={20} alt="Faction Icon"/>:<span className="ladderFactionIconSpacer"></span>}
+            {factionImage?<img onClick={(event) => {stopPropagation(event);showList(props.player)}} title="Show List" src={factionImage} height={20} width={20} alt="Faction Icon"/>:<span className="ladderFactionIconSpacer"></span>}
             <TournamentPlayerName player={props.player} />
           </>}
         </Col>

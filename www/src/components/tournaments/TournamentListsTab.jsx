@@ -81,6 +81,12 @@ export default function TournamentListsTab() {
                 setEditing(false);
                 setRaw(rawList);
                 setFaction(allFactions[factionSelected.value])
+                if(list===null || list===undefined){
+                    playerLists[tournamentPlayer.id] = {
+                        tournament_player_id: tournamentPlayer.id,
+                    }
+                    list = playerLists[tournamentPlayer.id]
+                }
                 list.raw=rawList
                 list.Faction=allFactions[factionSelected.value]
                 list.faction=factionSelected.value
