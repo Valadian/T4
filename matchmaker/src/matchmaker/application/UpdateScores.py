@@ -62,11 +62,14 @@ class ScoreUpdater:
 
         return player
 
-    def calculateScores(self):
+    def calculateScores(self, players=False):
         """Calculate TP/MoV/SoS.  The default class method here is for
         Armada; replace for subclasses."""
 
-        self.players = [self.addPreviousOpponents(player) for player in self.players]
+        if not players:
+            self.players = [self.addPreviousOpponents(player) for player in self.players]
+        else:
+            self.players = players
 
         for player in self.players:
             for player_match in player["Matches"]:
@@ -84,20 +87,40 @@ class ScoreUpdater:
                     player["mov"] += match_mov if match_mov > 0 else 0
 
         for player in self.players:
-            opp_performance = {"tournament_points": 0, "rounds_played": 0}
+            opp_record = {"tournament_points": 0, "rounds_played": 0}
             for opponent in player["previous_opponents"]:
                 if opponent["player_name"].upper() == "BYE":
                     continue
-                opp_performance["tournament_points"] += opponent["tournament_points"]
-                opp_performance["rounds_played"] += len(opponent["Matches"])
+                opp_record["tournament_points"] += opponent["tournament_points"]
+                opp_record["rounds_played"] += len(opponent["Matches"])
             player["sos"] = (
                 0
-                if not opp_performance["rounds_played"]
-                else (
-                    opp_performance["tournament_points"]
-                    / opp_performance["rounds_played"]
-                )
+                if not opp_record["rounds_played"]
+                else (opp_record["tournament_points"] / opp_record["rounds_played"])
             )
+
+        return self.players
+
+    def rankPlayers(self, players=False):
+
+        # Fail gracefully if the tournament ladder is empty
+        if players: 
+            self.players = players
+        if not self.players:
+            return False
+
+        self.players = sorted(
+            self.players,
+            key=itemgetter("tournament_points", "mov", "sos"),
+            reverse=True,
+        )
+
+        return self.players
+
+    def scoreAndRankPlayers(self):
+
+        self.calculateScores()
+        self.rankPlayers()
 
         return [
             {
@@ -108,31 +131,6 @@ class ScoreUpdater:
                 "sos": tourney_player["sos"],
             }
             for tourney_player in self.players
-        ]
-
-    def rankPlayers(self):
-
-        # Fail gracefully if the tournament ladder is empty
-        if not self.players:
-            return False
-
-        self.calculateScores()
-
-        players_ranked = sorted(
-            self.players,
-            key=itemgetter("tournament_points", "mov", "sos"),
-            reverse=True,
-        )
-
-        return [
-            {
-                "id": tourney_player["id"],
-                "player_name": tourney_player["player_name"],
-                "tournament_points": tourney_player["tournament_points"],
-                "mov": tourney_player["mov"],
-                "sos": tourney_player["sos"],
-            }
-            for tourney_player in players_ranked
         ]
 
 

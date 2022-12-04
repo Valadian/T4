@@ -43,6 +43,7 @@ def getTournamentData(tourney_id, live=True):
                     mov
                     sos
                     user_id
+                    disqualified
                     Matches(where: {Match: {Round: """
         + ("" if live else "{finalized: {_eq: true}}, _and: ")
         + """{deleted: {_eq: false}}}}) {

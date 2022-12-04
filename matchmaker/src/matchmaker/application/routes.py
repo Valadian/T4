@@ -33,7 +33,7 @@ def NextRoundMatchesHandler():
     # mm = Matchmaker(args.tournament_id, args.round_num, args.no_delete)
     mm.generatePairings()
     if not mm.pairings:
-        return NextRoundMatchesOutput(0).to_json()
+        return NextRoundMatchesOutput("Posted no pairings",[]).to_json()
     mm.postPairings()
     app.logger.debug("Generated round in {}".format(str(time() - start)))
     return NextRoundMatchesOutput(mm.round_id, mm.populated_match_ids).to_json()
@@ -54,8 +54,9 @@ def UpdateScoresHandler():
             updater = UpdateScores.XWingScoreUpdater(args.tournament_id, args.live)
         case "STAR_WARS_LEGION":
             updater = UpdateScores.LegionScoreUpdater(args.tournament_id, args.live)
+    out = updater.scoreAndRankPlayers()
     app.logger.debug("Updated scores in {}".format(str(time() - start)))
-    return UpdateScoresOutput(updater.rankPlayers()).to_json()
+    return UpdateScoresOutput(out).to_json()
 
 
 

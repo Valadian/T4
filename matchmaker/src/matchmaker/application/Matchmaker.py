@@ -7,7 +7,7 @@ from time import time
 from flask import current_app as app
 
 
-class Matchmaker:
+class Matchmaker(UpdateScores.ScoreUpdater):
     """
     Makes player matchups for T4.
 
@@ -54,29 +54,30 @@ class Matchmaker:
             app.logger.debug("=" * 30)
             app.logger.debug("Generating Round {}...".format(self.round))
             app.logger.debug("=" * 30)
-            self.players = self.tournament_data["Ladder"]
-        except KeyError:
+            # we occasionally need to include DQ'd/dropped players
+            self.players_inc_dq = self.tournament_data["Ladder"]
+            self.players = list(
+                filter(lambda p: not p["disqualified"], self.players_inc_dq)
+            )
+        except KeyError as exc:
             app.logger.debug(
                 "Aborting... found no players in the ladder for tournament {}.".format(
                     tournament_id
                 )
             )
+            app.logger.debug("Error: {}".format(exc))
 
             self.players = False
             self.pairings = False
-            return
 
-        random.shuffle(self.players)
-        self.unpaired_players = self.players
+            return False
 
-        self.pairings = []
-        self.bye = None
+        return True
 
     def deleteRoundsAtOrAfter(self, this_round):
         """Delete any round with a higher round_num than this_round,
         including all matches and match_players."""
 
-        app.logger.debug("deleting some shit here")
         self.to_delete = []
 
         for round in self.tournament_data["Rounds"]:
@@ -95,49 +96,30 @@ class Matchmaker:
         if not self.players:
             return False
 
-        # app.logger.debug("Players to pair: ")
-        # app.logger.debug(self.players)
+        self.pairings = []
+        self.bye = None
 
-        [self.addPreviousOpponents(player) for player in self.unpaired_players]
+        [self.addPreviousOpponents(player) for player in self.players]
+        self.unpaired_players = self.players
 
-        scorer = UpdateScores.ScoreUpdater(
+        self.scorer = UpdateScores.ScoreUpdater(
             self.tournament_id, tournament_data=self.tournament_data
         )
 
-        scored_players = scorer.calculateScores()
-        for p in self.players:
-            scored_player = list(
-                filter(lambda pl: pl["id"] == p["id"], scored_players)
-            )[0]
-            (p["tournament_points"], p["mov"], p["sos"],) = itemgetter(
-                "tournament_points", "mov", "sos"
-            )(scored_player)
-            app.logger.debug(
-                "{},{},{},{}".format(
-                    str(scored_player["player_name"]),
-                    str(scored_player["tournament_points"]),
-                    str(scored_player["mov"]),
-                    str(scored_player["sos"]),
-                )
+        self.players = list(
+            filter(
+                lambda p: not p["disqualified"],
+                self.scorer.calculateScores(self.players_inc_dq),
             )
-            # exit()
+        )
 
         # Bye bye bye
-        if len(self.players) % 2:
-            # Rank players to find last place for the bye
-            players_ranked = sorted(
-                self.players,
-                key=itemgetter("tournament_points", "mov", "sos"),
-                reverse=True,
-            )
-
-            self.bye = players_ranked[-1]
-            self.unpaired_players.remove(self.bye)
+        self.bye = self.assignBye()
 
         # Shuffle then sort on TP only to randomize within TP tiers
-        random.shuffle(self.players)
+        random.shuffle(self.unpaired_players)
         self.players_in_pairing_order = sorted(
-            self.players, key=itemgetter("tournament_points"), reverse=True
+            self.unpaired_players, key=itemgetter("tournament_points"), reverse=True
         )
 
         # iterate through the shuffled player list and generate pairings
@@ -161,23 +143,35 @@ class Matchmaker:
 
         # app.logger.debug("Adding previous opponents of {}".format(player['player_name']))
 
-        player["previous_opponents"] = []
-
-        for previous_match in player["Matches"]:
-            not previous_match["TournamentOpponent"] or player[
-                "previous_opponents"
-            ].append(
-                [
-                    p
-                    for p in self.players
-                    if p["id"] == previous_match["TournamentOpponent"]["id"]
-                ][0]
+        player["previous_opponents"] = [
+            (
+                list(
+                    filter(
+                        lambda p: p["id"] == previous_match["TournamentOpponent"]["id"],
+                        self.players,
+                    )
+                )[0]
             )
-
-        # app.logger.debug("And here they are: ")
-        # app.logger.debug(player)
+            for previous_match in player["Matches"]
+            if previous_match["TournamentOpponent"] is not None
+        ]
 
         return player
+
+    def assignBye(self):
+        """Calculate the bye, ensuring no repeats and avoiding drop/DQ"""
+
+        if not len(self.players) % 2:
+            self.bye = False
+
+        players_reverse_ranked = self.scorer.rankPlayers(self.players)
+        players_reverse_ranked.reverse()
+
+        for player in players_reverse_ranked:
+            [app.logger.debug(p["player_name"]) for p in player["previous_opponents"]]
+            self.bye = player
+            self.unpaired_players.remove(self.bye)
+            return self.bye
 
     def matchmakePlayer(self, player, player_index):
         """Recurse through the pairings order until we find the first
