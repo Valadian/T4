@@ -8,12 +8,13 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router } from "react-router-dom";
 import Auth0ProviderWithHistory from "./auth/Auth0Provider";
+import CacheBuster from './components/CacheBuster';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <>
-
   <Router>
+    <CacheBuster />
     <Auth0ProviderWithHistory>
       <App />
     </Auth0ProviderWithHistory>
