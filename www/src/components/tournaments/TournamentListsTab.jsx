@@ -33,7 +33,7 @@ mutation UpdatePlayerList($tournament_player_id: uuid!, $raw: String = null, $fa
 `
 export default function TournamentListsTab() {
     const { user, getAccessTokenSilently } = useAuth0();
-    const { tournament, isOwner, dispatchTournament, updateTournament } = useContext(TournamentHomeContext);
+    const { tournament, isOwner, dispatchTournament, updateTournament, playerLists, setPlayerLists } = useContext(TournamentHomeContext);
     const [factionOptions, setFactionOptions] = useState([])
     const [allFactions, setAllFactions] = useState({})
 
@@ -52,16 +52,13 @@ export default function TournamentListsTab() {
     :<></>
     const SuggestButton = ({User, Action}) => (user && !isOwner && !(User?.id===user?.sub))?<Button variant="outline-secondary" onClick={Action} title="Suggest List"><i className="bi bi-chat-left-text-fill"></i></Button>:<></>
     
-    const ListCard = ({tournamentPlayer}) => {
+    const ListCard = ({tournamentPlayer, list}) => {
         const [tp, setTp] = useState(tournamentPlayer)
         const [editing, setEditing] = useState(false)
-        const [faction, setFaction] = useState(tp.PlayerList?.Faction)
-        const [raw, setRaw] = useState(tp.PlayerList?.raw)
+        const [faction, setFaction] = useState(list?.Faction)
+        const [raw, setRaw] = useState(list?.raw)
         const [factionSelected, setFactionSelected] = useState()
-        const [rawList, setRawList] = useState(tp.PlayerList?.raw??"")
-        useEffect(() => {
-
-        })
+        const [rawList, setRawList] = useState(list?.raw??"")
         const toggleEdit = () => {
             if(editing){
                 setEditing(false)
@@ -82,10 +79,14 @@ export default function TournamentListsTab() {
                 raw:rawList },accessToken)
             .then((response) => {
                 setEditing(false);
-                // setRaw(rawList);
-                // setFaction(allFactions[factionSelected.value])
+                setRaw(rawList);
+                setFaction(allFactions[factionSelected.value])
+                list.raw=rawList
+                list.Faction=allFactions[factionSelected.value]
+                list.faction=factionSelected.value
+                setPlayerLists(playerLists)
                 // dispatchTournament({type: 'reset', payload: tournament})
-                updateTournament();
+                // updateTournament();
             })
         }
         if(!tournament.lists_visible && !isOwner && !(user && (tp.User?.id===user?.sub))){
@@ -141,6 +142,6 @@ export default function TournamentListsTab() {
     }
     return (<>
         {(!tournament.lists_visible)?<h2 className="text-warning">Lists are Hidden</h2>:<></>}
-        {tournament.Ladder.map(tp => <ListCard key={tp.id} tournamentPlayer={tp}/>)}
+        {tournament.Ladder.map(tp => <ListCard key={tp.id} tournamentPlayer={tp} list={playerLists[tp.id]}/>)}
     </>)
 }

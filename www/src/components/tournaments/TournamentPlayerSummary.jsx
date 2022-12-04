@@ -35,12 +35,13 @@ mutation UpdateNameTournamentPlayer($id: uuid = "", $player_name: String = null,
   }
 }`
 export default function TournamentPlayerSummary(props) {
-    const {updateTournament, isOwner, tournament, config, showList} = useContext(TournamentHomeContext);
+    const {updateTournament, isOwner, tournament, config, showList, playerLists} = useContext(TournamentHomeContext);
     const { getAccessTokenSilently } = useAuth0();
     const [nameUpdate, setNameUpdate] = useState(props.player.player_name);
     const [clubUpdate, setClubUpdate] = useState(props.player.club);
     const [expanded, setExpanded] = useState(false);
 
+    let PlayerList = playerLists[props.player.id]
     const stopPropagation = (event) =>{
       event.stopPropagation();
       event.nativeEvent.stopImmediatePropagation();
@@ -126,7 +127,7 @@ export default function TournamentPlayerSummary(props) {
               autoFocus
             />
           </FloatingLabel>:<>
-            {props.player.PlayerList?<img onClick={(event) => {stopPropagation(event);showList(props.player)}} title="Show List" src={props.player.PlayerList?.Faction?.image} height={20} width={20} alt="Faction Icon"/>:<span className="ladderFactionIconSpacer"></span>}
+            {PlayerList?<img onClick={(event) => {stopPropagation(event);showList(props.player)}} title="Show List" src={PlayerList?.Faction?.image} height={20} width={20} alt="Faction Icon"/>:<span className="ladderFactionIconSpacer"></span>}
             <TournamentPlayerName player={props.player} />
           </>}
         </Col>

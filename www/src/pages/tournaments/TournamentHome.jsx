@@ -63,32 +63,6 @@ const tournamentByIdDoc = `
           id
           name
         }
-        PlayerList {
-            id
-            faction
-            Faction {
-                key
-                name
-                image
-                acronym
-            }
-            raw
-            PlayerListEntities {
-                count
-                Entity {
-                    name
-                    cost
-                    faction
-                    type
-                    Upgrades {
-                        name
-                        cost
-                        faction
-                        type
-                    }
-                }
-            }
-        }
         Matches(order_by: {Match: {Round: {round_num: asc}}}) {
           id
           confirmed
@@ -146,6 +120,36 @@ const tournamentByIdDoc = `
     }
   }
 `;
+const playerListDoc = `
+query AllPlayerLists($id: uuid = "") {
+    PlayerList(where: {TournamentPlayer: {tournament_id: {_eq: $id}}}) {
+        tournament_player_id
+        id
+        faction
+        Faction {
+            key
+            name
+            image
+            acronym
+        }
+        raw
+        PlayerListEntities {
+            count
+            Entity {
+                name
+                cost
+                faction
+                type
+                Upgrades {
+                    name
+                    cost
+                    faction
+                    type
+                }
+            }
+        }
+    }
+}`
 const TournamentHomeContext = createContext()
 
 function TournamentHome() {
@@ -159,6 +163,7 @@ function TournamentHome() {
 
     const [showListModal, setShowListModal] = useState(false);
     const [listModalTp, setListModalTp] = useState(null);
+    const [playerLists, setPlayerLists] = useState({})
 
     const showList = (tp) => {
         setListModalTp(tp)
@@ -263,6 +268,19 @@ function TournamentHome() {
     }
     const [tournament, dispatchTournament] = useReducer(ladderReducer, null);
     
+    useEffect(() => {
+        const fetchData = async () => {
+            var accessToken = undefined
+            if (user) {
+                accessToken = await getAccessTokenSilently()
+            }
+            await Query("AllPlayerLists",playerListDoc , { id: id },accessToken)
+            .then((response) => {
+                setPlayerLists(Object.fromEntries(response.PlayerList.map(pl => [pl.tournament_player_id,pl])))
+            })
+        }
+        fetchData();
+    },[getAccessTokenSilently, id, user])
     // useEffect(() => {
     //     setConfig(getScoringConfig(tournament?.Game?.key,tournament?.ScoringRuleset?.name))
     // },[tournament])
@@ -333,7 +351,9 @@ function TournamentHome() {
             finalizedOnly,
             setFinalizedOnly,
             config,
-            showList
+            showList,
+            playerLists,
+            setPlayerLists
             // rebakeLadder
         }
 
@@ -344,6 +364,7 @@ function TournamentHome() {
                     show={showListModal}
                     onHide={() => setShowListModal(false)}
                     tp={listModalTp}
+                    playerLists={playerLists}
                 />
                 {breadcrumbs()}
                 {isOwner && !tournament.public?<>

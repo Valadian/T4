@@ -57,11 +57,10 @@ select_permissions:
         - raw
         - tournament_player_id
       filter:
-        MatchPlayer:
-          Match:
-            Round:
-              Tournament:
-                lists_visible: {}
+        TournamentPlayer:
+          Tournament:
+            lists_visible:
+              _eq: true
   - role: user
     permission:
       columns:
@@ -72,15 +71,6 @@ select_permissions:
         - tournament_player_id
       filter:
         _or:
-          - MatchPlayer:
-              Match:
-                Round:
-                  Tournament:
-                    lists_visible:
-                      _eq: true
-          - MatchPlayer:
-              user_id:
-                _eq: X-Hasura-User-Id
           - TournamentPlayer:
               user_id:
                 _eq: X-Hasura-User-Id

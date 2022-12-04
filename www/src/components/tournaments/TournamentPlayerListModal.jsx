@@ -3,8 +3,9 @@ import { Button, Col, Row } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import TournamentPlayerName from "./TournamentPlayerName";
 
-export default function TournamentPlayerListModal({onHide, show, tp}) {
+export default function TournamentPlayerListModal({onHide, show, tp, playerLists}) {
     if(tp){
+        let PlayerList = playerLists[tp.id]
         return (
             <Modal 
                 onHide={onHide}
@@ -21,11 +22,11 @@ export default function TournamentPlayerListModal({onHide, show, tp}) {
                 <Modal.Body>
                     <Row>
                         <Col className="d-flex">
-                        {tp.PlayerList?.raw?<>
+                        {PlayerList?.raw?<>
                             <div className="listFactionIconWrapperModal">
-                                <img className="listFactionIcon" src={tp.PlayerList?.Faction?.image} alt="Faction Icon"/>
+                                <img className="listFactionIcon" src={PlayerList?.Faction?.image} alt="Faction Icon"/>
                             </div>
-                            <pre>{tp.PlayerList?.raw}</pre>
+                            <pre>{PlayerList?.raw}</pre>
                             </>:
                             <span className="text-muted">No List</span>}
                         </Col>
