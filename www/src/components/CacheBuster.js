@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { version } from '../../package.json';
+import packageInfo from '../../package.json';
 
 const CacheBuster = () => {
   const location = useLocation();
@@ -12,7 +12,7 @@ const CacheBuster = () => {
       .then((meta) => {
         if (meta?.version) {
           const metaVersion = parseVersion(meta.version);
-          const packageVersion = parseVersion(version);
+          const packageVersion = parseVersion(packageInfo.version);
           if (packageVersion < metaVersion) {
             if (window?.location?.reload) {
               window.location.reload();
