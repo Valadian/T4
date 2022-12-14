@@ -41,6 +41,7 @@ const tournamentByIdDoc = `
       ScoringRuleset {
         name
       }
+      creator_name
       Creator {
         name
         id

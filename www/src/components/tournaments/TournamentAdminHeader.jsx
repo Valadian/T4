@@ -150,13 +150,13 @@ function TournamentAdminHeader(props) {
                 {/* Administrator */}
                 <Button
                   variant="outline-secondary"
-                  // onClick={() => {
-                  //   setShowTournamentAdminEditor(true);
-                  // }}
+                  onClick={() => {
+                    setShowTournamentAdminEditor(true);
+                  }}
                   size="sm"
                 >
                   <i className="bi bi-person-fill text-primary"></i>{" "}
-                  <span>{tournament.Creator.name}</span>
+                  <span>{tournament.creator_name??tournament.Creator.name}</span>
                 </Button>
               </div>
               <TournamentAdminEditor

@@ -53,8 +53,8 @@ query ScoringByGame($gameKey: Game_enum) {
 `;
 
 const updateDoc = `
-mutation UpdateTournament($name: String = "", $location: String = "", $start: date = null, $game: Game_enum  = "", $scoring_ruleset_id: uuid = null, $id: uuid = "id") {
-  update_Tournament(_set: {name: $name, location: $location, start: $start, game: $game, scoring_ruleset_id: $scoring_ruleset_id}, where: {id: {_eq: $id}}) {
+mutation UpdateTournament($name: String = "", $location: String = "", $start: date = null, $game: Game_enum  = "", $scoring_ruleset_id: uuid = null, $id: uuid = "id", $creator_name: String = null) {
+  update_Tournament(_set: {name: $name, location: $location, start: $start, game: $game, scoring_ruleset_id: $scoring_ruleset_id, creator_name: $creator_name}, where: {id: {_eq: $id}}) {
     returning {
       id
     }
@@ -62,14 +62,22 @@ mutation UpdateTournament($name: String = "", $location: String = "", $start: da
 }  
 `
 const insertDoc = `
-mutation InsertTournament($name: String = "", $location: String = "", $start: date = null, $game: Game_enum  = "", $scoring_ruleset_id: uuid = null) {
-  insert_Tournament(objects: {name: $name, location: $location, start: $start, game: $game, scoring_ruleset_id: $scoring_ruleset_id}) {
+mutation InsertTournament($name: String = "", $location: String = "", $start: date = null, $game: Game_enum  = "", $scoring_ruleset_id: uuid = null, $creator_name: String = null) {
+  insert_Tournament(objects: {name: $name, location: $location, start: $start, game: $game, scoring_ruleset_id: $scoring_ruleset_id, creator_name: $creator_name}) {
     returning {
       id
     }
   }
 }  
 `
+const getPreferencesDoc = `
+query GetPreferences($user_id: String!) {
+  UserPreferences_by_pk(user_id: $user_id) {
+    club
+    location
+    player_name
+  }
+}`
 export default function TournamentEditor(props) {
     const params = useParams()
     const successRef = React.createRef();
@@ -77,8 +85,29 @@ export default function TournamentEditor(props) {
     const [tournament, setTournament] = useState(new Tournament())
     const [gameOptions, setGameOptions] = useState([])
     const [scoringOptions, setScoringOptions] = useState([])
-    const { getAccessTokenSilently } = useAuth0()
+    const { user, getAccessTokenSilently } = useAuth0()
     const navigate = useNavigate();
+    const [playerName, setPlayerName] = useState(null);
+  
+    useEffect(() => {
+        if(user){
+            let fetchData = async () => {
+                let accessToken = await getAccessTokenSilently()
+                Query("GetPreferences", getPreferencesDoc, { 
+                    user_id: user.sub
+                },accessToken)
+                .then((response) => {
+                  if (response.UserPreferences_by_pk){
+                    let {player_name, club} = response.UserPreferences_by_pk
+                    setPlayerName(player_name)
+                  } else {
+                    setPlayerName(user.name)
+                  }
+                })
+            }
+            fetchData();
+        }
+    },[user, getAccessTokenSilently])
 
     const setTournamentPartial = function(valueKeys){
       setTournament(prevTourn => ({...prevTourn, ...valueKeys}))
@@ -159,7 +188,8 @@ export default function TournamentEditor(props) {
           start: new Date(tournament.start).toISOString(), 
           game: tournament.Game?.key, 
           scoring_ruleset_id: tournament.ScoringRuleset?.id, 
-          id: tournament.id}, accessToken)
+          id: tournament.id,
+          creator_name: playerName}, accessToken)
         .then((data) => {
             var node = successRef.current;
             if(data.update_Tournament.returning.length === 0){
@@ -176,13 +206,14 @@ export default function TournamentEditor(props) {
           location: tournament.location, 
           start: new Date(tournament.start).toISOString(), 
           game: tournament.Game?.key, 
-          scoring_ruleset_id: tournament.ScoringRuleset?.id}, accessToken) //TODO: Get logged in user
+          scoring_ruleset_id: tournament.ScoringRuleset?.id,
+          creator_name: playerName}, accessToken) //TODO: Get logged in user
         .then((data) => {
-            if(data.insert_Tournament.returning.length > 0) {
+            if(data && data.insert_Tournament.returning.length > 0) {
               navigate("/events/"+data.insert_Tournament.returning[0].id)
             }
             var node = successRef.current;
-            if(data.insert_Tournament.returning.length === 0){
+            if(data===undefined || data.insert_Tournament.returning.length === 0){
               node = failureRef.current;
             }
             
@@ -241,7 +272,7 @@ export default function TournamentEditor(props) {
               Tournament has been updated!
           </div>
           <div ref={failureRef} className="alert alert-danger collapse mt-3" role="alert">
-              Tournament cannot be updated!
+              Creating Tournament failed!
           </div>
         </>
       );

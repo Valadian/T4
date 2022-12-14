@@ -7,9 +7,17 @@ import {TournamentHomeContext} from "../../pages/tournaments/TournamentHome"
 export default function Ladder(props) {
     const {tournament, dispatchTournament, isOwner, finalizedOnly, setFinalizedOnly, config } = useContext(TournamentHomeContext);
     const [showTournamentPlayerEditor, setShowTournamentPlayerEditor] = useState(false);
-    const [editPlayerNames, setEditPlayerNames] = useState(false);
+    const [editNameMode, setEditNameMode] = useState(false);
     const [disqualifyMode, setDisqualifyMode] = useState(false);
 
+    const toggleDisqualifyModeExclusive = () => {
+      setEditNameMode(false)
+      setDisqualifyMode(v => !v)
+    }
+    const toggleEditNameModeExclusive = () => {
+      setEditNameMode(v => !v)
+      setDisqualifyMode(false)
+    }
     const toggleFinalizedOnly = () => {
       let next = !finalizedOnly
       setFinalizedOnly(next)
@@ -28,9 +36,9 @@ export default function Ladder(props) {
             {isOwner?<button className="btn btn-outline-success" onClick={() => {
                     setShowTournamentPlayerEditor(true);
                   }} title="Add Player"><i className="bi bi-plus"></i></button>:<></>}
-            {isOwner?<button className="btn btn-outline-primary" onClick={() => setEditPlayerNames(v => !v)} title="Override Names"><i className="bi bi-pen"></i></button>:<></>}
+            {isOwner?<button className="btn btn-outline-primary" onClick={toggleEditNameModeExclusive} title="Override Names"><i className="bi bi-pen"></i></button>:<></>}
             {/* {isOwner && editPlayerNames?<button className="btn btn-outline-success" onClick={() => {}} title="Save Names"><i className="bi bi-save"></i></button>:<></>} */}
-            {isOwner?<button className="btn btn-outline-danger pl-0 pr-0" onClick={() => setDisqualifyMode(v => !v)} title="Disqualify"><i className="bi bi-slash-circle"></i></button>:<></>}
+            {isOwner?<button className="btn btn-outline-danger pl-0 pr-0" onClick={toggleDisqualifyModeExclusive} title="Disqualify"><i className="bi bi-slash-circle"></i></button>:<></>}
             <span className="me-auto"></span>
             {finalizedOnly?<span className="form-group"><button className="btn btn-outline-secondary" onClick={toggleFinalizedOnly}>Finalized</button></span>:<></>}
             {!finalizedOnly?<span className="form-group"><button className="btn btn-outline-danger" onClick={toggleFinalizedOnly}>LIVE</button></span>:<></>}
@@ -47,7 +55,7 @@ export default function Ladder(props) {
             </Col>
           </Row>
           {tournament.Ladder.map((player) => (
-            <TournamentPlayerSummary key={player.id} player={player} editPlayerNames={editPlayerNames} setEditPlayerNames={setEditPlayerNames} disqualifyMode={disqualifyMode}/>
+            <TournamentPlayerSummary key={player.id} player={player} editNameMode={editNameMode} disqualifyMode={disqualifyMode}/>
           ))}
           <TournamentPlayerEditor
               show={showTournamentPlayerEditor}
