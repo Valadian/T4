@@ -35,7 +35,7 @@ mutation UpdateNameTournamentPlayer($id: uuid = "", $player_name: String = null,
   }
 }`
 export default function TournamentPlayerSummary({player, editNameMode, disqualifyMode}) {
-    const {updateTournament, isOwner, tournament, config, showList, playerLists} = useContext(TournamentHomeContext);
+    const {updateTournament, isOwner, tournament, config, showLists, showMatchLists, playerLists} = useContext(TournamentHomeContext);
     const { user, getAccessTokenSilently } = useAuth0();
     const [nameUpdate, setNameUpdate] = useState(player.player_name??"");
     const [clubUpdate, setClubUpdate] = useState(player.club);
@@ -101,10 +101,18 @@ export default function TournamentPlayerSummary({player, editNameMode, disqualif
       let m = match
       let state = m.TournamentOpponent?(m.win===null?"PENDING":(m.win?"WIN":(m.disqualified?"DQ":(m.draw?"DRAW":"LOSS")))):(m.win===false?"D/Q":"BYE")
       let oppname = m.TournamentOpponent?(m.TournamentOpponent.player_name??m.TournamentOpponent.User?.name):""
+      let oppid = m.TournamentOpponent?(m.TournamentOpponent.id):""
+      
+      const [oppFactionImage, setOppFactionImage] = useState(playerLists[oppid]?.Faction?.image)
+
+      // useEffect(() => {
+      //   setFactionImage(playerLists[oppid]?.Faction?.image)
+      // },[playerLists, oppid])
 
       return (<>
         <Col xs={1}></Col>
-        <Col xs={11} lg={4}>&nbsp;- R{m.Match.Round.round_num} vs {oppname}</Col>
+        <Col xs={11} lg={4}>&nbsp;- R{m.Match.Round.round_num} vs {oppFactionImage?<img onClick={(event) => {stopPropagation(event);showMatchLists(m)}} title="Show List" src={oppFactionImage} height={20} width={20} alt=""/>:<span className="ladderFactionIconSpacer"></span>}
+            {oppname}</Col>
         <Col xs={1} className="d-lg-none"></Col>
         <Col xs={3} lg={1} className={state==="PENDING"?"text-warning":(m.win?"text-info2":(m.draw?"text-muted":"text-danger"))}>{state}</Col>
         <Col xs={3} lg={2}><TournamentColoredText value={m.tournament_points} min={config.MIN_TPS} max={config.MAX_TPS}/></Col>
@@ -138,7 +146,7 @@ export default function TournamentPlayerSummary({player, editNameMode, disqualif
               autoFocus
             />
           </FloatingLabel>:<>
-            {factionImage?<img onClick={(event) => {stopPropagation(event);showList(player)}} title="Show List" src={factionImage} height={20} width={20} alt=""/>:<span className="ladderFactionIconSpacer"></span>}
+            {factionImage?<img onClick={(event) => {stopPropagation(event);showLists(player)}} title="Show List" src={factionImage} height={20} width={20} alt=""/>:<span className="ladderFactionIconSpacer"></span>}
             <TournamentPlayerName player={player} />
           </>}
         </Col>

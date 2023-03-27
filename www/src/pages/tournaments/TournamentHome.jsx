@@ -163,11 +163,22 @@ function TournamentHome() {
     const [config, setConfig] = useState(getScoringConfig())
 
     const [showListModal, setShowListModal] = useState(false);
-    const [listModalTp, setListModalTp] = useState(null);
+    const [listModalTps, setListModalTps] = useState([]);
+    const [listModalMatch, setListModalMatch] = useState(null);
     const [playerLists, setPlayerLists] = useState({})
 
-    const showList = (tp) => {
-        setListModalTp(tp)
+    const showLists = (...tps) => {
+        setListModalTps(tps)
+        setListModalMatch(null)
+        setShowListModal(true)
+    }
+    const showMatchLists = (match) => {
+        setListModalMatch(match)
+        if (match.TournamentOpponent){
+            setListModalTps([match.TournamentPlayer, match.TournamentOpponent])
+        } else {
+            setListModalTps([match.TournamentPlayer])
+        }
         setShowListModal(true)
     }
     const sum = (arr) => arr.reduce((a, b) => a + b,0)
@@ -352,7 +363,8 @@ function TournamentHome() {
             finalizedOnly,
             setFinalizedOnly,
             config,
-            showList,
+            showLists,
+            showMatchLists,
             playerLists,
             setPlayerLists
             // rebakeLadder
@@ -364,8 +376,8 @@ function TournamentHome() {
                 <TournamentPlayerListModal
                     show={showListModal}
                     onHide={() => setShowListModal(false)}
-                    tp={listModalTp}
-                    playerLists={playerLists}
+                    tps={listModalTps}
+                    match={listModalMatch}
                 />
                 {breadcrumbs()}
                 {isOwner && !tournament.public?<>
