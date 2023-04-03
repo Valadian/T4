@@ -279,7 +279,11 @@ function TournamentHome() {
         }
     }
     const [tournament, dispatchTournament] = useReducer(ladderReducer, null);
-    
+    useEffect(() => {
+        if(window.location.hash) {
+            setActiveTab(window.location.hash.replace("#",""))
+        }
+    },[])
     useEffect(() => {
         const fetchData = async () => {
             var accessToken = undefined
@@ -395,25 +399,25 @@ function TournamentHome() {
                     className="mb-3"
                     // fill
                 >
-                    <Tab eventKey="ladder" title={<span><i className="bi bi-list-ol"></i> Ladder</span>}>
+                    <Tab eventKey="ladder" title={<span onClick={()=>window.location.hash = "ladder"}><i className="bi bi-list-ol"></i> Ladder</span>}>
                         {!tournament.ladder_visible?<h3 className="text-warning"><i className="bi bi-lock-fill"></i> Ladder is Hidden</h3>:<></>}
                         {tournament.ladder_visible || isOwner?<Ladder />:<></>}
                     </Tab>
-                    <Tab eventKey="rounds" title={<span><i className="bi bi-play-circle-fill"></i> Rounds</span>}>
+                    <Tab eventKey="rounds" title={<span onClick={()=>window.location.hash = "rounds"}><i className="bi bi-play-circle-fill"></i> Rounds</span>}>
                         <TournamentRoundsTab />
                     </Tab>
                     {/* <Tab eventKey="log" title={<span><i className="bi bi-journals"></i> <span className="d-none d-md-inline">Event </span>Logs</span>}>
                     </Tab> */}
-                    <Tab eventKey="lists" title={<span><i className="bi bi-card-list"></i> Lists</span>}>
+                    <Tab eventKey="lists" title={<span onClick={()=>window.location.hash = "lists"}><i className="bi bi-card-list"></i> Lists</span>}>
                         <TournamentListsTab tournament_id={tournament.id}/>
                     </Tab>
-                    {isParticipant?<Tab eventKey="submit" title={<span><i className="bi bi-trophy-fill"></i> My Scores</span>}>
+                    {isParticipant?<Tab eventKey="submit" title={<span onClick={()=>window.location.hash = "submit"}><i className="bi bi-trophy-fill"></i> My Scores</span>}>
                         <TournamentResultSubmission />
                     </Tab>:<></>}
-                    {showSignUpTab?<Tab eventKey="signup" title={<span><i className="bi bi-person-plus-fill"></i> Sign Up</span>}>
+                    {showSignUpTab?<Tab eventKey="signup" title={<span onClick={()=>window.location.hash = "signup"}><i className="bi bi-person-plus-fill"></i> Sign Up</span>}>
                         <TournamentSignUp />
                     </Tab>:<></>}
-                    {isOwner?<Tab eventKey="reports" title={<span><i className="bi bi-clipboard2-data-fill"></i> Reports</span>}>
+                    {isOwner?<Tab eventKey="reports" title={<span onClick={()=>window.location.hash = "reports"}><i className="bi bi-clipboard2-data-fill"></i> Reports</span>}>
                         <TournamentReports />
                     </Tab>:<></>}
                 </Tabs>
