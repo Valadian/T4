@@ -206,6 +206,7 @@ body {
   display: flex;
   /*align-items: center;*/ /* vertical */
   justify-content: center; /* horizontal */
+  pointer-events: none;
 }
 .ladderFactionIconSpacer{
   width: 20px;
