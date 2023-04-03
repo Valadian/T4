@@ -2,9 +2,10 @@ import React, {useContext} from "react"
 import { TournamentHomeContext } from "../../pages/tournaments/TournamentHome";
 
 export default function TournamentReports() {
-    const { tournament, isOwner } = useContext(TournamentHomeContext);
+    const { tournament, isOwner, config } = useContext(TournamentHomeContext);
     
     return (
+        <>
         <div className="card">
             <div className="card-header">
                 Finalized Match Summary
@@ -33,5 +34,19 @@ export default function TournamentReports() {
                 })}
             </div>
         </div>
+        <br/>
+        <div className="card">
+            <div className="card-header">
+                Ladder Export (paste into spreadsheet, then text to columns)
+            </div>
+            <div className="card-body">
+                rank,name,win,loss,{config.LADDER_COLS[0][1].join(",")},{config.LADDER_COLS[1][1].join(",")},club
+            {tournament?.Ladder?.map((p) => {
+                let player1name = p.player_name??p.User?.name
+                return <div key={p.id} className="mb-0">{p.rank},{player1name},{p.win},{p.loss},{config.LADDER_COLS.map(col => col[1].map(attr => p[attr]).join(",")).join(",")},{p.club??"N/A"}</div>
+            })}
+            </div>
+        </div>
+        </>
     )
 }

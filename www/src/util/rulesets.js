@@ -47,16 +47,16 @@ const avg = (arr) => arr.length===0?0:sum(arr)/arr.length
 let match_battle_points = (mp) => mp.points + mp.opp_points === 0 ? 0.5 : mp.points / (mp.points+mp.opp_points)
 // let battle_points = (tp) => sum(tp.Matches.filter(m=>m.win!=null).map((m,i)=> m.points+tp.OpponentMatches[i]?.points===0?0.5:(m.points / (m.points+tp.OpponentMatches[i]?.points))))
 // let battle_points = (tp,match_filter=()=>true) => sum(tp.Matches.filter(match_filter).filter(m=>m.win!=null).map((m)=> m.mov))
-let mov = (tp,match_filter=()=>true) => avg(tp.Matches.filter(match_filter).filter(mp=>mp.win!=null).map(mp=>mp.mov))
-let sos_mov = (tp,match_filter=()=>true) => avg(tp.Matches.filter(match_filter).filter(mp=>mp.win!=null && mp.TournamentOpponent).map(mp => avg(mp.TournamentOpponent.Matches.filter(match_filter).filter(mp=>mp.win!=null).map(mp => mp['mov']))))
-let sos_sos = (tp,match_filter=()=>true) => avg(tp.Matches.filter(match_filter).filter(mp=>mp.win!=null && mp.TournamentOpponent).map(mp=>mp.TournamentOpponent.sos))
+let mov = (tp,match_filter=()=>true) => +avg(tp.Matches.filter(match_filter).filter(mp=>mp.win!=null).map(mp=>mp.mov)).toFixed(2)
+let sos_mov = (tp,match_filter=()=>true) => +avg(tp.Matches.filter(match_filter).filter(mp=>mp.win!=null && mp.TournamentOpponent).map(mp => avg(mp.TournamentOpponent.Matches.filter(match_filter).filter(mp=>mp.win!=null).map(mp => mp['mov'])))).toFixed(2)
+let sos_sos = (tp,match_filter=()=>true) => +avg(tp.Matches.filter(match_filter).filter(mp=>mp.win!=null && mp.TournamentOpponent).map(mp=>mp.TournamentOpponent.sos)).toFixed(2)
 let LegionBattlePoints = new TournamentRuleset();
 LegionBattlePoints.POINTS_NAME =  "Victory Points"
 LegionBattlePoints.POINTS_ACRONYM = "VP"
 LegionBattlePoints.TPS_NAME = "Tournament Points"
 LegionBattlePoints.TPS_ACRONYM = "TP"
 LegionBattlePoints.TP_SCORING = (pts,o_pts,win) => win?1:0 // ,Conceded:2,Tabled:3
-LegionBattlePoints.MOV_SCORING = (pts,o_pts,win,draw) => (+pts+ +o_pts)>0?(+pts / (+pts + +o_pts)):0.5
+LegionBattlePoints.MOV_SCORING = (pts,o_pts,win,draw) => +((+pts+ +o_pts)>0?(+pts / (+pts + +o_pts)):0.5).toFixed(2)
 LegionBattlePoints.WIN_SCORING = (pts,o_pts) => pts>o_pts?true:(pts<o_pts?false:null)
 LegionBattlePoints.DRAW_SCORING = () => null
 LegionBattlePoints.MOV_DATATYPE = "numeric"
