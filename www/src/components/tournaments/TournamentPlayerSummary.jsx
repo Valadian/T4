@@ -189,11 +189,11 @@ export default function TournamentPlayerSummary({player, editNameMode, disqualif
         
           {isEditing?<button className="btn btn-sm btn-outline-success" onClick={(event) => {stopPropagation(event);updatePlayerName(player.id);setIsEditing(false)}}><i className="bi bi-save"></i></button>:
 
-          (disqualifyMode?(!player.disqualified?<button className="btn btn-sm btn-outline-danger d-md-rightside" onClick={(event) => {stopPropagation(event);withdrawPlayer(player.id,true);}} title="Disqualify player"><i className="bi bi-slash-circle"></i></button>:
-          <button className="btn btn-sm btn-outline-success  d-md-rightside" onClick={(event) => {stopPropagation(event);withdrawPlayer(player.id,false)}} title="Re-enter player"><i className="bi bi-plus"></i></button>):
-          (isOwner && player.Matches.length===0?<button className="btn btn-sm btn-outline-danger d-md-rightside" onClick={(event) => {stopPropagation(event);deletePlayer(player.id)}}><i className="bi bi-x"></i></button>:<></>))
+          (disqualifyMode?(!player.disqualified?<button className="btn btn-sm btn-outline-danger" onClick={(event) => {stopPropagation(event);withdrawPlayer(player.id,true);}} title="Disqualify player"><i className="bi bi-slash-circle"></i></button>:
+          <button className="btn btn-sm btn-outline-success " onClick={(event) => {stopPropagation(event);withdrawPlayer(player.id,false)}} title="Re-enter player"><i className="bi bi-plus"></i></button>):
+          (isOwner && player.Matches.length===0?<button className="btn btn-sm btn-outline-danger" onClick={(event) => {stopPropagation(event);deletePlayer(player.id)}}><i className="bi bi-x"></i></button>:<></>))
           }
-          {(((editNameMode && !isEditing)||(isMe && !disqualifyMode))?<button className="btn btn-sm btn-outline-primary d-md-rightside" title="Edit Player" onClick={(event) => {stopPropagation(event);setIsEditing(v => !v)}}><i className="bi bi-pen"></i></button>:<></>)}
+          {(((editNameMode && !isEditing)||(isMe && !disqualifyMode))?<button className="btn btn-sm btn-outline-primary" title="Edit Player" onClick={(event) => {stopPropagation(event);setIsEditing(v => !v)}}><i className="bi bi-pen"></i></button>:<></>)}
         </Col>
       </Row>
       <Row style={{maxHeight:(expanded?"500px":null)}} className={"mb-1 match-summary-rows collapsible-content"} >{/*accordion-collapse  id={"TP"+props.player.id.replaceAll("-","")} data-bs-parent="#ladder" accordion-collapse collapse */}
