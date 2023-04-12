@@ -19,6 +19,7 @@ const operationsDoc = `
       location
       start
       public
+      creator_name
       Ladder_aggregate {
         aggregate {
           count

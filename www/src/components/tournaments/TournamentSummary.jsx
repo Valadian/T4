@@ -42,7 +42,7 @@ export default function TournamentSummary({data}) {
                     </div>
                     <div className="col-12 col-lg-6 d-flex row">
                         <span className="col-12 col-sm-6"><i className="bi bi-globe"></i> {data.location}</span>
-                        <span className="col-12 col-sm-6"><PlayerLink data={data.Creator} /></span>
+                        <span className="col-12 col-sm-6"><PlayerLink data={data.Creator} nameOverride={data.creator_name} /></span>
                     </div>
                 </div>
             </div>
