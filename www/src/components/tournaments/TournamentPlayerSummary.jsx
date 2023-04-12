@@ -22,16 +22,11 @@ mutation WithdrawTournamentPlayer($id: uuid!, $disqualified: Boolean = true) {
 }`
 const updateNameDoc = `
 mutation UpdateNameTournamentPlayer($id: uuid = "", $player_name: String = null, $club: String = null) {
-  update_TournamentPlayer_by_pk(pk_columns: {id: $id}, _set: {player_name: $player_name, club: $club}) {
-    player_name
-    club
-    id
+  update_TournamentPlayer(where: {id: {_eq: $id}}, _set: {player_name: $player_name, club: $club}) {
+    affected_rows
   }
   update_MatchPlayer(where: {tournament_player_id: {_eq: $id}}, _set: {player_name: $player_name}) {
-    returning {
-      id
-      player_name
-    }
+    affected_rows
   }
 }`
 export default function TournamentPlayerSummary({player, editNameMode, disqualifyMode}) {
@@ -191,7 +186,7 @@ export default function TournamentPlayerSummary({player, editNameMode, disqualif
 
           (disqualifyMode?(!player.disqualified?<button className="btn btn-sm btn-outline-danger" onClick={(event) => {stopPropagation(event);withdrawPlayer(player.id,true);}} title="Disqualify player"><i className="bi bi-slash-circle"></i></button>:
           <button className="btn btn-sm btn-outline-success " onClick={(event) => {stopPropagation(event);withdrawPlayer(player.id,false)}} title="Re-enter player"><i className="bi bi-plus"></i></button>):
-          (isOwner && player.Matches.length===0?<button className="btn btn-sm btn-outline-danger" onClick={(event) => {stopPropagation(event);deletePlayer(player.id)}}><i className="bi bi-x"></i></button>:<></>))
+          ((isOwner || isMe) && player.Matches.length===0?<button className="btn btn-sm btn-outline-danger" onClick={(event) => {stopPropagation(event);deletePlayer(player.id)}}><i className="bi bi-x"></i></button>:<></>))
           }
           {(((editNameMode && !isEditing)||(isMe && !disqualifyMode))?<button className="btn btn-sm btn-outline-primary" title="Edit Player" onClick={(event) => {stopPropagation(event);setIsEditing(v => !v)}}><i className="bi bi-pen"></i></button>:<></>)}
         </Col>

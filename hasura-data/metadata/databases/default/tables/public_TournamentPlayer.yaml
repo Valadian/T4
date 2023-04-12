@@ -116,15 +116,30 @@ update_permissions:
         - user_id
         - win
       filter:
-        Tournament:
-          creator_id:
-            _eq: X-Hasura-User-Id
-      check: null
+        _or:
+          - Tournament:
+              creator_id:
+                _eq: X-Hasura-User-Id
+          - _and:
+              - user_id:
+                  _eq: X-Hasura-User-Id
+      check:
+        _or:
+          - Tournament:
+              creator_id:
+                _eq: X-Hasura-User-Id
+          - _and:
+              - user_id:
+                  _eq: X-Hasura-User-Id
 delete_permissions:
   - role: user
     permission:
       backend_only: false
       filter:
-        Tournament:
-          creator_id:
-            _eq: X-Hasura-User-Id
+        _or:
+          - Tournament:
+              creator_id:
+                _eq: X-Hasura-User-Id
+          - _and:
+              - user_id:
+                  _eq: X-Hasura-User-Id
