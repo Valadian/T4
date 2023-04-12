@@ -17,7 +17,7 @@ const updateTournamentNameDoc = `
   }
 `;
 
-export default function TournamenNameEditor(props) {
+export default function TournamentNameEditor(props) {
   const [newTournamentName, setNewTournamentName] = useState("");
     const { getAccessTokenSilently } = useAuth0();
     const {tournament, updateTournament} = useContext(TournamentHomeContext);

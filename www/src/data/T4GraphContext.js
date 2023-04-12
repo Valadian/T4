@@ -33,9 +33,10 @@ async function Query(operationName, operationDoc, variables, accessToken) {
         return Promise.reject("No Data Returned");
       }
     })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+    // .catch((error) => {
+    //   console.error("Error:", error);
+    //   throw(error);
+    // });
 }
 
 export default Query;

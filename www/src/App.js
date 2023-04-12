@@ -19,6 +19,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
+        <Route path="e/:short_name" element={<TournamentHome />} />
         <Route path="events" element={<Events />} />
         <Route path="events/:id" element={<TournamentHome />} />
         <Route path="events/add" element={<TournamentEditor />} />

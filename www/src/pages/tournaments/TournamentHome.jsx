@@ -17,9 +17,10 @@ import TournamentReports from "../../components/tournaments/TournamentReports"
 import getScoringConfig from "../../util/rulesets"
 
 const tournamentByIdDoc = `
-  query TournamentById($id: uuid) {
-    Tournament(order_by: {start: desc}, where: {id: {_eq: $id}}) {
+  query TournamentById($id: uuid="00000000-0000-0000-0000-000000000000", $short_name: String = "") {
+    Tournament(order_by: {start: desc}, where:  {_or: [{id: {_nin: ["00000000-0000-0000-0000-000000000000"], _eq: $id}}, {short_name: {_eq: $short_name, _nin: [""]}}]}) {
       id
+      short_name
       name
       description
       location
@@ -122,8 +123,8 @@ const tournamentByIdDoc = `
   }
 `;
 const playerListDoc = `
-query AllPlayerLists($id: uuid = "") {
-    PlayerList(where: {TournamentPlayer: {tournament_id: {_eq: $id}}}) {
+query AllPlayerLists($id: uuid="00000000-0000-0000-0000-000000000000", $short_name: String = "") {
+    PlayerList(where: {TournamentPlayer: {Tournament: {_or: [{id: {_nin: ["00000000-0000-0000-0000-000000000000"], _eq: $id}}, {short_name: {_eq: $short_name, _nin: [""]}}]}}}) {
         tournament_player_id
         id
         faction
@@ -154,7 +155,7 @@ query AllPlayerLists($id: uuid = "") {
 const TournamentHomeContext = createContext()
 
 function TournamentHome() {
-    const { id } = useParams();
+    const { id, short_name } = useParams();
     const { user, getAccessTokenSilently } = useAuth0();
     const [finalizedOnly, setFinalizedOnly] = useState(false);
     const [activeTab, setActiveTab] = useState("ladder")
@@ -290,13 +291,13 @@ function TournamentHome() {
             if (user) {
                 accessToken = await getAccessTokenSilently()
             }
-            await Query("AllPlayerLists",playerListDoc , { id: id },accessToken)
+            Query("AllPlayerLists",playerListDoc , { id: id, short_name: short_name },accessToken)
             .then((response) => {
                 setPlayerLists(Object.fromEntries(response.PlayerList.map(pl => [pl.tournament_player_id,pl])))
             })
         }
         fetchData();
-    },[getAccessTokenSilently, id, user])
+    },[getAccessTokenSilently, id, short_name, user])
     // useEffect(() => {
     //     setConfig(getScoringConfig(tournament?.Game?.key,tournament?.ScoringRuleset?.name))
     // },[tournament])
@@ -313,8 +314,7 @@ function TournamentHome() {
         if (user) {
             accessToken = await getAccessTokenSilently()
         }
-        await Query("TournamentById", tournamentByIdDoc, { id: id },accessToken)
-        .then((response) => {
+        Query("TournamentById", tournamentByIdDoc, { id: id, short_name: short_name},accessToken).then((response) => {
             var tournament = null;
             if (response && response.Tournament && response.Tournament.length > 0) {
                 tournament = response.Tournament[0];
@@ -325,11 +325,11 @@ function TournamentHome() {
         .catch((error) => {
             toaster.current.ShowError(error);
         });
-    },[id, getAccessTokenSilently, user])
+    },[id, short_name, getAccessTokenSilently, user])
 
     useEffect(() => {
         queryTournament();
-    },[id, queryTournament])
+    },[id, short_name, queryTournament])
 
     const updateTournament = () => {
         queryTournament();
@@ -383,12 +383,14 @@ function TournamentHome() {
                     tps={listModalTps}
                     match={listModalMatch}
                 />
+                <div className="position-relative">
+                    <Toaster ref={toaster} />
+                </div>
                 {breadcrumbs()}
                 {isOwner && !tournament.public?<>
                     <h2 className="text-warning">This event is a Draft and hidden</h2>
                     <p className="text-muted">Click <b>Draft</b> toggle below to make public</p>
                 </>:<></>}
-                <Toaster ref={toaster} />
                 {isOwner?<TournamentAdminHeader/>:<TournamentHeader/>}
                 {(isOwner && tournament.signups_open && tournament.Rounds.length>0 && tournament.Rounds[0].Matches.length>0) ?<h2 className="text-warning">Round 1 matchups generated but sign ups remain open (Disable above)</h2>:<></>}
                 <Tabs

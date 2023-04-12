@@ -1,8 +1,6 @@
 import { React, useState, useContext } from "react";
 import format from "date-fns/format";
-import { Button } from "react-bootstrap";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
+import { Col, Row, Button, Form, FloatingLabel } from "react-bootstrap";
 import TournamentAdminEditor from "./TournamentAdminEditor";
 import TournamentDateEditor from "./TournamentDateEditor";
 import TournamentLadderToggle from "./TournamentLadderToggle";
@@ -14,8 +12,10 @@ import TournamentNameEditor from "./TournamentNameEditor";
 import TournamentPlayerEditor from "./TournamentPlayerEditor";
 import TournamentRegistrationToggle from "./TournamentRegistrationToggle";
 import TournamentDeleteModal from "./TournamentDeleteModal";
+import TournamentShortNameEditor from "./TournamentShortNameEditor"
 import { TournamentHomeContext } from "../../pages/tournaments/TournamentHome";
 import ReactMarkdown from 'react-markdown'
+
 
 function TournamentAdminHeader(props) {
   const [showTournamentDateEditor, setShowTournamentDateEditor] =
@@ -43,6 +43,9 @@ function TournamentAdminHeader(props) {
     useState(false);
   const [showDeleteModal, setShowDeleteModal] =
     useState(false);
+    
+  const [uniqueName, setUniqueName] = useState("");
+  const [editingUniqueName, setEditingUniqueName] = useState(false);
 
   var list_visibility = tournament.lists_visible ? "visible" : "hidden";
   var list_availability = tournament.lists_locked
@@ -61,38 +64,39 @@ function TournamentAdminHeader(props) {
   return (
     <div>
       <Row>
-        <Col xs={10} md={11} >
-          <h2 className="">{tournament.name || "Fetching Event..."}</h2>
-        </Col>
-        <Col xs={2} md={1}>
+        <div className="d-flex">
+          <h2 className="w-100">{tournament.name || "Fetching Event..."}</h2>
           <button className="btn btn-outline-primary" onClick={() => {
                       setShowTournamentNameEditor(true);
                     }} title="Edit Title"><i className="bi bi-pen"></i></button>
-                  
-          <TournamentNameEditor
-            show={showTournamentNameEditor}
-            onHide={() => setShowTournamentNameEditor(false)}/>
-          
-        </Col>
+        </div>
+        <TournamentNameEditor
+          show={showTournamentNameEditor}
+          onHide={() => setShowTournamentNameEditor(false)}/>
       </Row>
       <h4 className="text-secondary" style={{ fontVariant: ["small-caps"] }}>
         {tournament.Game.value || "Fetching Game..."}
       </h4>
-      <Row>
-        <Col xs={10} md={11} >
-          <div className="card">
-          <ReactMarkdown className="card-body pb-0">{tournament.description}</ReactMarkdown></div>
-        </Col>
-        <Col xs={2} md={1}>
+      <Row className="mb-3">
+        <div className="d-flex">
+          <div className="card card-no-grow h-100 w-100">
+            <div className="card-body pb-0">
+            {tournament.description.length===0?<p className="text-muted">Description goes here</p>:
+            <ReactMarkdown>{tournament.description}</ReactMarkdown>}
+            </div>
+          </div>
           <button className="btn btn-outline-primary" onClick={() => {
                     setShowTournamentDescriptionEditor(true);
                   }} title="Edit Description"><i className="bi bi-pen"></i></button>
                   
-          <TournamentDescriptionEditor
-            show={showTournamentDescriptionEditor}
-            onHide={() => setShowTournamentDescriptionEditor(false)}
-          />
-        </Col>
+        </div>
+        <TournamentDescriptionEditor
+          show={showTournamentDescriptionEditor}
+          onHide={() => setShowTournamentDescriptionEditor(false)}
+        />
+      </Row>
+      <Row>
+        <TournamentShortNameEditor></TournamentShortNameEditor>
       </Row>
       <Row className="pt-3 small">
         {/* Timezone issue: day of the month may be off by one depending on tz; 

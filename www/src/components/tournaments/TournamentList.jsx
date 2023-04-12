@@ -14,6 +14,7 @@ const operationsDoc = `
     }
     Tournament(limit: $pageSize, offset: $offset, where: $whereExpr, order_by: {start: $orderBy}) {
       id
+      short_name
       name
       location
       start
